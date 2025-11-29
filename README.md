@@ -40,7 +40,7 @@ O objetivo é evitar reprovações por falta e garantir a manutenção de benef�
 | :--- | :--- | :--- |
 | **Nicolas Viana Alves** | Full-Stack, Back-end, Documentação | [@naicolas-br](https://github.com/naicolas-br) |
 | **Bruno Felix Seixas** | Front-end, Testes, Design | [@obrunofelix](https://github.com/obrunofelix) |
-| **Igor Thiago Costa Rodrigues** | Front-end, Mobile/PWA, UI/UX | |
+| **Igor Thiago Costa Rodrigues** | Front-end, Mobile/PWA, UI/UX | [@luxxzvh](https://github.com/luxxzvh) |
 
 ---
 
