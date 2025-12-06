@@ -51,7 +51,7 @@ O objetivo é evitar reprovações por falta e garantir a manutenção de benef�
 ### 🏗️ Fase 1: Configuração & Back-end (02/12 - 10/12)
 - [x] Criar repositório e configurar Git.
 - [x] Instalar Laravel e configurar ambiente (`.env`).
-- [ ] **Banco de Dados:** Criar Migrations (Users, Disciplinas, Frequencias).
+- [x] **Banco de Dados:** Criar Migrations (Users, Disciplinas, Frequencias).
 - [ ] **Banco de Dados:** Criar Models e Relationships.
 - [ ] **API:** Criar Controllers básicos (CRUD Disciplinas).
 - [ ] Implementar Autenticação (Laravel Breeze/Sanctum).
