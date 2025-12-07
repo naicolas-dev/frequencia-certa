@@ -46,8 +46,21 @@ class User extends Authenticatable
         ];
     }
 
-    public function disciplinas()
+
+    /* Relacionamento 1:N: Um Aluno tem várias Disciplinas.
+     */
+    public function disciplinas(): HasMany
     {
+        // Usa a foreign key 'user_id' na tabela 'disciplinas'
         return $this->hasMany(Disciplina::class);
+    }
+
+    /**
+     * Relacionamento 1:N: Um Aluno tem vários registros de Frequencia.
+     */
+    public function frequencias(): HasMany
+    {
+        // Usa a foreign key 'user_id' na tabela 'frequencias'
+        return $this->hasMany(Frequencia::class);
     }
 }
