@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class HorarioAula extends Model
+class GradeHoraria extends Model
 {
     protected $table = 'horario_aulas';
 
