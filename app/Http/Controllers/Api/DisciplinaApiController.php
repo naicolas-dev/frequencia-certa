@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Disciplina;
 use Illuminate\Http\JsonResponse; // Usar para tipagem do retorno
 
-class DisciplinaController extends Controller
+class DisciplinaApiController extends Controller
 {
 
     /**
