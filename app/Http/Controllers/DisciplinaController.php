@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Importante importar o Auth
+use Illuminate\Support\Facades\Auth;
 
 class DisciplinaController extends Controller
 {
     public function index()
     {
-        // Pega as disciplinas APENAS do usuário logado
-        $disciplinas = Auth::user()->disciplinas;
+        /**
+         * ALTERAÇÃO IMPORTANTE:
+         * Usamos o 'with' para trazer junto os Horários e Frequências.
+         * Isso evita que o sistema vá no banco de dados 10 vezes se o aluno tiver 10 matérias.
+         */ 
+        $disciplinas = Auth::user()->disciplinas()->with(['horarios', 'frequencias'])->get();
         
-        // Retorna a view 'dashboard' enviando os dados
         return view('dashboard', compact('disciplinas'));
     }
 }
