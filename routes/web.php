@@ -25,6 +25,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Isso vai listar as disciplinas ao logar, em vez de mostrar uma tela vazia
     Route::get('/dashboard', [DisciplinaController::class, 'index'])->name('dashboard');
 
+    // Rota para MOSTRAR o formulário
+    Route::get('/disciplinas/criar', [DisciplinaController::class, 'create'])->name('disciplinas.create');
+
+    // Rota para SALVAR os dados do formulário
+    Route::post('/disciplinas', [DisciplinaController::class, 'store'])->name('disciplinas.store');
+
     // Rotas de Perfil (Necessárias para o funcionamento do Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -18,4 +18,29 @@ class DisciplinaController extends Controller
         
         return view('dashboard', compact('disciplinas'));
     }
+
+    // 1. Mostra a tela de cadastro
+    public function create()
+    {
+        return view('disciplinas.create');
+    }
+
+    // 2. Recebe os dados e salva no banco
+    public function store(Request $request)
+    {
+        // Validação básica (O nome é obrigatório)
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'cor' => 'required|string|max:7', // Ex: #FF0000
+        ]);
+
+        // Cria a disciplina vinculada ao usuário logado
+        Auth::user()->disciplinas()->create([
+            'nome' => $request->nome,
+            'cor' => $request->cor,
+        ]);
+
+        // Redireciona para o Dashboard com mensagem de sucesso
+        return redirect()->route('dashboard')->with('success', 'Disciplina criada com sucesso!');
+    }
 }
