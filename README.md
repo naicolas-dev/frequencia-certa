@@ -59,8 +59,8 @@ O objetivo é evitar reprovações por falta e garantir a manutenção de benef�
 ### 🎨 Fase 2: Front-end & Interface (11/12 - 20/12)
 - [x] Definir Paleta de Cores e Identidade Visual.
 - [x] **Tela Login/Cadastro:** Criar layout responsivo.
-- [ ] **Tela Grade (Web):** Criar tabela de horários desktop.
-- [ ] **Tela Grade (Mobile):** Criar sistema de abas por dia da semana.
+- [x] **Tela Grade (Web):** Criar tabela de horários desktop.
+- [x] **Tela Grade (Mobile):** Criar sistema de abas por dia da semana.
 - [x] **Componentes:** Criar Cards de matéria com indicadores de cor.
 
 ### 🧠 Fase 3: Lógica & Integração (21/12 - 05/01)
