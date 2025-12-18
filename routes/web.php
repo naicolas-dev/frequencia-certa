@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DisciplinaController;
 use App\Http\Controllers\GradeHorariaController;
+use App\Http\Controllers\GradeGeralController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Apagar horário
     Route::delete('/grade/{id}', [GradeHorariaController::class, 'destroy'])->name('grade.destroy');
+
+    // Rota da Grade Geral (Visão Completa)
+    Route::get('/grade-geral', [GradeGeralController::class, 'index'])->name('grade.geral');
 
 // --- ROTAS DE DISCIPLINAS ---
     Route::get('/disciplinas', [DisciplinaController::class, 'index'])->name('disciplinas');
