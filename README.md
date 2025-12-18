@@ -57,11 +57,11 @@ O objetivo é evitar reprovações por falta e garantir a manutenção de benef�
 - [ ] Implementar Autenticação (Laravel Breeze/Sanctum).
 
 ### 🎨 Fase 2: Front-end & Interface (11/12 - 20/12)
-- [ ] Definir Paleta de Cores e Identidade Visual.
-- [ ] **Tela Login/Cadastro:** Criar layout responsivo.
+- [x] Definir Paleta de Cores e Identidade Visual.
+- [x] **Tela Login/Cadastro:** Criar layout responsivo.
 - [ ] **Tela Grade (Web):** Criar tabela de horários desktop.
 - [ ] **Tela Grade (Mobile):** Criar sistema de abas por dia da semana.
-- [ ] **Componentes:** Criar Cards de matéria com indicadores de cor.
+- [x] **Componentes:** Criar Cards de matéria com indicadores de cor.
 
 ### 🧠 Fase 3: Lógica & Integração (21/12 - 05/01)
 - [ ] **Lógica:** Algoritmo de cálculo de % de frequência.
