@@ -58,7 +58,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('api.frequencia.falta');
 
     // Rotas da API de Frequência (Usando só o FrequenciaController)
-    Route::get('/api/aulas-hoje', [FrequenciaController::class, 'aulasDeHoje']);
+    Route::get('/api/buscar-aulas', [FrequenciaController::class, 'buscarPorData']);
     Route::post('/api/registrar-chamada', [FrequenciaController::class, 'registrarLote']);
 
     // Rotas de Perfil (Necessárias para o funcionamento do Breeze)
