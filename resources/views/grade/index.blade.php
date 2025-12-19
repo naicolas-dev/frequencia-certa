@@ -1,94 +1,115 @@
 <x-app-layout>
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob dark:bg-blue-900/20"></div>
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000 dark:bg-purple-900/20"></div>
+        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-emerald-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000 dark:bg-emerald-900/20"></div>
+    </div>
+
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <a href="{{ route('dashboard') }}" class="group p-2 -ml-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800/50 transition">
+                <svg class="w-6 h-6 text-gray-600 dark:text-gray-300 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </a>
+            
             <div class="flex items-center gap-3">
-                <a href="{{ route('dashboard') }}" class="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    <svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
-                </a>
-                <div class="flex items-center gap-2">
-                    <div class="w-3 h-3 rounded-full shadow-sm" style="background-color: {{ $disciplina->cor }}"></div>
-                    <h2 class="font-bold text-lg text-gray-800 dark:text-white leading-tight truncate max-w-[150px]">
+                <div class="w-4 h-4 rounded-full shadow-lg ring-2 ring-white/50 dark:ring-white/10" style="background-color: {{ $disciplina->cor }}"></div>
+                <div>
+                    <h2 class="font-bold text-xl text-gray-900 dark:text-white leading-tight truncate max-w-[200px]">
                         {{ $disciplina->nome }}
                     </h2>
+                    <p class="text-[10px] uppercase tracking-widest text-gray-500 dark:text-gray-400 font-bold">Configurar Horários</p>
                 </div>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-6">
+    <div class="py-6 pb-24">
         <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
-            <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 p-5">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Novo Horário</h3>
+            <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-[2.5rem] shadow-sm border border-white/20 dark:border-gray-800 p-6 sm:p-8 relative overflow-hidden">
+                
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-6 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Novo Horário
+                </h3>
                 
                 <form action="{{ route('grade.store', $disciplina->id) }}" method="POST" x-data="{ dia: '1' }">
                     @csrf
                     
-                    <div class="mb-6">
-                        <label class="block text-xs font-bold text-gray-500 mb-2">Dia da Semana</label>
-                        <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                    <div class="mb-8">
+                        <label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-3 ml-1">Dia da Semana</label>
+                        <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-2 px-2 snap-x">
                             @php
-                                $dias = [
-                                    1 => 'Seg', 2 => 'Ter', 3 => 'Qua', 
-                                    4 => 'Qui', 5 => 'Sex', 6 => 'Sab'
-                                ];
+                                $dias = [1 => 'Seg', 2 => 'Ter', 3 => 'Qua', 4 => 'Qui', 5 => 'Sex', 6 => 'Sab'];
                             @endphp
                             
                             @foreach($dias as $k => $d)
-                                <label class="cursor-pointer">
+                                <label class="cursor-pointer snap-center shrink-0">
                                     <input type="radio" name="dia_semana" value="{{ $k }}" class="sr-only" x-model="dia">
-                                    <span class="px-4 py-3 rounded-xl text-sm font-bold border transition-all inline-block min-w-[60px] text-center"
+                                    <div class="px-5 py-3 rounded-2xl text-sm font-bold transition-all duration-300 transform active:scale-95 border"
                                           :class="dia == '{{ $k }}' 
-                                            ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/30' 
-                                            : 'bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-gray-600'">
+                                            ? 'bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/30 border-transparent scale-105' 
+                                            : 'bg-white/40 dark:bg-black/20 text-gray-600 dark:text-gray-400 border-white/20 dark:border-gray-700 hover:bg-white/60 dark:hover:bg-gray-800/60'">
                                         {{ $d }}
-                                    </span>
+                                    </div>
                                 </label>
                             @endforeach
                         </div>
                     </div>
 
-                    <div class="flex gap-4 mb-6">
-                        <div class="flex-1">
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Início</label>
-                            <input type="time" name="horario_inicio" required class="w-full text-center rounded-xl bg-gray-50 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-blue-500 dark:text-white py-3 font-mono text-lg font-bold">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="flex-1 relative group">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Início</label>
+                            <input type="time" name="horario_inicio" required 
+                                class="w-full text-center rounded-2xl bg-white/50 dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:text-white py-4 font-mono text-xl font-bold shadow-sm transition-all group-hover:bg-white/80 dark:group-hover:bg-black/30">
                         </div>
-                        <div class="flex items-end pb-3 text-gray-400">
+                        
+                        <div class="pt-6 text-gray-400">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                         </div>
-                        <div class="flex-1">
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Fim</label>
-                            <input type="time" name="horario_fim" required class="w-full text-center rounded-xl bg-gray-50 dark:bg-gray-700 border-0 focus:ring-2 focus:ring-blue-500 dark:text-white py-3 font-mono text-lg font-bold">
+
+                        <div class="flex-1 relative group">
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2 ml-1">Fim</label>
+                            <input type="time" name="horario_fim" required 
+                                class="w-full text-center rounded-2xl bg-white/50 dark:bg-black/20 border border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:text-white py-4 font-mono text-xl font-bold shadow-sm transition-all group-hover:bg-white/80 dark:group-hover:bg-black/30">
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-black dark:bg-white dark:text-black text-white font-bold py-3.5 rounded-xl shadow-lg active:scale-[0.98] transition flex justify-center items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                        Adicionar Horário
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-blue-600/20 active:scale-[0.98] transition-all flex justify-center items-center gap-2 group">
+                        <span>Adicionar à Grade</span>
+                        <div class="bg-white/20 p-1 rounded-full group-hover:rotate-90 transition-transform">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        </div>
                     </button>
                 </form>
             </div>
 
             <div>
-                <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4 px-1">Horários Definidos</h3>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-5 px-2 flex items-center justify-between">
+                    <span>Horários Definidos</span>
+                    <span class="text-xs bg-white/50 dark:bg-gray-800/50 px-3 py-1 rounded-full text-gray-500 border border-white/20">{{ $disciplina->horarios->count() }} aulas</span>
+                </h3>
                 
                 @if($disciplina->horarios->count() > 0)
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         @foreach($disciplina->horarios->sortBy('dia_semana') as $horario)
-                            <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 flex justify-between items-center group">
+                            <div class="group bg-white/70 dark:bg-gray-900/70 backdrop-blur-md rounded-3xl p-5 shadow-sm border border-white/40 dark:border-gray-800 flex justify-between items-center transition-all hover:scale-[1.02] hover:shadow-md relative overflow-hidden">
                                 
-                                <div class="flex items-center gap-4">
-                                    <div class="flex flex-col items-center justify-center w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-600 dark:text-blue-400">
-                                        <span class="text-[10px] font-bold uppercase">Dia</span>
-                                        <span class="text-lg font-extrabold leading-none">
+                                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 pointer-events-none"></div>
+
+                                <div class="flex items-center gap-5">
+                                    <div class="flex flex-col items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-gray-700 shadow-inner">
+                                        <span class="text-[10px] font-bold uppercase opacity-60">Dia</span>
+                                        <span class="text-xl font-extrabold leading-none tracking-tight">
                                             {{ substr(\Carbon\Carbon::parse("2023-01-0{$horario->dia_semana}")->locale('pt_BR')->dayName, 0, 3) }}
                                         </span>
                                     </div>
                                     
                                     <div>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 font-medium">Horário da aula</p>
-                                        <p class="font-mono font-bold text-gray-800 dark:text-gray-200 text-lg">
-                                            {{ \Carbon\Carbon::parse($horario->horario_inicio)->format('H:i') }} - 
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-0.5">Horário</p>
+                                        <p class="font-mono font-bold text-gray-800 dark:text-white text-xl tracking-tight">
+                                            {{ \Carbon\Carbon::parse($horario->horario_inicio)->format('H:i') }} 
+                                            <span class="text-gray-300 dark:text-gray-600 mx-1">-</span> 
                                             {{ \Carbon\Carbon::parse($horario->horario_fim)->format('H:i') }}
                                         </p>
                                     </div>
@@ -97,7 +118,7 @@
                                 <form action="{{ route('grade.destroy', $horario->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition">
+                                    <button type="submit" class="p-3 text-red-400 hover:text-red-600 bg-red-50/50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-2xl transition-colors border border-transparent hover:border-red-200 dark:hover:border-red-800">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                     </button>
                                 </form>
@@ -105,9 +126,12 @@
                         @endforeach
                     </div>
                 @else
-                    <div class="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl opacity-60">
-                        <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <p class="text-gray-500 font-medium">Nenhum horário ainda.</p>
+                    <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-gray-300/50 dark:border-gray-700/50 rounded-[2.5rem] bg-white/20 dark:bg-black/10 backdrop-blur-sm">
+                        <div class="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4 shadow-sm">
+                            <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <p class="text-gray-900 dark:text-white font-bold text-lg">Sem horários</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 max-w-[200px]">Adicione quando são as aulas desta matéria acima.</p>
                     </div>
                 @endif
             </div>
