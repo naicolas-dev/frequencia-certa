@@ -64,11 +64,11 @@ O objetivo é evitar reprovações por falta e garantir a manutenção de benef�
 - [x] **Componentes:** Criar Cards de matéria com indicadores de cor.
 
 ### 🧠 Fase 3: Lógica & Integração (21/12 - 05/01)
-- [ ] **Lógica:** Algoritmo de cálculo de % de frequência.
+- [x] **Lógica:** Algoritmo de cálculo de % de frequência.
 - [ ] **Lógica:** Sistema de projeção de dias letivos.
-- [ ] Conectar Front-end com a API (Axios/Fetch).
+- [x] Conectar Front-end com a API (Axios/Fetch).
 - [ ] Implementar funcionalidade "Marcar Feriado/Sem Aula".
-- [ ] Implementar funcionalidade "Registrar Presença".
+- [x] Implementar funcionalidade "Registrar Presença".
 
 ### 📱 Fase 4: PWA & Finalização (06/01 - 01/02)
 - [ ] Configurar `manifest.json` (Ícones, Nome, Cores).
