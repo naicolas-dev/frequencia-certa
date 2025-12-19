@@ -41,12 +41,6 @@
                         Vamos manter o foco nos estudos hoje?
                     </p>
                 </div>
-                <div class="hidden md:block">
-                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-600 dark:text-gray-300 shadow-sm">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        Ano Letivo {{ date('Y') }}
-                    </span>
-                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -106,7 +100,7 @@
                             <div>
                                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/20 backdrop-blur-md text-xs font-semibold mb-3 border border-white/10">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    {{ \Carbon\Carbon::now()->locale('pt_BR')->dayName }}
+                                    {{ date('d/m/y -') }} {{ \Carbon\Carbon::now()->locale('pt_BR')->dayName }} 
                                 </div>
                                 <h2 class="text-2xl sm:text-3xl font-bold leading-tight">Registrar<br>Presença Diária</h2>
                             </div>
@@ -197,14 +191,20 @@
             <div>
                 <div class="flex items-center justify-between px-1 mb-6">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Minhas Matérias</h3>
-                    
-                    <a id="tour-nova-materia" href="{{ route('disciplinas.criar') }}" class="hidden lg:inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Nova Matéria
-                    </a>
-                </div>
+                    </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    
+                    <a href="{{ route('disciplinas.criar') }}" 
+                       id="tour-nova-materia"
+                       class="hidden md:flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group min-h-[200px]">
+                        <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Nova Matéria</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">Adicionar à grade</p>
+                    </a>
+
                     @forelse($disciplinas as $disciplina)
                         @php
                             $totalRegistros = $disciplina->frequencias->count();
@@ -273,8 +273,8 @@
                             </div>
                         </div>
                     @empty
-                        <div class="col-span-full py-16 text-center border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl opacity-50">
-                            <p class="text-gray-500 font-medium">Nenhuma disciplina cadastrada ainda.</p>
+                        <div class="col-span-full py-16 text-center md:hidden">
+                            <p class="text-gray-500 font-medium">Nenhuma disciplina cadastrada.</p>
                         </div>
                     @endforelse
                 </div>
@@ -284,124 +284,70 @@
     </div>
 
     @if(Auth::user()->has_seen_intro && !Auth::user()->has_completed_tour)
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const driver = window.driver.js.driver;
-        const isMobile = window.innerWidth < 1024;
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const driver = window.driver.js.driver;
+            const isMobile = window.innerWidth < 1024;
 
-        // 1. Definição dos Passos (Focados e Curtos)
-        let tourSteps = [
-            { 
-                element: '#tour-chamada', 
-                popover: { 
-                    title: 'Chamada Rápida', 
-                    description: 'Clique aqui para registrar sua presença do dia. O sistema identifica as aulas automaticamente.' 
-                } 
-            },
-            { 
-                element: '#tour-status', 
-                popover: { 
-                    title: 'Seu Painel', 
-                    description: 'Acompanhe sua frequência global e veja alertas de matérias em risco.' 
-                } 
+            let tourSteps = [
+                { 
+                    element: '#tour-chamada', 
+                    popover: { 
+                        title: 'Chamada Rápida', 
+                        description: 'Registre sua presença do dia com um clique aqui. O sistema identifica as aulas automaticamente.' 
+                    } 
+                },
+                { 
+                    element: '#tour-status', 
+                    popover: { 
+                        title: 'Seu Painel', 
+                        description: 'Acompanhe sua frequência global e veja alertas de matérias em risco.' 
+                    } 
+                }
+            ];
+
+            if (isMobile) {
+                tourSteps.push(
+                    { element: '#tour-add-mobile', popover: { title: 'Nova Matéria', description: 'Toque no botão central para adicionar suas disciplinas.' } },
+                    { element: '#tour-grade-mobile', popover: { title: 'Sua Grade', description: 'Veja e configure seus horários nesta aba.' } },
+                    { element: '#tour-profile-mobile', popover: { title: 'Seu Perfil', description: 'Gerencie sua conta e configurações aqui.' } }
+                );
+            } else {
+                tourSteps.push(
+                    { element: '#tour-nova-materia', popover: { title: 'Nova Matéria', description: 'Comece clicando aqui para cadastrar disciplinas.' } },
+                    { element: '#tour-grade-desktop', popover: { title: 'Grade Horária', description: 'Acesse a visão completa da sua semana.' } },
+                    { element: '#tour-theme-toggle', popover: { title: 'Modo Noturno', description: 'Prefere estudar à noite? Troque o tema aqui.' } }
+                );
             }
-        ];
 
-        // 2. Lógica Responsiva (Mobile First)
-        if (isMobile) {
-            tourSteps.push(
-                { 
-                    element: '#tour-add-mobile', 
-                    popover: { 
-                        title: 'Nova Matéria', 
-                        description: 'Toque no botão central para adicionar suas disciplinas.' 
-                    } 
-                },
-                { 
-                    element: '#tour-grade-mobile', 
-                    popover: { 
-                        title: 'Grade Horária', 
-                        description: 'Configure seus horários de aula nesta aba.' 
-                    } 
-                },
-                { 
-                    element: '#tour-profile-mobile', 
-                    popover: { 
-                        title: 'Seu Perfil', 
-                        description: 'Gerencie sua conta e configurações aqui.' 
-                    } 
-                },
-                { 
-                    element: '#tour-theme-toggle', 
-                    popover: { 
-                        title: 'Modo Noturno', 
-                        description: 'Prefere estudar à noite? Troque o tema aqui.' 
-                    } 
-                }
-            );
-        } else {
-            // Desktop Steps
-            tourSteps.push(
-                { 
-                    element: '#tour-nova-materia', 
-                    popover: { 
-                        title: 'Adicionar Matéria', 
-                        description: 'Comece criando suas disciplinas neste botão.' 
-                    } 
-                },
-                { 
-                    element: '#tour-grade-desktop', 
-                    popover: { 
-                        title: 'Grade Completa', 
-                        description: 'Visualize sua semana inteira aqui.' 
-                    } 
-                },
-                { 
-                    element: '#tour-theme-toggle', 
-                    popover: { 
-                        title: 'Modo Noturno', 
-                        description: 'Prefere estudar à noite? Troque o tema aqui.' 
-                    } 
-                }
-            );
-        }
+            const finalizarTour = () => {
+                fetch('{{ route("tour.finish") }}', {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
+                });
+                driverObj.destroy();
+            };
 
-        // 3. Função de Finalização (Reutilizável)
-        const finalizarTour = () => {
-            fetch('{{ route("tour.finish") }}', {
-                method: 'POST',
-                headers: { 
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}', 
-                    'Content-Type': 'application/json' 
+            const driverObj = driver({
+                showProgress: true,
+                allowClose: true,
+                animate: true,
+                nextBtnText: 'Próximo',
+                prevBtnText: 'Voltar',
+                doneBtnText: 'Concluir',
+                steps: tourSteps,
+  
+                onDestroyStarted: () => {
+                    finalizarTour();
                 }
             });
-            driverObj.destroy();
-        };
 
-        // 4. Instância do Driver
-        const driverObj = driver({
-            showProgress: true,
-            allowClose: true, // Obriga a usar os botões (UX controlada)
-            animate: true,
-            
-            // Textos
-            nextBtnText: 'Próximo',
-            prevBtnText: 'Voltar',
-            doneBtnText: 'Concluir',
-
-            steps: tourSteps,
-
-            onDestroyStarted: () => {
-                finalizarTour();
-            }
+            setTimeout(() => {
+                driverObj.drive();
+            }, 1000);
         });
-
-        // Inicia após renderização completa
-        setTimeout(() => {
-            driverObj.drive();
-        }, 800);
-    });
-</script>
-@endif
+    </script>
+    @endif
 
 </x-app-layout>
