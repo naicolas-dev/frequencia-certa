@@ -330,6 +330,13 @@
                         title: 'Seu Perfil', 
                         description: 'Gerencie sua conta e configurações aqui.' 
                     } 
+                },
+                { 
+                    element: '#tour-theme-toggle', 
+                    popover: { 
+                        title: 'Modo Noturno', 
+                        description: 'Prefere estudar à noite? Troque o tema aqui.' 
+                    } 
                 }
             );
         } else {
