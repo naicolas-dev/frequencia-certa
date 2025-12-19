@@ -40,6 +40,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // --- ROTAS DE DISCIPLINAS ---
     Route::get('/disciplinas', [DisciplinaController::class, 'index'])->name('disciplinas');
+    Route::get('/disciplinas/{id}/editar', [DisciplinaController::class, 'edit'])->name('disciplinas.edit');
+    Route::put('/disciplinas/{id}', [DisciplinaController::class, 'update'])->name('disciplinas.update');
+    Route::delete('/disciplinas/{id}', [DisciplinaController::class, 'destroy'])->name('disciplinas.destroy');
 
     // Isso vai listar as disciplinas ao logar, em vez de mostrar uma tela vazia
     Route::get('/dashboard', function () {

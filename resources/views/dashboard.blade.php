@@ -204,69 +204,79 @@
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    @forelse($disciplinas as $disciplina)
-                        @php
-                            $totalRegistros = $disciplina->frequencias->count();
-                            $totalFaltas = $disciplina->frequencias->where('presente', false)->count();
-                            $porcentagem = 100;
-                            if ($totalRegistros > 0) {
-                                $porcentagem = round((($totalRegistros - $totalFaltas) / $totalRegistros) * 100);
-                            }
-                            $corBarra = 'bg-emerald-500';
-                            $corTexto = 'text-emerald-600 dark:text-emerald-400';
-                            if($porcentagem < 75) {
-                                $corBarra = 'bg-red-500';
-                                $corTexto = 'text-red-600 dark:text-red-400';
-                            } elseif($porcentagem < 85) {
-                                $corBarra = 'bg-yellow-500';
-                                $corTexto = 'text-yellow-600 dark:text-yellow-400';
-                            }
-                        @endphp
+    @forelse($disciplinas as $disciplina)
+        @php
+            $totalRegistros = $disciplina->frequencias->count();
+            $totalFaltas = $disciplina->frequencias->where('presente', false)->count();
+            $porcentagem = 100;
+            if ($totalRegistros > 0) {
+                $porcentagem = round((($totalRegistros - $totalFaltas) / $totalRegistros) * 100);
+            }
+            $corBarra = 'bg-emerald-500';
+            $corTexto = 'text-emerald-600 dark:text-emerald-400';
+            if($porcentagem < 75) {
+                $corBarra = 'bg-red-500';
+                $corTexto = 'text-red-600 dark:text-red-400';
+            } elseif($porcentagem < 85) {
+                $corBarra = 'bg-yellow-500';
+                $corTexto = 'text-yellow-600 dark:text-yellow-400';
+            }
+        @endphp
 
-                        <div class="group bg-white/70 dark:bg-gray-900/70 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
-                            <div class="h-2 w-full absolute top-0 left-0" style="background-color: {{ $disciplina->cor ?? '#3B82F6' }}"></div>
-                            
-                            <div class="p-6">
-                                <div class="flex justify-between items-start mb-6">
-                                    <h4 class="text-lg font-bold text-gray-900 dark:text-white truncate pr-4 leading-tight">
-                                        {{ $disciplina->nome }}
-                                    </h4>
-                                    <div class="flex flex-col items-end">
-                                        <span class="text-3xl font-extrabold text-gray-900 dark:text-white leading-none tracking-tighter">
-                                            {{ $totalFaltas }}
-                                        </span>
-                                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Faltas</span>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-2">
-                                    <div class="flex justify-between items-end">
-                                        <span class="text-xs font-medium text-gray-400">Frequência</span>
-                                        <span class="text-sm font-bold {{ $corTexto }}">{{ $porcentagem }}%</span>
-                                    </div>
-                                    <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden">
-                                        <div class="h-full rounded-full transition-all duration-1000 {{ $corBarra }}" style="width: {{ $porcentagem }}%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-black/20 flex justify-between items-center">
-                                <a href="{{ route('grade.index', $disciplina->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-700 transition flex items-center gap-1">
-                                    Configurar
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                                </a>
-                                <span class="text-xs font-medium text-gray-400 flex items-center gap-1">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    {{ $disciplina->horarios->count() }} aulas
-                                </span>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-span-full py-16 text-center border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl opacity-50">
-                            <p class="text-gray-500 font-medium">Nenhuma disciplina cadastrada ainda.</p>
-                        </div>
-                    @endforelse
+        <div class="group bg-white/70 dark:bg-gray-900/70 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+            <div class="h-2 w-full absolute top-0 left-0" style="background-color: {{ $disciplina->cor ?? '#3B82F6' }}"></div>
+            
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-6">
+                    <h4 class="text-lg font-bold text-gray-900 dark:text-white truncate pr-4 leading-tight">
+                        {{ $disciplina->nome }}
+                    </h4>
+                    <div class="flex flex-col items-end">
+                        <span class="text-3xl font-extrabold text-gray-900 dark:text-white leading-none tracking-tighter">
+                            {{ $totalFaltas }}
+                        </span>
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Faltas</span>
+                    </div>
                 </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-end">
+                        <span class="text-xs font-medium text-gray-400">Frequência</span>
+                        <span class="text-sm font-bold {{ $corTexto }}">{{ $porcentagem }}%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-1000 {{ $corBarra }}" style="width: {{ $porcentagem }}%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-black/20 flex justify-between items-center">
+                <a href="{{ route('grade.index', $disciplina->id) }}" class="text-xs font-bold text-blue-600 hover:text-blue-700 transition flex items-center gap-1 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Grade
+                </a>
+
+                <div class="flex items-center gap-1">
+                    <a href="{{ route('disciplinas.edit', $disciplina->id) }}" class="p-2 text-gray-400 hover:text-blue-500 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition" title="Editar Matéria">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                    </a>
+
+                    <form action="{{ route('disciplinas.destroy', $disciplina->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta matéria? Todas as faltas serão apagadas.');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="p-2 text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition" title="Excluir Matéria">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @empty
+        <div class="col-span-full py-16 text-center border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-3xl opacity-50">
+            <p class="text-gray-500 font-medium">Nenhuma disciplina cadastrada ainda.</p>
+        </div>
+    @endforelse
+</div>
             </div>
 
         </div>
