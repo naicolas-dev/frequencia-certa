@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DisciplinaController;
 use App\Http\Controllers\GradeHorariaController;
 use App\Http\Controllers\GradeGeralController;
+use App\Http\Controllers\FrequenciaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,14 +41,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // --- ROTAS DE DISCIPLINAS ---
     Route::get('/disciplinas', [DisciplinaController::class, 'index'])->name('disciplinas');
 
-    // ✅ CORREÇÃO: O Dashboard agora aponta para o seu Controller
     // Isso vai listar as disciplinas ao logar, em vez de mostrar uma tela vazia
     Route::get('/dashboard', [DisciplinaController::class, 'index'])->name('dashboard');
 
     // Rota para MOSTRAR o formulário
     Route::get('/disciplinas/criar', [DisciplinaController::class, 'create'])->name('disciplinas.criar');
 
-Route::post('/disciplinas', [DisciplinaController::class, 'store'])->name('disciplinas.store');
+    Route::post('/disciplinas', [DisciplinaController::class, 'store'])->name('disciplinas.store');
+
+    // Rota API para registrar falta (Usada pelo botão + do Dashboard)
+    Route::post('/api/frequencia/{id}/falta', [FrequenciaController::class, 'registrarFalta'])
+        ->name('api.frequencia.falta');
 
     // Rotas de Perfil (Necessárias para o funcionamento do Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

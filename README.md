@@ -112,4 +112,3 @@ npm run dev
 Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais detalhes.
 
 Desenvolvido para o TCC do Curso Técnico em Desenvolvimento de Sistemas - 2025/2026.
->>>>>>> e9a830ac43fa47e76d984011de721e2a18a837cc
