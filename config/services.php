@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'invertexto' => [
+        'key' => env('INVERTEXTO_API_KEY'),
+    ],
+
+
 ];

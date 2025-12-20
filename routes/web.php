@@ -117,10 +117,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Rota para EXIBIR o Wizard
-    Route::get('/intro', [IntroController::class, 'index'])->name('intro');
+    Route::get('/intro', [IntroController::class, 'index'])->name('intro')
+        ->middleware('auth');
 
     // Rota para SALVAR os dados e finalizar
-    Route::post('/intro', [IntroController::class, 'store'])->name('intro.store');
+    Route::post('/intro', [IntroController::class, 'store'])->name('intro.store')
+        ->middleware('auth');
 
 });
 

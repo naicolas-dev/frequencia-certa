@@ -11,15 +11,6 @@ use Illuminate\Http\RedirectResponse;
 
 class IntroController extends Controller
 {
-    /**
-     * Aplica o middleware de autenticação no construtor
-     * reforçando a segurança além das rotas.
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function index(): View|RedirectResponse
     {
         if (Auth::user()->has_seen_intro) {
@@ -29,32 +20,28 @@ class IntroController extends Controller
         return view('intro.index');
     }
 
-    public function store(StoreIntroRequest $request, CalendarioService $calendarioService): RedirectResponse
-    {
-        // 1. Persistência
-        // Os dados já vêm validados e normalizados pelo StoreIntroRequest
+    public function store(
+        StoreIntroRequest $request,
+        CalendarioService $calendarioService
+    ): RedirectResponse {
         $user = $request->user();
-        
+
+        // 1. Salva dados do onboarding
         $user->update([
             'estado' => $request->estado,
             'cidade' => $request->cidade,
-            'has_seen_intro' => true 
+            'has_seen_intro' => true,
         ]);
 
-        // 2. Integração Externa (Não Bloqueante / Fail-safe)
+        // 2. Integração com API de feriados (fail-safe)
         try {
-            // Tentamos gerar o calendário. Se a API externa cair,
-            // isso NÃO deve impedir o usuário de acessar o dashboard.
-            $calendarioService->gerarCalendario($request->estado, $request->cidade);
-
-        } catch (\Exception $e) {
-            // 3. Log de Erro Silencioso
-            // Registramos o erro para o desenvolvedor ver, mas o usuário segue feliz.
-            Log::error('Falha ao gerar calendário no onboarding', [
+            // Invertexto usa apenas o estado
+            $calendarioService->obterFeriados($request->estado);
+        } catch (\Throwable $e) {
+            Log::warning('Falha ao gerar calendário no onboarding', [
                 'user_id' => $user->id,
-                'estado' => $request->estado,
-                'cidade' => $request->cidade,
-                'erro' => $e->getMessage()
+                'estado'  => $request->estado,
+                'erro'    => $e->getMessage(),
             ]);
         }
 
