@@ -114,7 +114,7 @@
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                     {{ date('d/m/y -') }} {{ \Carbon\Carbon::now()->locale('pt_BR')->dayName }} 
                                 </div>
-                                <h2 class="text-2xl sm:text-3xl font-bold leading-tight">Registrar<br>Presença Diária</h2>
+                                <h2 class="text-2xl sm:text-3xl font-bold leading-tight">Diário de Classe</h2>
                             </div>
                             <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">
                                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -122,7 +122,7 @@
                         </div>
 
                         <button @click="abrirModal()" class="mt-8 w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-8 rounded-xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2 group">
-                            <span>Abrir Diário de Classe</span>
+                            <span>Registrar Presença</span>
                             <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                         </button>
                         <button @click="modalEvento = true" class="mt-3 w-full sm:w-auto bg-white/20 text-white hover:bg-white/30 font-semibold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2">
@@ -391,8 +391,8 @@ document.addEventListener('DOMContentLoaded', function () {
         {
             element: '#tour-chamada',
             popover: {
-                title: 'Chamada Rápida',
-                description: 'Registre sua presença do dia com um clique aqui. O sistema identifica as aulas automaticamente.'
+                title: 'Diário de Classe',
+                description: 'Registre sua presença do dia com um clique. Ou, marque um dia livre.'
             }
         },
         {
@@ -413,13 +413,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (isMobile) {
         tourSteps.push(
-            { element: '#tour-add-mobile', popover: { title: 'Nova Matéria', description: 'Toque no botão central para adicionar suas disciplinas.' } },
-            { element: '#tour-grade-mobile', popover: { title: 'Sua Grade', description: 'Veja e configure seus horários nesta aba.' } },
-            { element: '#tour-profile-mobile', popover: { title: 'Seu Perfil', description: 'Gerencie sua conta e configurações aqui.' } }
+            { element: '#tour-add-mobile', popover: { title: 'Adicione uma Matéria', description: 'Toque no botão central para adicionar suas disciplinas.' } },
+            { element: '#tour-grade-mobile', popover: { title: 'Sua Grade', description: 'Veja seus horários nesta aba.' } },
+            { element: '#tour-profile-mobile', popover: { title: 'Seu Perfil', description: 'Gerencie sua conta e outras configurações aqui.' } }
         );
     } else {
         tourSteps.push(
-            { element: '#tour-nova-materia', popover: { title: 'Nova Matéria', description: 'Comece clicando aqui para cadastrar disciplinas.' } },
+            { element: '#tour-nova-materia', popover: { title: 'Adicione uma Matéria', description: 'Comece clicando aqui para cadastrar disciplinas.' } },
             { element: '#tour-grade-desktop', popover: { title: 'Grade Horária', description: 'Acesse a visão completa da sua semana.' } }
         );
     }
