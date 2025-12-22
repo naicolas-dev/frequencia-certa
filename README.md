@@ -38,9 +38,9 @@ O objetivo é evitar reprovações por falta e garantir a manutenção de benef�
 
 | Integrante | Funções Principais | GitHub |
 | :--- | :--- | :--- |
-| **Nicolas Viana Alves** | Full-Stack, Back-end, Documentação | [@naicolas-br](https://github.com/naicolas-br) |
-| **Bruno Felix Seixas** | Front-end, Testes, Design | [@obrunofelix](https://github.com/obrunofelix) |
-| **Igor Thiago Costa Rodrigues** | Front-end, Mobile/PWA, UI/UX | [@luxxzvh](https://github.com/luxxzvh) |
+| **Nicolas Viana Alves** | Full-Stack, Documentação | [@naicolas-br](https://github.com/naicolas-br) |
+| **Bruno Felix Seixas** | Front-end, Design | [@obrunofelix](https://github.com/obrunofelix) |
+| **Igor Thiago Costa Rodrigues** | Back-end | [@luxxzvh](https://github.com/luxxzvh) |
 
 ---
 
