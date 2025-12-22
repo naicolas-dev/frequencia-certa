@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\GradeHoraria;
 use App\Models\Frequencia;
+use App\Services\CalendarioService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -15,6 +16,17 @@ class FrequenciaController extends Controller
     {
         // Pega a data da URL (?data=2025-12-18) ou usa Hoje se não vier nada
         $dataAlvo = $request->query('data', now()->format('Y-m-d'));
+
+        // 🚫 BLOQUEIO: verifica se o dia é livre
+        $diaLivre = app(CalendarioService::class)
+            ->verificarDiaLivre($dataAlvo);
+
+        if ($diaLivre) {
+            return response()->json([
+                'dia_livre' => true,
+                'motivo' => $diaLivre['titulo'],
+            ]);
+        }
         
         // Descobre o dia da semana dessa data (1=Segunda ... 7=Domingo)
         $diaSemana = Carbon::parse($dataAlvo)->dayOfWeekIso;
@@ -54,9 +66,18 @@ class FrequenciaController extends Controller
     public function registrarLote(Request $request)
     {
         $dados = $request->validate([
-            'data' => 'required|date', // Agora a data vem do Front-end
+            'data' => 'required|date',
             'chamada' => 'required|array',
         ]);
+
+        $diaLivre = app(CalendarioService::class)
+            ->verificarDiaLivre($dados['data']);
+
+        if ($diaLivre) {
+            return response()->json([
+                'erro' => 'Não é possível registrar chamada em dia livre.',
+            ], 403);
+        }
 
         foreach ($dados['chamada'] as $item) {
             Frequencia::updateOrCreate(

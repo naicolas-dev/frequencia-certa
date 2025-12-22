@@ -49,6 +49,7 @@
                      x-data="{
                         modalOpen: false, 
                         modalEvento: false,
+                        diaLivre: null,
                         aulas: [], 
                         loading: false, 
                         enviando: false, 
@@ -65,9 +66,17 @@
                         async buscarAulas() {
                             this.loading = true;
                             this.aulas = [];
+                            this.diaLivre = null;
                             try {
                                 let res = await fetch(`/api/buscar-aulas?data=${this.dataSelecionada}`);
-                                this.aulas = await res.json();
+                                let data = await res.json();
+                                if (data.dia_livre) {
+                                    this.aulas = [];
+                                    this.diaLivre = data.motivo;
+                                    this.loading = false;
+                                    return;
+                                    }
+                                this.aulas = data;
                             } catch(e) { console.error(e); }
                             this.loading = false;
                         },
@@ -138,11 +147,33 @@
                                     <input type="date" x-model="dataSelecionada" @change="buscarAulas()" class="w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white py-3 px-4 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 shadow-sm">
                                 </div>
 
+                                <div x-show="diaLivre"
+     class="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-50 text-red-700 border border-red-200 text-sm font-semibold">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+    </svg>
+
+    <span>
+        Dia livre:
+        <strong x-text="diaLivre"></strong>
+    </span>
+</div>
+
+
                                 <div class="min-h-[200px]">
                                     <div x-show="loading" class="flex flex-col items-center justify-center h-40 text-gray-400"><svg class="animate-spin h-8 w-8 text-blue-500 mb-3" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="text-sm font-medium">Sincronizando grade...</span></div>
                                     <div x-show="sucesso" class="flex flex-col items-center justify-center h-40 text-emerald-500"><div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mb-3"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div><span class="font-bold text-lg">Salvo com Sucesso!</span></div>
                                     <div x-show="!loading && !sucesso">
-                                        <div x-show="aulas.length === 0" class="text-center py-10 text-gray-400"><p>Nenhuma aula encontrada para esta data.</p></div>
+                                        <div x-show="aulas.length === 0 && !loading" class="text-center py-10 text-gray-400 text-sm">
+                                            <!-- Dia livre -->
+                                             <p x-show="diaLivre">
+                                                Dia livre — Nenhuma aula neste dia 🎉
+                                            </p>
+                                            <p x-show="!diaLivre">
+                                                Nenhuma aula nesta grade horária.
+                                            </p>
+                                        </div>
                                         <div class="space-y-3">
                                             <template x-for="(aula, index) in aulas" :key="index">
                                                 <div class="flex items-center justify-between p-4 rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
