@@ -130,7 +130,7 @@
         {{-- SAIR --}}
         <form method="POST"
             action="{{ route('logout') }}"
-            onsubmit="return confirm('Tem certeza que deseja sair da sua conta?')"
+            data-confirm="Tem certeza que deseja sair da sua conta?"
             class="h-full">
             @csrf
 

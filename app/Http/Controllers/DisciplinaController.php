@@ -46,7 +46,10 @@ class DisciplinaController extends Controller
         ]);
 
         // 3. Redirecionar
-        return redirect()->route('dashboard')->with('success', 'Disciplina criada com sucesso!');
+        return redirect()->route('dashboard')->with('toast',[
+            'type' => 'success',
+            'message' => 'Disciplina cadastrada com sucesso!'
+        ]);
     }
 
     public function edit($id)
@@ -82,7 +85,10 @@ class DisciplinaController extends Controller
             'cor' => $request->cor,
         ]);
 
-        return redirect()->route('dashboard')->with('status', 'Matéria atualizada com sucesso!');
+        return redirect()->route('dashboard')->with('toast',[
+            'type' => 'success',
+            'message' => 'Disciplina atualizada com sucesso!'
+        ]);
     }
 
     /**
@@ -101,6 +107,9 @@ class DisciplinaController extends Controller
         // Caso contrário, ele deleta apenas a disciplina.
         $disciplina->delete();
 
-        return redirect()->route('dashboard')->with('status', 'Matéria excluída.');
+        return redirect()->route('dashboard')->with('toast',[
+            'type' => 'success',
+            'message' => 'Disciplina removida com sucesso!'
+        ]);
     }
 }

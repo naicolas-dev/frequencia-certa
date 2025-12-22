@@ -233,12 +233,6 @@
                 </select>
             </div>
 
-            <div>
-                <label class="block text-sm font-semibold mb-1">Descrição (opcional)</label>
-                <textarea name="descricao" rows="3"
-                          class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white"></textarea>
-            </div>
-
             <div class="flex gap-3 pt-2">
                 <button type="submit"
                         class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl">
@@ -360,7 +354,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </a>
 
-                                    <form action="{{ route('disciplinas.destroy', $disciplina->id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta matéria? Todas as faltas serão apagadas.');">
+                                    <form action="{{ route('disciplinas.destroy', $disciplina->id) }}" method="POST" data-confirm="Tem certeza que deseja excluir esta matéria? Todas as faltas serão apagadas.">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="p-2 text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition" title="Excluir Matéria">
@@ -448,6 +442,29 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endif
+
+@if(session('toast'))
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toast = @json(session('toast'));
+
+        switch (toast.type) {
+            case 'success':
+                toastSuccess(toast.message);
+                break;
+            case 'error':
+                toastError(toast.message);
+                break;
+            case 'warning':
+                toastWarning(toast.message);
+                break;
+            default:
+                toastInfo(toast.message);
+        }
+    });
+</script>
+@endif
+
 
 
 </x-app-layout>
