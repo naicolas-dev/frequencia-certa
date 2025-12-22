@@ -76,6 +76,7 @@
                                     this.loading = false;
                                     return;
                                     }
+                                this.diaLivre = null;
                                 this.aulas = data;
                             } catch(e) { console.error(e); }
                             this.loading = false;
