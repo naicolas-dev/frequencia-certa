@@ -128,6 +128,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // EVENTOS / DIAS LIVRES (CRUD COMPLETO)
     Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
     Route::get('/eventos/{evento}/editar', [EventoController::class, 'edit'])->name('eventos.edit');
+    Route::post('/eventos', [EventoController::class, 'store'])->name('eventos.store');
     Route::put('/eventos/{evento}', [EventoController::class, 'update'])->name('eventos.update');
     Route::delete('/eventos/{evento}', [EventoController::class, 'destroy'])->name('eventos.destroy');
 
