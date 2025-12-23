@@ -73,7 +73,7 @@ O sistema **não substitui** o diário oficial das instituições de ensino e **
 
 ### 🧠 Fase 3: Lógica & Integração (21/12 - 05/01)
 - [x] **Lógica:** Algoritmo de cálculo de % de frequência.
-- 💡 ~~**Lógica:** Sistema de projeção de dias letivos~~ *(estudo conceitual – fora do escopo da versão final do TCC)*.
+- [ ] ~~**Lógica:** Sistema de projeção de dias letivos~~ *(estudo conceitual – fora do escopo da versão final do TCC)*.
 - [x] Conectar Front-end com a API (Axios/Fetch).
 - [x] Implementar funcionalidade "Marcar Feriado/Sem Aula".
 - [x] Implementar funcionalidade "Registrar Presença".
