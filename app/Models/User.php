@@ -24,7 +24,6 @@ class User extends Authenticatable
         'password',
         'has_seen_intro',
         'has_completed_tour',
-        'cidade',
         'estado',
     ];
 

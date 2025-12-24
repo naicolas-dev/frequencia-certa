@@ -8,7 +8,7 @@
     <div class="bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-2xl p-4 mb-2">
         <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold tracking-wider mb-1">Localização Definida</p>
         <p class="text-lg font-medium text-gray-800 dark:text-white">
-            <span x-text="form.cidade"></span> - <span x-text="form.estado"></span>
+            <span x-text="form.estado"></span>
         </p>
     </div>
     

@@ -22,15 +22,15 @@
 <body class="antialiased bg-gray-50 dark:bg-black text-gray-900 dark:text-white min-h-screen flex items-center justify-center relative overflow-hidden font-sans"
     x-data="{ 
         step: 1,
-        form: { estado: '', cidade: '' },
+        form: { estado: ''},
         error: '',      
         loading: false, 
         
         nextStep() {
             this.error = ''; 
             if (this.step === 2) {
-                if (!this.form.estado || !this.form.cidade) {
-                    this.error = 'Por favor, selecione o estado e digite a cidade.'; 
+                if (!this.form.estado) {
+                    this.error = 'Por favor, selecione o estado.'; 
                     return;
                 }
             }
@@ -65,7 +65,6 @@
             
             @csrf
             <input type="hidden" name="estado" :value="form.estado">
-            <input type="hidden" name="cidade" :value="form.cidade">
 
             <div class="flex justify-center gap-2 mb-10">
                 <template x-for="i in 3">

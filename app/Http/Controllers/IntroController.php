@@ -32,7 +32,6 @@ class IntroController extends Controller
         // 2. Salva dados do onboarding usando o array $dados
         $user->update([
             'estado' => $dados['estado'], // Alterado de $request->estado
-            'cidade' => $dados['cidade'], // Alterado de $request->cidade
             'has_seen_intro' => true,
         ]);
 

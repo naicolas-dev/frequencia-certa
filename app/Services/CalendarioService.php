@@ -11,8 +11,20 @@ use Carbon\Carbon;
 
 class CalendarioService
 {
-    // Cache de 30 dias
+    // Mantido apenas por compatibilidade histórica
+    // NÃO é mais utilizado diretamente
     const CACHE_TTL = 60 * 60 * 24 * 30;
+
+    /**
+     * Calcula dinamicamente o TTL do cache
+     * para expirar exatamente no final do ano atual
+     */
+    private function ttlAteFimDoAno(): int
+    {
+        return now()->diffInSeconds(
+            now()->copy()->endOfYear()
+        );
+    }
 
     /**
      * Busca feriados nacionais + estaduais (Invertexto)
@@ -21,12 +33,16 @@ class CalendarioService
     {
         $ano = $ano ?? date('Y');
 
-        // Cache agora depende só de ano + estado
+        // Cache depende de ano + estado
         $cacheKey = "feriados_{$ano}_{$estado}";
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($estado, $ano) {
-            return $this->buscarNaApi($estado, $ano);
-        });
+        return Cache::remember(
+            $cacheKey,
+            $this->ttlAteFimDoAno(),
+            function () use ($estado, $ano) {
+                return $this->buscarNaApi($estado, $ano);
+            }
+        );
     }
 
     /**
@@ -122,7 +138,7 @@ class CalendarioService
             ];
         }
 
-        // 2. Verifica na API (usando seu método cacheado)
+        // 2. Verifica na API (usando método cacheado)
         $ano = Carbon::parse($data)->year;
         $estado = Auth::user()->estado ?? 'BR'; // fallback seguro
 

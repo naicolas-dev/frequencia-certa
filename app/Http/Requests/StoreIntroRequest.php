@@ -22,7 +22,6 @@ class StoreIntroRequest extends FormRequest
     {
         return [
             'estado' => ['required', 'string', 'size:2'],
-            'cidade' => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -34,7 +33,6 @@ class StoreIntroRequest extends FormRequest
         return [
             'estado.required' => 'Selecione o estado.',
             'estado.size' => 'O estado deve ter 2 letras.',
-            'cidade.required' => 'Digite o nome da cidade.',
         ];
     }
 
@@ -46,7 +44,6 @@ class StoreIntroRequest extends FormRequest
     {
         $this->merge([
             'estado' => Str::upper($this->estado), // Transforma 'sp' em 'SP'
-            'cidade' => Str::title(trim($this->cidade)), // Transforma '  são paulo ' em 'São Paulo'
         ]);
     }
 }
