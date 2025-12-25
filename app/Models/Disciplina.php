@@ -118,4 +118,18 @@ public function getTotalAulasPrevistasAttribute()
 
         return $totalAulas;
     }
+
+    public function getTaxaPresencaAttribute(): float
+    {
+        // Usa a coleção já carregada para evitar queries extras
+        $totalAulas = $this->frequencias->count();
+        
+        if ($totalAulas === 0) {
+            return 100.0; // Sem registros = 100% de presença
+        }
+
+        $presencas = $this->frequencias->where('presente', true)->count();
+
+        return round(($presencas / $totalAulas) * 100, 1);
+    }
 }

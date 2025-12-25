@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DisciplinaController;
 use App\Http\Controllers\GradeHorariaController;
@@ -26,22 +27,10 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // =========================================================================
-    // 1. DASHBOARD & ONBOARDING (Lógica Principal)
+    // 1. DASHBOARD & ONBOARDING
     // =========================================================================
 
-    // Rota Dashboard com verificação de Onboarding
-    Route::get('/dashboard', function () {
-        $user = Auth::user();
-
-        // Se o usuário é novo e não viu a intro, redireciona
-        if (!$user->has_seen_intro) {
-            return redirect()->route('intro');
-        }
-
-        // Carrega dados para a tela
-        $disciplinas = $user->disciplinas()->with('frequencias')->get();
-        return view('dashboard', compact('disciplinas'));
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Tela de Introdução (Boas-vindas)
     Route::get('/intro', function () {

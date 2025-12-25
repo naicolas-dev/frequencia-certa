@@ -331,6 +331,52 @@
             @endif
 
             <div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6 px-1">Filtros</h3>
+                {{-- BARRA DE FILTROS (Novo) --}}
+                <div class="flex gap-3 mb-6 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide sm:mx-0 sm:px-0">
+                    
+                    {{-- 1. TODAS --}}
+                    <a href="{{ route('dashboard') }}" 
+                       class="shrink-0 px-5 py-2.5 rounded-full text-sm font-bold transition shadow-sm border
+                              {{ !request('filtro') 
+                                 ? 'bg-blue-600 text-white border-blue-600' 
+                                 : 'bg-white text-gray-600 border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
+                        Todas
+                    </a>
+    
+                    {{-- 2. HOJE --}}
+                    <a href="{{ route('dashboard', ['filtro' => 'hoje']) }}" 
+                       class="shrink-0 px-5 py-2.5 rounded-full text-sm font-bold transition shadow-sm border flex items-center gap-2
+                              {{ request('filtro') == 'hoje' 
+                                 ? 'bg-blue-600 text-white border-blue-600' 
+                                 : 'bg-white text-gray-600 border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
+                        <span>📅</span> Hoje
+                    </a>
+    
+                    {{-- 3. EM RISCO --}}
+                    <a href="{{ route('dashboard', ['filtro' => 'risco']) }}" 
+                       class="shrink-0 px-5 py-2.5 rounded-full text-sm font-bold transition shadow-sm border flex items-center gap-2
+                              {{ request('filtro') == 'risco' 
+                                 ? 'bg-red-500 text-white border-red-500' 
+                                 : 'bg-white text-gray-600 border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700' }}">
+                        <span>⚠️</span> Em Risco
+                    </a>
+                </div>
+
+                {{-- FEEDBACK DO FILTRO --}}
+                @if(request('filtro') == 'hoje')
+                    <div class="mb-4 flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-900/20 px-3 py-2 rounded-lg inline-flex">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Mostrando apenas aulas desta {{ now()->translatedFormat('l') }}
+                    </div>
+                @elseif(request('filtro') == 'risco')
+                    <div class="mb-4 flex items-center gap-2 text-sm text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg inline-flex">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Matérias com frequência abaixo ou igual a 75%
+                    </div>
+                @endif
+
+            <div>
                 <div class="flex items-center justify-between px-1 mb-6">
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white">Minhas Matérias</h3>
                     </div>
