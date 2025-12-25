@@ -22,7 +22,7 @@
 <body class="antialiased bg-gray-50 dark:bg-black text-gray-900 dark:text-white min-h-screen flex items-center justify-center relative overflow-hidden font-sans"
     x-data="{ 
         step: 1,
-        form: { estado: ''},
+        form: { estado: '', ano_letivo_inicio: '{{ date('Y') }}-01-01', ano_letivo_fim: '{{ date('Y') }}-12-31' },
         error: '',      
         loading: false, 
         
@@ -34,10 +34,22 @@
                     return;
                 }
             }
+            
+            if (this.step === 3) {
+                if (!this.form.ano_letivo_inicio || !this.form.ano_letivo_fim) {
+                    this.error = 'Por favor, preencha as datas.'; 
+                    return;
+                }
+                
+                if (this.form.ano_letivo_fim <= this.form.ano_letivo_inicio) {
+                    this.error = 'Por favor, preencha as datas corretamente.'; 
+                    return;
+                }
+            }
+
             this.step++;
         },
 
-        // 🔙 Função para voltar
         prevStep() {
             this.error = '';
             if (this.step > 1) {
@@ -66,8 +78,11 @@
             @csrf
             <input type="hidden" name="estado" :value="form.estado">
 
+            <input type="hidden" name="ano_letivo_inicio" :value="form.ano_letivo_inicio">
+            <input type="hidden" name="ano_letivo_fim" :value="form.ano_letivo_fim">
+
             <div class="flex justify-center gap-2 mb-10">
-                <template x-for="i in 3">
+                <template x-for="i in 4">
                     <div class="h-1.5 rounded-full transition-all duration-500"
                         :class="step >= i ? 'w-8 bg-blue-600' : 'w-2 bg-gray-300 dark:bg-gray-700'"></div>
                 </template>
@@ -86,6 +101,12 @@
             </template>
 
             <template x-if="step === 3">
+                <div x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
+                    @include('intro.step-datas')
+                </div>
+            </template>
+
+            <template x-if="step === 4">
                 <div x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
                     @include('intro.step-final')
                 </div>

@@ -26,23 +26,25 @@ class IntroController extends Controller
     ): RedirectResponse {
         $user = $request->user();
 
-        // 1. Pega os dados validados e normalizados
+        // 1. Pega os dados validados (Estado + Datas)
+        // Certifique-se de que o StoreIntroRequest já tem as regras das datas
         $dados = $request->validated();
 
-        // 2. Salva dados do onboarding usando o array $dados
+        // 2. Salva TODOS os dados do onboarding de uma vez
         $user->update([
-            'estado' => $dados['estado'], // Alterado de $request->estado
+            'estado' => $dados['estado'],
+            'ano_letivo_inicio' => $dados['ano_letivo_inicio'], // Novo campo
+            'ano_letivo_fim' => $dados['ano_letivo_fim'],       // Novo campo
             'has_seen_intro' => true,
         ]);
 
         // 3. Integração com API de feriados (fail-safe)
         try {
-            // Usa o estado validado
             $calendarioService->obterFeriados($dados['estado']);
         } catch (\Throwable $e) {
             Log::warning('Falha ao gerar calendário no onboarding', [
                 'user_id' => $user->id,
-                'estado'  => $dados['estado'], // Usa o dado validado no log também
+                'estado'  => $dados['estado'],
                 'erro'    => $e->getMessage(),
             ]);
         }

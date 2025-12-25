@@ -33,14 +33,20 @@ class DisciplinaController extends Controller
         $request->validate([
             'nome' => 'required|string|max:255',
             'cor' => 'required|string|max:7',
+            'data_inicio' => 'nullable|date',
+            'data_fim' => 'nullable|date|after_or_equal:data_inicio',
         ]);
+
+        $inicio = $request->data_inicio ?? Auth::user()->ano_letivo_inicio;
+        $fim    = $request->data_fim    ?? Auth::user()->ano_letivo_fim;
 
         // 2. Salvar no Banco
         // Usamos o relacionamento para já vincular ao usuário logado
         Auth::user()->disciplinas()->create([
             'nome' => $request->nome,
             'cor' => $request->cor,
-            // Valores padrão (obrigatórios no banco, mas ocultos no form por enquanto)
+            'data_inicio' => $inicio,
+            'data_fim' => $fim,
             'carga_horaria_total' => 0, 
             'porcentagem_minima' => 75,
         ]);
@@ -78,11 +84,15 @@ class DisciplinaController extends Controller
         $request->validate([
             'nome' => 'required|string|max:255',
             'cor' => 'required|string|max:7',
+            'data_inicio' => 'nullable|date',
+            'data_fim' => 'nullable|date|after_or_equal:data_inicio',
         ]);
 
         $disciplina->update([
             'nome' => $request->nome,
             'cor' => $request->cor,
+            'data_inicio' => $request->data_inicio,
+            'data_fim' => $request->data_fim
         ]);
 
         return redirect()->route('dashboard')->with('toast',[

@@ -22,6 +22,8 @@ class StoreIntroRequest extends FormRequest
     {
         return [
             'estado' => ['required', 'string', 'size:2'],
+            'ano_letivo_inicio' => ['required', 'date'],
+            'ano_letivo_fim' => ['required', 'date', 'after:ano_letivo_inicio'],
         ];
     }
 
@@ -33,6 +35,9 @@ class StoreIntroRequest extends FormRequest
         return [
             'estado.required' => 'Selecione o estado.',
             'estado.size' => 'O estado deve ter 2 letras.',
+            'ano_letivo_inicio.required' => 'A data de início é obrigatória.',
+            'ano_letivo_fim.required' => 'A data de término é obrigatória.',
+            'ano_letivo_fim.after' => 'A data de término deve ser depois do início.',
         ];
     }
 

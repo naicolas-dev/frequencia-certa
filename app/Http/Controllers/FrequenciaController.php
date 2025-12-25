@@ -34,6 +34,15 @@ class FrequenciaController extends Controller
         // 1. Busca a Grade Horária daquele dia da semana
         $grade = GradeHoraria::where('dia_semana', $diaSemana)
             ->where('user_id', Auth::id())
+            ->whereHas('disciplina', function($query) use ($dataAlvo) {
+                $query->where(function($q) use ($dataAlvo) {
+                    $q->whereNull('data_inicio')
+                        ->orWhere('data_inicio', '<=', $dataAlvo);
+            })->where(function($q) use ($dataAlvo) {
+                $q->whereNull('data_fim')
+                    ->orWhere('data_fim', '>=', $dataAlvo);
+            });
+            })
             ->with('disciplina')
             ->get()
             ->unique('disciplina_id');

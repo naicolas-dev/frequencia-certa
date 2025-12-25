@@ -15,8 +15,16 @@ class Disciplina extends Model
         'user_id',
         'nome',
         'cor',
+        'data_inicio',
+        'data_fim',
         'carga_horaria_total',
         'porcentagem_minima',
+    ];
+
+    //para facilitar manipulação de datas
+    protected $casts = [
+        'data_inicio' => 'date',
+        'data_fim' => 'date',
     ];
 
     /**

@@ -25,7 +25,10 @@ class User extends Authenticatable
         'has_seen_intro',
         'has_completed_tour',
         'estado',
+        'ano_letivo_inicio',
+        'ano_letivo_fim',
     ];
+    
 
     /**
      * The attributes that should be hidden for serialization.
@@ -49,6 +52,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'has_seen_intro' => 'boolean',
             'has_completed_tour' => 'boolean',
+            'ano_letivo_inicio' => 'date',
+            'ano_letivo_fim' => 'date',
         ];
     }
 

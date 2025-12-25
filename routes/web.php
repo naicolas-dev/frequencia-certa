@@ -57,6 +57,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect()->route('dashboard');
     })->name('intro.finish');
 
+    Route::get('/intro/datas', [IntroController::class, 'stepDatas'])->name('intro.step_datas');
+    Route::post('/intro/datas', [IntroController::class, 'storeDatas'])->name('intro.store_datas');
+
     // API para marcar o Tour do Dashboard como concluído
     Route::post('/tour/finish', function (Request $request) {
         $request->user()->update(['has_completed_tour' => true]);
