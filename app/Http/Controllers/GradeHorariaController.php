@@ -67,6 +67,23 @@ class GradeHorariaController extends Controller
             'horario_fim.after' => 'O horário final deve ser depois do inicial.'
         ]);
 
+        $conflito = GradeHoraria::where('user_id', Auth::id())
+            ->where('dia_semana', $request->dia_semana)
+            ->where(function($query) use ($request) {
+                $query->where('horario_inicio', '<', $request->horario_fim)
+                    ->where('horario_fim', '>', $request->horario_inicio);
+            })
+            ->first();
+
+        if ($conflito) {
+            $nomeDisciplina = $conflito->disciplina->nome ?? 'outra disciplina';
+
+            return back()->withInput()->with('toast', [
+                'type' => 'error',
+                'message' => 'Horário conflitante com o horário de ' . $nomeDisciplina
+            ]);
+        }
+
         GradeHoraria::create([
             'user_id' => Auth::id(), // Importante preencher o user_id
             'disciplina_id' => $disciplina->id,
@@ -110,6 +127,24 @@ class GradeHorariaController extends Controller
         ], [
             'horario_fim.after' => 'O horário final deve ser depois do inicial.'
         ]);
+
+        $conflito = GradeHoraria::where('user_id', Auth::id())
+            ->where('dia_semana', $request->dia_semana)
+            ->where('id', '!=', $id)
+            ->where(function($query) use ($request) {
+                $query->where('horario_inicio', '<', $request->horario_fim)
+                    ->where('horario_fim', '>', $request->horario_inicio);
+            })
+            ->first();
+
+        if ($conflito) {
+            $nomeDisciplina = $conflito->disciplina->nome ?? 'outra disciplina';
+
+            return back()->withInput()->with('toast', [
+                'type' => 'error',
+                'message' => 'Horário conflitante com o horário de ' . $nomeDisciplina
+            ]);
+        }
 
         $horario->update([
             'dia_semana' => $request->dia_semana,
