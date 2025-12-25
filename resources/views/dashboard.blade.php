@@ -26,47 +26,56 @@
                             </h1>
                             <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm sm:text-base">
                                 @php
-                                $hora = now()->hour;
+                                    $hora = now()->hour;
+                                    $diaHoje = now()->dayOfWeek; // 0 (Dom) a 6 (Sáb)
 
-                                $mensagensPorHora = [
-                                0 => 'Já deu por hoje 🙂 — descansar também é produtividade.',
-                                1 => 'Hora de desligar um pouco. Um bom sono melhora seu rendimento.',
-                                2 => 'Sono é parte do progresso. Seu eu de amanhã agradece.',
-                                3 => 'Tá bem tarde… cuida de você. Amanhã é um novo dia.',
-                                4 => 'Quase amanhecendo. Que tal se preparar pra não correr depois?',
-                                5 => 'Um novo começo chegando 🌅 Ajuste o ritmo e vai com calma.',
-                                6 => 'Bom começo de dia! Presença hoje faz diferença no final do semestre.',
-                                7 => 'Organiza o dia rapidinho e evita correria mais tarde.',
-                                8 => 'Primeiras aulas, primeira chance de mandar bem. Bora marcar presença?',
-                                9 => 'Mantém o ritmo: consistência é o que dá resultado.',
-                                10 => 'Cada aula conta. Confere sua presença e segue firme.',
-                                11 => 'Último gás da manhã 💪 Foco no que importa.',
-                                12 => 'Pausa merecida! Já aproveita e confirma sua presença.',
-                                13 => 'De volta aos estudos: calma, atenção e presença.',
-                                14 => 'Ainda dá tempo de virar o jogo hoje. Bora manter a frequência?',
-                                15 => 'Vai no constante: consistência vence a pressa.',
-                                16 => 'Olho na frequência 👀 O que você garante hoje evita dor de cabeça depois.',
-                                17 => 'Final da tarde chegando. Fecha o dia com presença em dia.',
-                                18 => 'Encerrando? Dá uma olhada na chamada antes de sair.',
-                                19 => 'Se organizar agora poupa estresse amanhã.',
-                                20 => 'Revisar hoje é se agradecer amanhã. E presença também 😉',
-                                21 => 'Última checagem do dia: tudo certo na frequência?',
-                                22 => 'Fechando o dia com responsabilidade. Boa!',
-                                23 => 'Hora de descansar 🌙 Amanhã continua — com mais uma presença.'
-                                ];
+                                    $mensagensPorHora = [
+                                    0 => 'Já deu por hoje 🙂 — descansar também é produtividade.',
+                                    1 => 'Hora de desligar um pouco. Um bom sono melhora seu rendimento.',
+                                    2 => 'Sono é parte do progresso. Seu eu de amanhã agradece.',
+                                    3 => 'Tá bem tarde… cuida de você. Amanhã é um novo dia.',
+                                    4 => 'Quase amanhecendo. Que tal se preparar pra não correr depois?',
+                                    5 => 'Um novo começo chegando 🌅 Ajuste o ritmo e vai com calma.',
+                                    6 => 'Bom começo de dia! Presença hoje faz diferença no final do semestre.',
+                                    7 => 'Organiza o dia rapidinho e evita correria mais tarde.',
+                                    8 => 'Primeiras aulas, primeira chance de mandar bem. Bora marcar presença?',
+                                    9 => 'Mantém o ritmo: consistência é o que dá resultado.',
+                                    10 => 'Cada aula conta. Confere sua presença e segue firme.',
+                                    11 => 'Último gás da manhã 💪 Foco no que importa.',
+                                    12 => 'Pausa merecida! Já aproveita e confirma sua presença.',
+                                    13 => 'De volta aos estudos: calma, atenção e presença.',
+                                    14 => 'Ainda dá tempo de virar o jogo hoje. Bora manter a frequência?',
+                                    15 => 'Vai no constante: consistência vence a pressa.',
+                                    16 => 'Olho na frequência 👀 O que você garante hoje evita dor de cabeça depois.',
+                                    17 => 'Final da tarde chegando. Fecha o dia com presença em dia.',
+                                    18 => 'Encerrando? Dá uma olhada na chamada antes de sair.',
+                                    19 => 'Se organizar agora poupa estresse amanhã.',
+                                    20 => 'Revisar hoje é se agradecer amanhã. 😉',
+                                    21 => 'Última checagem do dia: tudo certo na frequência?',
+                                    22 => 'Fechando o dia com responsabilidade. Boa!',
+                                    23 => 'Hora de descansar 🌙 Amanhã continua — com mais uma presença.'
+                                    ];
 
-                                // Aluno em risco → tom mais forte
-                                if ($materiasEmRisco > 0) {
-                                echo '⚠️ Atenção: sua frequência está no limite. Hoje é um ótimo dia pra marcar presença.';
-
-                                // Não tem aula hoje (nenhuma disciplina hoje)
-                                } elseif ($todasDisciplinas->isEmpty()) {
-                                echo 'Hoje não há aulas programadas. Aproveite pra descansar ou adiantar algo 😌';
-
-                                // Tem aula → mensagem por hora
-                                } else {
-                                echo $mensagensPorHora[$hora];
-                                }
+                                    $temAulaHoje = $todasDisciplinas->contains(function($d) use ($diaHoje) {
+                                                return $d->horarios->contains('dia_semana', $diaHoje);
+                                            });
+                                            
+                                            if ($todasDisciplinas->isEmpty()) {
+                                                // 1. Usuário Novo
+                                                echo 'Comece adicionando suas matérias para montar a grade 🚀';
+                                            
+                                            } elseif (!$temAulaHoje) {
+                                                // 2. Dia Livre (Detectado automaticamente, sem precisar clicar no filtro)
+                                                echo 'Hoje não há aulas programadas. Aproveite o descanso 😌';
+                                                
+                                            } elseif ($materiasEmRisco > 0) {
+                                                // 3. Alerta de Risco (Se tem aula e está perigando)
+                                                echo '⚠️ Atenção: você tem matérias com frequência baixa. Foco total!';
+                                                
+                                            } else {
+                                                // 4. Dia Normal
+                                                echo $mensagensPorHora[$hora];
+                                            }
                                 @endphp
 
                             </p>
