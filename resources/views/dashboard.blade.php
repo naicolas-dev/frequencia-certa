@@ -60,7 +60,7 @@
                                 echo '⚠️ Atenção: sua frequência está no limite. Hoje é um ótimo dia pra marcar presença.';
 
                                 // Não tem aula hoje (nenhuma disciplina hoje)
-                                } elseif ($disciplinas->isEmpty()) {
+                                } elseif ($todasDisciplinas->isEmpty()) {
                                 echo 'Hoje não há aulas programadas. Aproveite pra descansar ou adiantar algo 😌';
 
                                 // Tem aula → mensagem por hora
@@ -407,7 +407,7 @@
                             <p class="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">Adicionar à grade</p>
                         </a>
 
-                        @forelse($disciplinas as $disciplina)
+                        @forelse($disciplinasFiltradas as $disciplina)
                         @php
                         $totalRegistros = $disciplina->frequencias->count();
                         $totalFaltas = $disciplina->frequencias->where('presente', false)->count();

@@ -11,74 +11,78 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // 1. Redirecionamento de segurança (Onboarding)
         if (!$user->has_seen_intro) {
             return redirect()->route('intro');
         }
 
-        // 2. Prepara a Query (com relacionamentos)
-        $query = $user->disciplinas()->with(['frequencias', 'horarios']);
+        // 1. Busca TODAS as matérias (Para estatísticas globais reais)
+        // Trazemos tudo do banco de uma vez (Eager Loading)
+        $todasDisciplinas = $user->disciplinas()
+            ->with(['frequencias', 'horarios'])
+            ->orderBy('nome', 'asc')
+            ->get();
 
-        // --- FILTRO 1: AULAS DE HOJE ---
-        if ($request->filtro === 'hoje') {
-            $diaHoje = now()->dayOfWeek;
-            $query->whereHas('horarios', function ($q) use ($diaHoje) {
-                $q->where('dia_semana', $diaHoje);
-            });
-        }
-
-        // 3. Busca os dados (Ordenado A-Z)
-        $disciplinas = $query->orderBy('nome', 'asc')->get();
-
-        // 4. Cálculos de Estatísticas (Global)
-        $todasFrequencias = $disciplinas->pluck('frequencias')->collapse();
+        // ---------------------------------------------------------
+        // CÁLCULO DE ESTATÍSTICAS (Baseado em TUDO)
+        // ---------------------------------------------------------
+        
+        $todasFrequencias = $todasDisciplinas->pluck('frequencias')->collapse();
         $totalAulasGeral = $todasFrequencias->count();
         $totalFaltasGeral = $todasFrequencias->where('presente', false)->count();
         $totalPresencasGeral = $todasFrequencias->where('presente', true)->count();
 
-        // Cálculo da Porcentagem Global
+        // Porcentagem Global Real
         $porcentagemGlobal = 100;
         if ($totalAulasGeral > 0) {
             $porcentagemGlobal = round((($totalAulasGeral - $totalFaltasGeral) / $totalAulasGeral) * 100);
         }
 
-        // Definindo a Cor Global
+        // Cor do texto Global
         $corGlobal = 'text-emerald-600 dark:text-emerald-400';
-        if ($porcentagemGlobal < 75) {
+        if($porcentagemGlobal < 75) {
             $corGlobal = 'text-red-600 dark:text-red-400';
-        } elseif ($porcentagemGlobal < 85) {
+        } elseif($porcentagemGlobal < 85) {
             $corGlobal = 'text-yellow-600 dark:text-yellow-400';
         }
 
-        // Contagem de Matérias em Risco
-        $materiasEmRisco = $disciplinas->filter(function ($d) {
+        // Contagem Real de Riscos (Independente do dia)
+        $materiasEmRisco = $todasDisciplinas->filter(function($d) {
             return $d->taxa_presenca < 75;
         })->count();
 
-        // --- FILTRO 2: EM RISCO (Aplicado na coleção para exibição) ---
-        if ($request->filtro === 'risco') {
-            $disciplinas = $disciplinas->filter(function ($disciplina) {
-                return $disciplina->taxa_presenca < 75;
+        // ---------------------------------------------------------
+        // APLICAÇÃO DOS FILTROS (Apenas para a Lista de Cards)
+        // ---------------------------------------------------------
+        
+        // Começamos com a lista completa
+        $disciplinasFiltradas = $todasDisciplinas;
+
+        // Filtro: HOJE
+        if ($request->filtro === 'hoje') {
+            $diaHoje = now()->dayOfWeek; // 0 (Dom) - 6 (Sab)
+            
+            // Filtramos a coleção em memória (mais rápido que nova query)
+            $disciplinasFiltradas = $todasDisciplinas->filter(function ($d) use ($diaHoje) {
+                // Verifica se a matéria tem horário hoje
+                return $d->horarios->contains('dia_semana', $diaHoje);
             });
         }
 
-        // Dados para Gráficos
-        $graficoLabels = $disciplinas->pluck('nome');
-        $graficoDados = $disciplinas->map(fn($d) => $d->taxa_presenca);
-        $graficoCores = $graficoDados->map(function ($val) {
-            return $val >= 75 ? 'rgba(16, 185, 129, 0.7)' : 'rgba(239, 68, 68, 0.7)';
-        });
+        // Filtro: EM RISCO
+        if ($request->filtro === 'risco') {
+            $disciplinasFiltradas = $todasDisciplinas->filter(function ($d) {
+                return $d->taxa_presenca < 75;
+            });
+        }
 
         return view('dashboard', compact(
-            'disciplinas',
-            'porcentagemGlobal',
-            'corGlobal',
-            'materiasEmRisco',
-            'totalPresencasGeral',
+            'todasDisciplinas',
+            'disciplinasFiltradas',
+            'porcentagemGlobal', 
+            'corGlobal', 
+            'materiasEmRisco', 
+            'totalPresencasGeral', 
             'totalFaltasGeral',
-            'graficoLabels',
-            'graficoDados',
-            'graficoCores'
         ));
     }
 }
