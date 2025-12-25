@@ -104,4 +104,42 @@ class FrequenciaController extends Controller
 
         return response()->json(['sucesso' => true]);
     }
+
+    public function historico(Request $request)
+    {
+        // Inicia a query focada no utilizador logado
+        $query = \App\Models\Frequencia::where('user_id', Auth::id())
+            ->with('disciplina') // Traz a disciplina para não pesar o banco
+            ->orderBy('data', 'desc')
+            ->orderBy('created_at', 'desc');
+
+        // 1. Filtro por Disciplina
+        if ($request->filled('disciplina_id')) {
+            $query->where('disciplina_id', $request->disciplina_id);
+        }
+
+        // 2. Filtro por Data Início
+        if ($request->filled('data_inicio')) {
+            $query->whereDate('data', '>=', $request->data_inicio);
+        }
+
+        // 3. Filtro por Data Fim
+        if ($request->filled('data_fim')) {
+            $query->whereDate('data', '<=', $request->data_fim);
+        }
+
+        // 4. Filtro por Status (Presença ou Falta)
+        if ($request->filled('status') && in_array($request->status, ['0', '1'])) {
+            $query->where('presente', $request->status);
+        }
+
+        // Paginação (15 itens por página)
+        // O ->withQueryString() mantém os filtros ao clicar na página 2
+        $historico = $query->paginate(15)->withQueryString();
+
+        // Carrega todas as disciplinas para preencher o <select> de filtro
+        $disciplinas = Auth::user()->disciplinas()->orderBy('nome')->get();
+
+        return view('frequencia.historico', compact('historico', 'disciplinas'));
+    }
 }

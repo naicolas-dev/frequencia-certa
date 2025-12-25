@@ -112,6 +112,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Registrar falta rápida (botão + do card, se existir)
     Route::post('/api/frequencia/{id}/falta', [FrequenciaController::class, 'registrarFalta'])->name('api.frequencia.falta');
 
+    // Histórico
+    Route::get('/historico', [FrequenciaController::class, 'historico'])->name('frequencia.historico');
+
 
     // =========================================================================
     // 5. PERFIL DO USUÁRIO
