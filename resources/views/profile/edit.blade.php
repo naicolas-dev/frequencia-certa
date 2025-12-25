@@ -74,6 +74,27 @@
     <x-input-error class="mt-2" :messages="$errors->get('estado')" />
 </div>
 
+{{-- INÍCIO: NOVOS CAMPOS DE DATA --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {{-- Data Início --}}
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Início das Aulas</label>
+            <input type="date" name="ano_letivo_inicio" 
+                value="{{ old('ano_letivo_inicio', optional($user->ano_letivo_inicio)->format('Y-m-d')) }}" required 
+                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/20 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
+            <x-input-error class="mt-2" :messages="$errors->get('ano_letivo_inicio')" />
+        </div>
+
+        {{-- Data Fim --}}
+        <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Término das Aulas</label>
+            <input type="date" name="ano_letivo_fim" 
+                value="{{ old('ano_letivo_fim', optional($user->ano_letivo_fim)->format('Y-m-d')) }}" required 
+                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/20 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
+            <x-input-error class="mt-2" :messages="$errors->get('ano_letivo_fim')" />
+        </div>
+    </div>
+
 
     {{-- Botão Salvar --}}
     <div class="flex items-center gap-4 pt-2">

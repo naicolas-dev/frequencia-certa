@@ -27,6 +27,8 @@ class ProfileUpdateRequest extends FormRequest
             ],
 
             'estado' => ['nullable', 'string', 'size:2'],
+            'ano_letivo_inicio' => ['required', 'date'],
+            'ano_letivo_fim'    => ['required', 'date', 'after:ano_letivo_inicio'],
         ];
     }
 }
