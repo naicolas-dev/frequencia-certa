@@ -134,6 +134,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/relatorio/baixar', [RelatorioController::class, 'gerarRelatorio'])
         ->name('relatorio.baixar');
 
+    // =========================================================================
+    // 7. PWA
+    // =========================================================================
+    Route::get('/offline', function () {
+        return view('offline'); // Ou crie uma view 'offline.blade.php' simples
+    });
+
 });
 
 // Carrega rotas de autenticação (Login, Register, etc)

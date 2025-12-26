@@ -9,6 +9,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
@@ -84,6 +86,20 @@
         });
     </script>
     @endif
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('PWA: Service Worker registrado com sucesso:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error('PWA: Falha ao registrar Service Worker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 
 </html>

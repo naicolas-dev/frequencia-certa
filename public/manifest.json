@@ -1,0 +1,44 @@
+{
+    "name": "Frequência Certa",
+    "short_name": "Frequência Certa",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f3f4f6",
+    "theme_color": "#2563eb",
+    "orientation": "portrait",
+    "scope": "/",
+    "lang": "pt-BR",
+    "screenshots": [
+        {
+            "src": "/img/screenshots/desktop.png",
+            "sizes": "1881x930",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/mobile.png",
+            "sizes": "390x845",
+            "type": "image/png"
+        }
+    ]
+,
+    "icons": [
+        {
+            "src": "/img/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+    
+}
