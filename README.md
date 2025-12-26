@@ -81,7 +81,7 @@ O sistema **não substitui** o diário oficial das instituições de ensino e **
 ### 📱 Fase 4: PWA & Finalização (06/01 - 01/02)
 - [x] Configurar `manifest.json` (Ícones, Nome, Cores).
 - [x] Configurar Service Workers (Cache offline).
-- [ ] Testar instalação no Android/iOS.
+- [x] Testar instalação no Android/iOS.
 - [ ] Correção de Bugs e refinamento visual.
 - [ ] Escrever Documentação Final.
 
