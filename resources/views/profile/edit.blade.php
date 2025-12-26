@@ -1,4 +1,5 @@
 <x-app-layout>
+    {{-- Background Animado (Blob) --}}
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
         <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob dark:bg-blue-900/20"></div>
         <div class="absolute top-0 right-1/4 w-96 h-96 bg-purple-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000 dark:bg-purple-900/20"></div>
@@ -7,6 +8,7 @@
 
     <x-slot name="header">
         <div class="flex items-center gap-4">
+            {{-- Botão Voltar (Mobile) --}}
             <a href="{{ route('dashboard') }}" class="p-2 -ml-2 rounded-full hover:bg-white/50 dark:hover:bg-gray-800/50 transition lg:hidden">
                 <svg class="w-6 h-6 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
@@ -19,7 +21,7 @@
     <div class="py-6 pb-24">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
-            {{-- Card do Usuário --}}
+            {{-- 1. Card do Usuário --}}
             <div class="flex items-center gap-5 p-6 rounded-3xl bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border border-white/20 dark:border-gray-800 shadow-sm">
                 <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold shadow-lg shadow-blue-500/20">
                     {{ substr($user->name, 0, 1) }}
@@ -30,7 +32,25 @@
                 </div>
             </div>
 
-            {{-- Informações Pessoais --}}
+            {{-- 2. NOVA SEÇÃO: Relatórios e Documentos (Estilo Nativo) --}}
+            <div class="p-6 sm:p-8 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-sm rounded-[2rem] border border-white/20 dark:border-gray-800">
+                <section>
+                    <header class="mb-6">
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">Relatório da Frequência</h2>
+                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Baixe o relatório da sua presença informada em PDF</p>
+                    </header>
+
+                    <div class="flex items-center">
+                        <a href="{{ route('relatorio.baixar') }}" target="_blank" 
+                           class="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/30 transition transform active:scale-[0.98] text-sm flex items-center justify-center gap-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Baixar
+                        </a>
+                    </div>
+                </section>
+            </div>
+
+            {{-- 3. Informações Pessoais --}}
             <div class="p-6 sm:p-8 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-sm rounded-[2rem] border border-white/20 dark:border-gray-800">
                 <section>
                     <header class="mb-6">
@@ -111,7 +131,7 @@
                 </section>
             </div>
 
-            {{-- Segurança --}}
+            {{-- 4. Segurança --}}
             <div class="p-6 sm:p-8 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-sm rounded-[2rem] border border-white/20 dark:border-gray-800">
                 <section>
                     <header class="mb-6">
@@ -160,8 +180,7 @@
                 </section>
             </div>
 
-            {{-- BOTÃO DE SAIR (MOBILE APENAS) --}}
-            {{-- A classe lg:hidden garante que só apareça em telas menores --}}
+            {{-- 5. BOTÃO DE SAIR (MOBILE APENAS) --}}
             <div class="lg:hidden">
                 <form method="POST" data-confirm="Tem certeza que deseja sair?" action="{{ route('logout') }}">
                     @csrf
@@ -176,7 +195,7 @@
                 </form>
             </div>
 
-            {{-- Excluir Conta --}}
+            {{-- 6. Excluir Conta --}}
             <div class="p-6 sm:p-8 bg-red-50/80 dark:bg-red-900/20 backdrop-blur-md shadow-sm rounded-[2rem] border border-red-100 dark:border-red-900/30"
                  x-data="{ confirmDeletion: {{ $errors->userDeletion->isNotEmpty() ? 'true' : 'false' }} }">
                 

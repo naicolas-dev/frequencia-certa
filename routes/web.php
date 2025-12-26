@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DisciplinaController;
@@ -127,6 +128,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/eventos/{evento}', [EventoController::class, 'update'])->name('eventos.update');
     Route::delete('/eventos/{evento}', [EventoController::class, 'destroy'])->name('eventos.destroy');
 
+    // =========================================================================
+    // 6. RELATÓRIOS (PDF)
+    // =========================================================================
+    Route::get('/relatorio/baixar', [RelatorioController::class, 'gerarRelatorio'])
+        ->name('relatorio.baixar');
 
 });
 
