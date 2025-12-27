@@ -213,9 +213,9 @@
 
                     {{-- MODAL DE CHAMADA --}}
                     <div x-show="modalOpen" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true">
-                        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" @click="modalOpen = false"></div>
+                        <div class="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm" @click="modalOpen = false"></div>
 
-                        <div class="relative bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div class="relative w-full max-w-md rounded-3xl bg-white dark:bg-[#0B1220] shadow-2xl shadow-black/20 dark:shadow-black/60 border border-gray-100 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
                             <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl z-10">
                                 <h3 class="text-lg font-bold text-gray-800 dark:text-white">Diário de Classe</h3>
                                 <button @click="modalOpen = false" class="p-2 -mr-2 text-gray-400 hover:text-gray-600 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,7 +232,7 @@
                                         @change="validarDataEBuscar()" 
                                         min="{{ date('Y') }}-01-01" 
                                         max="{{ date('Y-m-d') }}" 
-                                        class="w-full rounded-xl border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white py-3 px-4 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 shadow-sm"
+                                        class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#0F172A] text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
                                     >
                                 </div>
 
@@ -258,7 +258,7 @@
                                         <span class="font-bold text-lg">Salvo com Sucesso!</span>
                                     </div>
                                     <div x-show="!loading && !sucesso">
-                                        <div x-show="aulas.length === 0 && !loading" class="text-center py-10 text-gray-400 text-sm">
+                                        <div x-show="aulas.length === 0 && !loading" class="text-center py-10 text-gray-500 dark:text-gray-400 text-sm">
                                             <p x-show="diaLivre">Dia livre — Nenhuma aula neste dia 🎉</p>
                                             <p x-show="!diaLivre">Nenhuma aula nesta grade horária.</p>
                                         </div>
@@ -284,36 +284,37 @@
 
                             <div class="p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-black/20">
                                 <button x-show="aulas.length > 0 && !loading && !sucesso" @click="confirmarChamada()" :disabled="enviando" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all disabled:opacity-50"><span x-show="!enviando">Confirmar Chamada</span><span x-show="enviando">Salvando...</span></button>
-                                <button x-show="aulas.length === 0 || sucesso" @click="modalOpen = false" class="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold py-4 rounded-xl shadow-sm">Fechar</button>
+                                <button x-show="aulas.length === 0 || sucesso" @click="modalOpen = false" class="w-full bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold py-4 rounded-xl shadow-sm">Fechar</button>
                             </div>
                         </div>
                     </div>
 
                     {{-- MODAL DE EVENTO --}}
-                    <div x-show="modalEvento" style="display: none" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="modalEvento = false"></div>
-                        <div class="relative bg-white dark:bg-gray-900 w-full max-w-md rounded-3xl shadow-2xl p-6">
-                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Marcar Dia Livre</h3>
+                    <div x-show="modalEvento" style="display: none" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true">
+                        <div class="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm" @click="modalEvento = false"></div>
+
+                        <div class="relative w-full max-w-md rounded-3xl p-6 bg-white dark:bg-[#0B1220] border border-gray-100 dark:border-white/10 shadow-2xl shadow-black/20 dark:shadow-black/60">
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Marcar Dia Livre</h3>
                             <form method="POST" action="{{ route('eventos.store') }}" class="space-y-4">
                                 @csrf
                                 <div>
-                                    <label class="block text-sm font-semibold mb-1">Título</label>
-                                    <input type="text" name="titulo" required placeholder="Ex: Feriado, Recesso, Falta Justificada" class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Título</label>
+                                    <input type="text" name="titulo" required placeholder="Ex: Feriado, Recesso, Falta Justificada" class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#0F172A] text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold mb-1">Data</label>
-                                    <input type="date" name="data" required class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Data</label>
+                                    <input type="date" name="data" required class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#0F172A] text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold mb-1">Tipo</label>
-                                    <select name="tipo" required class="w-full rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Tipo</label>
+                                    <select name="tipo" required class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#0F172A] text-gray-900 dark:text-white py-3 px-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
                                         <option value="sem_aula">Sem Aula</option>
                                         <option value="feriado">Feriado Municipal</option>
                                     </select>
                                 </div>
                                 <div class="flex gap-3 pt-2">
-                                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl">Salvar</button>
-                                    <button type="button" @click="modalEvento = false" class="flex-1 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-xl">Cancelar</button>
+                                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-600/30 active:scale-[0.98] transition">Salvar</button>
+                                    <button type="button" @click="modalEvento = false" class="flex-1 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/10 transition">Cancelar</button>
                                 </div>
                             </form>
                         </div>
