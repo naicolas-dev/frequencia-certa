@@ -35,6 +35,6 @@ COPY --from=node_builder /app/public/build ./public/build
 
 RUN chmod -R 775 storage bootstrap/cache || true
 
-CMD sh -c "php artisan migrate --force --no-interaction \
+CMD sh -c "php artisan migrate:fresh --force --no-interaction \
   && php artisan optimize \
   && php -S 0.0.0.0:${PORT:-10000} -t public"
