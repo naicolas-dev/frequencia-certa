@@ -92,7 +92,7 @@
                                 <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-1">Instalar no iPhone</h3>
                                 <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                                     1. Toque no botão <strong class="text-blue-600">Compartilhar</strong> 
-                                    <svg class="w-4 h-4 inline-block align-text-bottom text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                                    <svg class="w-4 h-4 inline-block align-text-bottom text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7a3.07 3.07 0 000-1.39l7.02-4.11A3 3 0 0018 7.91a3 3 0 10-3-3c0 .23.03.45.08.67l-7.02 4.11a3 3 0 100 4.62l7.02 4.11c-.05.21-.08.43-.08.66a3 3 0 103-3z"/></svg>
                                     abaixo.<br>
                                     2. Selecione <strong class="text-gray-900 dark:text-white">Adicionar à Tela de Início</strong> 
                                     <svg class="w-4 h-4 inline-block align-text-bottom text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>.
