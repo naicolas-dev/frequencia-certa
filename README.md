@@ -1,9 +1,10 @@
 # 🎓 Frequência Certa
 
-![Status](https://img.shields.io/badge/Status-Em_Desenvolvimento-yellow)
-![Laravel](https://img.shields.io/badge/Laravel-10+-FF2D20?style=flat&logo=laravel&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Concluído-brightgreen)
+![Laravel](https://img.shields.io/badge/Laravel-12+-FF2D20?style=flat&logo=laravel&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat&logo=pwa&logoColor=white)
-![PHP](https://img.shields.io/badge/PHP-8.1+-777BB4?style=flat&logo=php&logoColor=white)
+![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat&logo=php&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 > **Sistema de Gestão e Controle de Frequência Escolar.**
 
@@ -11,34 +12,41 @@
 
 ## 📖 Sobre o Projeto
 
-O **Frequência Certa** é uma solução web e mobile (PWA) desenvolvida para ajudar estudantes do ensino médio e técnico a gerenciarem sua assiduidade escolar. 
+O **Frequência Certa** é uma solução híbrida (Web e PWA) desenvolvida para empoderar estudantes do ensino médio e técnico no gerenciamento de sua assiduidade escolar.
 
-O objetivo é evitar reprovações por falta e garantir a manutenção de benefícios financeiros governamentais (como o **Pé-de-Meia**) que exigem frequência mínima de 80%.
+O objetivo central é mitigar a evasão e a reprovação por faltas, além de auxiliar no monitoramento de requisitos para benefícios governamentais (como o **Pé-de-Meia**), que exigem frequência mínima de 80%. Através de uma interface intuitiva, o aluno consegue projetar seu desempenho e receber alertas visuais antes de atingir limites críticos.
 
 ### 🚀 Principais Funcionalidades
-- **Mobile First:** Funciona como App no celular (PWA) e no computador.
-- **Grade Dinâmica:** O aluno monta seu horário semanal.
-- **Cálculo Automático:** Projeção de faltas permitidas baseada no calendário letivo.
-- **Alertas Visuais:** Cores (Verde/Amarelo/Vermelho) indicando risco de reprovação.
+
+- **📱 Mobile First & PWA:** Aplicação instalável no celular (Android/iOS).
+- **📅 Grade Dinâmica:** Montagem flexível de horários semanais adaptada à realidade do ensino técnico.
+- **📊 Inteligência de Dados:** Projeção automática de dias letivos e cálculo percentual de presença em tempo real.
+- **🚦 Alertas Semafóricos:** Indicadores visuais (Verde/Amarelo/Vermelho) que sinalizam o risco de reprovação por disciplina.
+- **🗓️ Gestão de Eventos:** Cadastro de feriados e dias sem aula para garantir a precisão dos cálculos.
+- **📄 Relatórios:** Geração de histórico de presença (Web).
 
 ---
 
-## 📌 Delimitação de Escopo
+## 📸 Demonstração
 
-Este projeto tem como objetivo fornecer uma ferramenta de apoio ao estudante para acompanhamento pessoal de sua frequência escolar.
-
-O sistema **não substitui** o diário oficial das instituições de ensino e **não realiza validações legais** relacionadas a calendário escolar oficial, carga horária anual ou projeção obrigatória de dias letivos, por se tratar de um projeto acadêmico (TCC).
+<div align="center">
+  <img src="public/img/screenshots/desktop.png" alt="Dashboard Desktop" width="600">
+  <br><br>
+  <img src="public/img/screenshots/mobile.png" alt="Versão Mobile" width="250">
+</div>
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
-| Front-end & Mobile | Back-end & Dados | Ferramentas |
+O projeto utiliza uma arquitetura moderna focada em performance e experiência do usuário:
+
+| Front-end & Interface | Back-end & Infraestrutura | Ferramentas de Dev |
 | :--- | :--- | :--- |
-| ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) **HTML5** | ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white) **Laravel** | ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) **Git** |
-| ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white) **CSS3** | ![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white) **PHP 8** | ![VS Code](https://img.shields.io/badge/VS_Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white) **VS Code** |
-| ![JS](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) **JavaScript** | ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) **MySQL** | ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white) **GitHub** |
-| ![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=flat-square&logo=bootstrap&logoColor=white) **Bootstrap/Tailwind** | | |
+| ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) **HTML5** | ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white) **Laravel 12+** | ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) **Git** |
+| ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) **Tailwind CSS** | ![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white) **PHP 8.2** | ![VS Code](https://img.shields.io/badge/VS_Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white) **VS Code** |
+| ![AlpineJS](https://img.shields.io/badge/Alpine.js-8BC0D0?style=flat-square&logo=alpine.js&logoColor=black) **Alpine.js** | ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) **MySQL** | ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white) **GitHub** |
+| ![PWA](https://img.shields.io/badge/PWA-Workbox-5A0FC8?style=flat-square&logo=pwa&logoColor=white) **Service Workers** | | |
 
 ---
 
@@ -46,44 +54,9 @@ O sistema **não substitui** o diário oficial das instituições de ensino e **
 
 | Integrante | Funções Principais | GitHub |
 | :--- | :--- | :--- |
-| **Nicolas Viana Alves** | Full-Stack, Documentação | [@naicolas-br](https://github.com/naicolas-br) |
-| **Bruno Felix Seixas** | Front-end, Design | [@obrunofelix](https://github.com/obrunofelix) |
-| **Igor Thiago Costa Rodrigues** | Back-end | [@luxxzvh](https://github.com/luxxzvh) |
-
----
-
-## ✅ Checklist de Desenvolvimento
-
-*OBS PARA OS INTEGRANTES: Marque as caixas `[x]` editando este arquivo no GitHub conforme o progresso.*
-
-### 🏗️ Fase 1: Configuração & Back-end (02/12 - 10/12)
-- [x] Criar repositório e configurar Git.
-- [x] Instalar Laravel e configurar ambiente (`.env`).
-- [x] **Banco de Dados:** Criar Migrations (Users, Disciplinas, Frequencias).
-- [x] **Banco de Dados:** Criar Models e Relationships.
-- [x] **API:** Criar Controllers básicos (CRUD Disciplinas).
-- [x] Implementar Autenticação (Laravel Breeze/Sanctum).
-
-### 🎨 Fase 2: Front-end & Interface (11/12 - 20/12)
-- [x] Definir Paleta de Cores e Identidade Visual.
-- [x] **Tela Login/Cadastro:** Criar layout responsivo.
-- [x] **Tela Grade (Web):** Criar tabela de horários desktop.
-- [x] **Tela Grade (Mobile):** Criar sistema de abas por dia da semana.
-- [x] **Componentes:** Criar Cards de matéria com indicadores de cor.
-
-### 🧠 Fase 3: Lógica & Integração (21/12 - 05/01)
-- [x] **Lógica:** Algoritmo de cálculo de % de frequência.
-- [x] **Lógica:** Sistema de projeção de dias letivos
-- [x] Conectar Front-end com a API (Axios/Fetch).
-- [x] Implementar funcionalidade "Marcar Feriado/Sem Aula".
-- [x] Implementar funcionalidade "Registrar Presença".
-
-### 📱 Fase 4: PWA & Finalização (06/01 - 01/02)
-- [x] Configurar `manifest.json` (Ícones, Nome, Cores).
-- [x] Configurar Service Workers (Cache offline).
-- [x] Testar instalação no Android/iOS.
-- [ ] Correção de Bugs e refinamento visual.
-- [ ] Escrever Documentação Final.
+| **Nicolas Viana Alves** | Full-Stack, Documentação & Deploy | [@naicolas-br](https://github.com/naicolas-br) |
+| **Bruno Felix Seixas** | Front-end, PWA & UI/UX | [@obrunofelix](https://github.com/obrunofelix) |
+| **Igor Thiago Costa Rodrigues** | Back-end & QA | [@luxxzvh](https://github.com/luxxzvh) |
 
 ---
 
@@ -116,6 +89,8 @@ php artisan migrate
 php artisan serve
 npm run dev
 ```
+Acesse o projeto em: http://localhost:8000
+
 ---
 ## ⚠️ Disclaimer
 
@@ -132,6 +107,4 @@ Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais deta
 
 ---
 
-Desenvolvido como Trabalho de Conclusão de Curso (TCC) do Curso Técnico em Desenvolvimento de Sistemas – 2025/2026.  
-
-Projeto de caráter acadêmico e demonstrativo.
+<div align="center"> <sub>Projeto de caráter acadêmico e demonstrativo. <br>© Desenvolvido para o Curso Técnico em Desenvolvimento de Sistemas – 2025/2026.</sub> </div>
