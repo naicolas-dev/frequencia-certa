@@ -4,24 +4,38 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        if($this->app->environment('production') || !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
-             URL::forceScheme('https');
+        if (
+            $this->app->environment('production') ||
+            (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        ) {
+            URL::forceScheme('https');
         }
+
+        // Personaliza o e-mail de verificação
+        VerifyEmail::toMailUsing(function ($notifiable, string $url) {
+            $appName = config('app.name');
+            $nome = $notifiable->name ?: 'tudo bem?';
+            $expiraEm = config('auth.verification.expire', 60);
+
+            return (new MailMessage)
+                ->subject("Confirme seu e-mail no {$appName}")
+                ->greeting("Olá, {$nome}!")
+                ->line("Recebemos seu cadastro no {$appName}. Para ativar sua conta, confirme seu e-mail clicando no botão abaixo.")
+                ->action('Confirmar e-mail', $url)
+                ->line("Esse link expira em {$expiraEm} minutos.")
+                ->line("Se você não criou uma conta, pode ignorar esta mensagem com segurança.");
+        });
     }
 }
