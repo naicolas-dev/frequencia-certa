@@ -61,7 +61,7 @@ O projeto utiliza uma arquitetura moderna focada em performance e experiência d
 
 | Integrante | Funções Principais | GitHub |
 | :--- | :--- | :--- |
-| **Nicolas Viana Alves** | Full-Stack, Documentação & Deploy | [@naicolas-br](https://github.com/naicolas-br) |
+| **Nicolas Viana Alves** | Full-Stack, Documentação & Deploy | [@naicolas-dev](https://github.com/naicolas-dev) |
 | **Bruno Felix Seixas** | Front-end, PWA & UI/UX | [@obrunofelix](https://github.com/obrunofelix) |
 | **Igor Thiago Costa Rodrigues** | Back-end & QA | [@luxxzvh](https://github.com/luxxzvh) |
 
