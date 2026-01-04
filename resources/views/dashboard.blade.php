@@ -618,7 +618,7 @@
                                             </div>
 
                                             <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                                                Tudo limpo por aqui
+                                                Nenhuma matéria encontrada
                                             </h3>
                                             <p class="text-gray-500 dark:text-gray-400 max-w-xs mx-auto mb-12 text-sm leading-relaxed">
                                                 Sua grade está vazia. Adicione sua primeira matéria para começar.
