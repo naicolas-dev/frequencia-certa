@@ -195,11 +195,21 @@
                             </div>
                         </div>
 
-                        <button @click="abrirModal()" class="mt-8 w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-8 rounded-xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2 group">
-                            <span>Registrar Presença</span>
-                            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                            </svg>
+                        <button @click="abrirModal()" 
+                            class="mt-8 w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-8 rounded-xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2 group">
+                            @if($temAulaHoje)
+                                {{-- CENÁRIO 1: TEM AULA HOJE (Urgência / Ação) --}}
+                                <span>Registrar Presença</span>
+                                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            @else
+                                {{-- CENÁRIO 2: NÃO TEM AULA (Consulta / Gestão) --}}
+                                <span>Gerenciar Frequência</span>
+                                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            @endif
                         </button>
                         <button @click="modalEvento = true" class="mt-3 w-full sm:w-auto bg-white/20 text-white hover:bg-white/30 font-semibold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
