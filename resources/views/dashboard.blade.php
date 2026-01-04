@@ -433,28 +433,27 @@
 
                             @forelse($disciplinasFiltradas as $disciplina)
                             @php
-                            $totalRegistros = $disciplina->frequencias->count();
-                            $totalFaltas = $disciplina->frequencias->where('presente', false)->count();
-                            $porcentagem = 100;
-                            if ($totalRegistros > 0) {
-                            $porcentagem = round((($totalRegistros - $totalFaltas) / $totalRegistros) * 100);
-                            }
+                            // Lógica centralizada: Pergunta ao Model a taxa correta
+                            $porcentagem = $disciplina->taxa_presenca;
 
-                            // CÁLCULO DE PROJEÇÃO DE AULAS
+                            // Dados auxiliares para exibir no HTML
+                            $totalFaltas = $disciplina->frequencias->where('presente', false)->count();
                             $totalPrevisto = $disciplina->total_aulas_previstas;
                             $limiteFaltas = floor($totalPrevisto * 0.25);
                             $restantes = $limiteFaltas - $totalFaltas;
 
+                            // Definição visual (Cores)
                             $corBarra = 'bg-emerald-500';
                             $corTexto = 'text-emerald-600 dark:text-emerald-400';
+                            
                             if($porcentagem < 75) {
-                                $corBarra='bg-red-500' ;
-                                $corTexto='text-red-600 dark:text-red-400' ;
-                                } elseif($porcentagem < 85) {
-                                $corBarra='bg-yellow-500' ;
-                                $corTexto='text-yellow-600 dark:text-yellow-400' ;
-                                }
-                                @endphp
+                                $corBarra='bg-red-500';
+                                $corTexto='text-red-600 dark:text-red-400';
+                            } elseif($porcentagem < 85) {
+                                $corBarra='bg-yellow-500';
+                                $corTexto='text-yellow-600 dark:text-yellow-400';
+                            }
+                            @endphp
 
                                 <div class="group bg-white/70 dark:bg-gray-900/70 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
                                 <div class="h-2 w-full absolute top-0 left-0" style="background-color: {{ $disciplina->cor ?? '#3B82F6' }}"></div>
