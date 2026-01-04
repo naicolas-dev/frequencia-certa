@@ -5,7 +5,7 @@
         <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-emerald-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000 dark:bg-emerald-900/20"></div>
     </div>
 
-    <div class="py-6 sm:py-10 pb-24 md:pb-0">
+    <div class="py-6 sm:py-10 pb-24 md:pb-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
 
             {{-- CABEÇALHO --}}
