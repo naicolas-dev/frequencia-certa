@@ -184,7 +184,7 @@
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
-                                    {{ date('d/m/y -') }} {{ \Carbon\Carbon::now()->locale('pt_BR')->dayName }}
+                                    {{ date('d/m/Y -') }} {{ \Carbon\Carbon::now()->locale('pt_BR')->dayName }}
                                 </div>
                                 <h2 class="text-2xl sm:text-3xl font-bold leading-tight">Diário de Classe</h2>
                             </div>
@@ -433,26 +433,39 @@
 
                             @forelse($disciplinasFiltradas as $disciplina)
                             @php
-                            // Lógica centralizada: Pergunta ao Model a taxa correta
-                            $porcentagem = $disciplina->taxa_presenca;
+                                // 1. Dados básicos
+                                $totalRegistros = $disciplina->frequencias->count(); // Conta quantas aulas teve
+                                $porcentagem = $disciplina->taxa_presenca;
+                                
+                                // Dados para exibição de faltas
+                                $totalFaltas = $disciplina->frequencias->where('presente', false)->count();
+                                $totalPrevisto = $disciplina->total_aulas_previstas;
+                                $limiteFaltas = floor($totalPrevisto * 0.25);
+                                $restantes = $limiteFaltas - $totalFaltas;
 
-                            // Dados auxiliares para exibir no HTML
-                            $totalFaltas = $disciplina->frequencias->where('presente', false)->count();
-                            $totalPrevisto = $disciplina->total_aulas_previstas;
-                            $limiteFaltas = floor($totalPrevisto * 0.25);
-                            $restantes = $limiteFaltas - $totalFaltas;
+                                // 2. Lógica de Cores (UX)
+                                if ($totalRegistros === 0) {
+                                    // ESTADO NEUTRO: Nenhuma aula registrada ainda
+                                    $corBarra = 'bg-gray-300 dark:bg-gray-600'; // Cinza
+                                    $corTexto = 'text-gray-500 dark:text-gray-400';
+                                    $textoPorcentagem = '--'; // Ou 'N/A'
+                                    $larguraBarra = '0'; // Barra vazia
+                                } else {
+                                    // ESTADO ATIVO: Já tem aulas
+                                    $textoPorcentagem = $porcentagem . '';
+                                    $larguraBarra = $porcentagem . '';
 
-                            // Definição visual (Cores)
-                            $corBarra = 'bg-emerald-500';
-                            $corTexto = 'text-emerald-600 dark:text-emerald-400';
-                            
-                            if($porcentagem < 75) {
-                                $corBarra='bg-red-500';
-                                $corTexto='text-red-600 dark:text-red-400';
-                            } elseif($porcentagem < 85) {
-                                $corBarra='bg-yellow-500';
-                                $corTexto='text-yellow-600 dark:text-yellow-400';
-                            }
+                                    $corBarra = 'bg-emerald-500';
+                                    $corTexto = 'text-emerald-600 dark:text-emerald-400';
+                                    
+                                    if($porcentagem < 75) {
+                                        $corBarra = 'bg-red-500';
+                                        $corTexto = 'text-red-600 dark:text-red-400';
+                                    } elseif($porcentagem < 85) {
+                                        $corBarra = 'bg-yellow-500';
+                                        $corTexto = 'text-yellow-600 dark:text-yellow-400';
+                                    }
+                                }
                             @endphp
 
                                 <div class="group bg-white/70 dark:bg-gray-900/70 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
@@ -494,10 +507,10 @@
                                     <div class="space-y-2">
                                         <div class="flex justify-between items-end">
                                             <span class="text-xs font-medium text-gray-400">Frequência</span>
-                                            <span class="text-sm font-bold {{ $corTexto }}">{{ $porcentagem }}%</span>
+                                            <span class="text-sm font-bold {{ $corTexto }}">{{ $textoPorcentagem }}%</span>
                                         </div>
                                         <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden">
-                                            <div class="h-full rounded-full transition-all duration-1000 {{ $corBarra }}" style="width: {{ $porcentagem }}%"></div>
+                                            <div class="h-2.5 rounded-full {{ $corBarra }}" style="width: {{ $larguraBarra }}%"></div>
                                         </div>
                                     </div>
                                 </div>
