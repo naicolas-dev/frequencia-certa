@@ -518,8 +518,25 @@
                                             <span class="text-xs font-medium text-gray-400">Frequência</span>
                                             <span class="text-sm font-bold {{ $corTexto }}">{{ $textoPorcentagem }}%</span>
                                         </div>
-                                        <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden">
-                                            <div class="h-2.5 rounded-full {{ $corBarra }}" style="width: {{ $larguraBarra }}%"></div>
+                                        {{-- Barra de Progresso Inteligente --}}
+                                        <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden"
+                                            x-data="{ 
+                                                id: {{ $disciplina->id }},
+                                                width: window.memoriaBarras[{{ $disciplina->id }}] ?? '{{ $larguraBarra }}%' 
+                                            }"
+                                            x-init="
+                                                // Espera um tick para o navegador renderizar o valor inicial
+                                                $nextTick(() => { 
+                                                    // Define a nova largura alvo
+                                                    width = '{{ $larguraBarra }}%'; 
+                                                    // Salva na memória global para o próximo reload
+                                                    window.memoriaBarras[id] = width;
+                                                })
+                                            ">
+                                            
+                                            <div class="h-2.5 rounded-full transition-all duration-1000 ease-in-out {{ $corBarra }}"
+                                                :style="'width: ' + width">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -768,5 +785,10 @@
                 console.error('Erro:', error);
             }
         }
+    </script>
+
+    <script>
+    // Cria um objeto global para lembrar o tamanho das barras
+    window.memoriaBarras = window.memoriaBarras || {};
     </script>
 </x-app-layout>
