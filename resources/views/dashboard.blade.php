@@ -340,16 +340,15 @@
                 <div id="tour-status" class="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
                     <div id="dashboard-stats" class="contents">
                         <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-[2rem] border border-white/20 dark:border-gray-800 p-6 flex flex-col justify-center shadow-sm">
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Global</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Presença total acumulada</p>
                             <div class="flex items-baseline gap-1">
                                 <h3 class="text-4xl font-extrabold {{ $corGlobal }}">{{ $porcentagemGlobal }}</h3>
                                 <span class="text-lg font-medium text-gray-400">%</span>
                             </div>
-                            <p class="text-xs text-gray-500 mt-2 font-medium">Presença total acumulada</p>
                         </div>
 
                         <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-[2rem] border border-white/20 dark:border-gray-800 p-6 flex flex-col justify-center shadow-sm">
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Em Risco</p>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Matérias Em Risco</p>
                             @if($materiasEmRisco > 0)
                             <div class="flex items-center gap-3">
                                 <h3 class="text-4xl font-extrabold text-red-500">{{ $materiasEmRisco }}</h3>
