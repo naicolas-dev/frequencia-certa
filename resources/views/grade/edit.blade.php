@@ -43,21 +43,31 @@
                       x-data="{ dia: '{{ old('dia_semana', $horario->dia_semana) }}' }">
                     @csrf
                     @method('PUT')
+
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-6 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                    Editando Horário
+                </h3>
                     
                     <div class="mb-8">
                         <label class="block text-sm font-bold text-gray-600 dark:text-gray-300 mb-3 ml-1">Dia da Semana</label>
-                        <div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-2 px-2 snap-x">
-                            @php
-                                $dias = [1 => 'Seg', 2 => 'Ter', 3 => 'Qua', 4 => 'Qui', 5 => 'Sex', 6 => 'Sab'];
-                            @endphp
+                        
+                        {{-- Container Flex com Scroll Horizontal --}}
+                        <div class="flex items-center gap-4 overflow-x-auto p-3 pb-4 -mx-2 snap-x scrollbar-hide">
+                            
+                            @php $dias = [1 => 'Seg', 2 => 'Ter', 3 => 'Qua', 4 => 'Qui', 5 => 'Sex', 6 => 'Sab']; @endphp
                             
                             @foreach($dias as $k => $d)
-                                <label class="cursor-pointer snap-center shrink-0">
+                                <label class="cursor-pointer snap-center shrink-0 w-16 text-center relative group">
+                                    
                                     <input type="radio" name="dia_semana" value="{{ $k }}" class="sr-only" x-model="dia">
-                                    <div class="px-5 py-3 rounded-2xl text-sm font-bold transition-all duration-300 transform active:scale-95 border"
-                                         :class="dia == '{{ $k }}' 
-                                            ? 'bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/30 border-transparent scale-105' 
-                                            : 'bg-white/40 dark:bg-black/20 text-gray-600 dark:text-gray-400 border-white/20 dark:border-gray-700 hover:bg-white/60 dark:hover:bg-gray-800/60'">
+                                    
+                                    <div class="h-12 w-full rounded-2xl flex items-center justify-center text-sm transition-all duration-300 border"
+                                        :class="dia == '{{ $k }}' 
+                                            ? 'bg-blue-600 text-white font-bold shadow-lg shadow-blue-500/40 border-blue-500 scale-110 -translate-y-1' 
+                                            : 'bg-white/40 dark:bg-black/20 text-gray-500 dark:text-gray-400 border-white/20 dark:border-gray-700 group-hover:bg-white/60 dark:group-hover:bg-gray-800/60'">
                                         {{ $d }}
                                     </div>
                                 </label>
