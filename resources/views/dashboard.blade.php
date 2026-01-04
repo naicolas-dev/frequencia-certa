@@ -427,7 +427,7 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-
+                        @if(!request('filtro') || $disciplinasFiltradas->isNotEmpty())
                             <a href="{{ route('disciplinas.criar') }}"
                                 id="tour-nova-materia"
                                 class="hidden md:flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group min-h-[200px]">
@@ -439,6 +439,7 @@
                                 <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Nova Matéria</h4>
                                 <p class="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">Adicionar à grade</p>
                             </a>
+                        @endif
 
                             @forelse($disciplinasFiltradas as $disciplina)
                             @php
@@ -565,17 +566,78 @@
                                 </div>
                             </div>
                             @empty
-                            <div class="col-span-full py-16 text-center md:hidden">
-                                <p class="text-gray-500 font-medium">Nenhuma disciplina cadastrada.</p>
-                            </div>
+                                <div class="col-span-full flex flex-col items-center justify-center py-12 px-4 text-center animate-fade-in-up">
+                                    
+                                    @if(request('filtro') == 'hoje')
+                                        {{-- CENÁRIO 1: FILTRO 'HOJE' VAZIO (Aparece PC e Mobile) --}}
+                                        <div class="relative mb-6">
+                                            <div class="absolute inset-0 bg-orange-400/20 rounded-full blur-xl"></div>
+                                            <div class="relative w-24 h-24 bg-orange-50 dark:bg-orange-900/20 rounded-full flex items-center justify-center border border-orange-100 dark:border-orange-800">
+                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Nada por hoje</h3>
+                                        <p class="text-gray-500 dark:text-gray-400 max-w-xs mx-auto mb-6 text-sm">
+                                            Nenhuma aula agendada para este dia. Aproveite o descanso! 😌
+                                        </p>
+                                        <button onclick="aplicarFiltro('')" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                                            Ver todas as matérias
+                                        </button>
+
+                                    @elseif(request('filtro') == 'risco')
+                                        {{-- CENÁRIO 2: FILTRO 'RISCO' VAZIO (Aparece PC e Mobile) --}}
+                                        <div class="relative mb-6">
+                                            <div class="absolute inset-0 bg-emerald-400/20 rounded-full blur-xl"></div>
+                                            <div class="relative w-24 h-24 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center border border-emerald-100 dark:border-emerald-800">
+                                                <svg class="w-10 h-10 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Tudo Seguro!</h3>
+                                        <p class="text-gray-500 dark:text-gray-400 max-w-xs mx-auto mb-6 text-sm">
+                                            Parabéns! Nenhuma matéria está com frequência baixa no momento. 🏆
+                                        </p>
+                                        <button onclick="aplicarFiltro('')" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                                            Ver todas as matérias
+                                        </button>
+
+                                    @else
+                                        {{-- CENÁRIO 3: ONBOARDING (Aparece SÓ no Mobile) --}}
+                                        {{-- Adicionei a div 'md:hidden' envolvendo tudo aqui --}}
+                                        <div class="md:hidden flex flex-col items-center">
+                                            <div class="relative mb-6 group">
+                                                <div class="absolute inset-0 bg-blue-400/20 rounded-full blur-xl"></div>
+                                                <div class="relative w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center border border-blue-100 dark:border-blue-800">
+                                                    <svg class="w-10 h-10 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+
+                                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                                Tudo limpo por aqui
+                                            </h3>
+                                            <p class="text-gray-500 dark:text-gray-400 max-w-xs mx-auto mb-12 text-sm leading-relaxed">
+                                                Sua grade está vazia. Adicione sua primeira matéria para começar.
+                                            </p>
+
+                                            <div class="flex flex-col items-center gap-2 animate-pulse opacity-80">
+                                                <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                                                    Toque no botão abaixo para adicionar
+                                                </span>
+                                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    
+                                </div>
                             @endforelse
                         </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
 
     @if(Auth::user()->has_seen_intro && !Auth::user()->has_completed_tour)
     <script>
