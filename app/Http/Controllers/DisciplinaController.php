@@ -10,8 +10,44 @@ class DisciplinaController extends Controller
 {
     public function index()
     {
-        $disciplinas = Auth::user()->disciplinas()->with(['horarios', 'frequencias'])->get();
-        return view('dashboard', compact('disciplinas'));
+        // 1. Carrega as disciplinas com os relacionamentos necessários
+        $disciplinas = Auth::user()->disciplinas()
+            ->with(['horarios', 'frequencias'])
+            ->get();
+            
+        // 2. Prepara as variáveis que a Dashboard exige
+        $todasDisciplinas = $disciplinas;
+        $disciplinasFiltradas = $disciplinas; // Filtros aplicados via JS ou Query param se quiser evoluir depois
+        
+        // 3. Cálculos básicos para não quebrar a View
+        $materiasEmRisco = $disciplinas->filter(function ($d) {
+            return $d->taxa_presenca < 75; // Usa o Acessor criado no Model
+        })->count();
+
+        // Cálculo simples da média global (pode ser refinado depois)
+        $somaPresencas = 0;
+        $totalAulas = 0;
+        foreach($disciplinas as $d) {
+            $totalAulas += $d->frequencias->count();
+            $somaPresencas += $d->frequencias->where('presente', true)->count();
+        }
+        $porcentagemGlobal = $totalAulas > 0 ? round(($somaPresencas / $totalAulas) * 100) : 100;
+        
+        $corGlobal = match(true) {
+            $porcentagemGlobal < 75 => 'text-red-500',
+            $porcentagemGlobal < 85 => 'text-yellow-500',
+            default => 'text-emerald-500',
+        };
+
+        // 4. Retorna a view com TUDO que ela precisa
+        return view('dashboard', compact(
+            'disciplinas', 
+            'todasDisciplinas', 
+            'disciplinasFiltradas', 
+            'materiasEmRisco', 
+            'porcentagemGlobal', 
+            'corGlobal'
+        ));
     }
 
     public function criar()
