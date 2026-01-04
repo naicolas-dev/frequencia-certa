@@ -30,6 +30,8 @@ class ProfileTest extends TestCase
             ->patch('/profile', [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
+                'ano_letivo_inicio' => date('Y-01-01'),
+                'ano_letivo_fim' => date('Y-12-31')
             ]);
 
         $response
@@ -52,6 +54,8 @@ class ProfileTest extends TestCase
             ->patch('/profile', [
                 'name' => 'Test User',
                 'email' => $user->email,
+            'ano_letivo_inicio' => date('Y-01-01'),
+            'ano_letivo_fim' => date('Y-12-31')
             ]);
 
         $response
