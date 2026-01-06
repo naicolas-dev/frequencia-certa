@@ -338,31 +338,55 @@
 
                 {{-- WRAPPER PARA ATUALIZAR STATUS VIA AJAX --}}
                 <div id="tour-status" class="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
-                    <div id="dashboard-stats" class="contents">
+<div id="dashboard-stats" class="contents">
+                        
+                        {{-- CARD 1: PRESENÇA TOTAL --}}
                         <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-[2rem] border border-white/20 dark:border-gray-800 p-6 flex flex-col justify-center shadow-sm">
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Presença total acumulada</p>
-                            <div class="flex items-baseline gap-1">
-                                <h3 class="text-4xl font-extrabold {{ $corGlobal }}">{{ $porcentagemGlobal }}</h3>
-                                <span class="text-lg font-medium text-gray-400">%</span>
-                            </div>
+                            
+                            @if($estadoVazio)
+                                {{-- ESTADO VAZIO (Neutro) --}}
+                                <div class="flex items-center gap-3 opacity-60">
+                                    <h3 class="text-4xl font-extrabold text-gray-300 dark:text-gray-600">--</h3>
+                                    <span class="text-xs font-medium text-gray-400 leading-tight">Aguardando<br>primeiros dados</span>
+                                </div>
+                            @else
+                                {{-- ESTADO ATIVO --}}
+                                <div class="flex items-baseline gap-1">
+                                    <h3 class="text-4xl font-extrabold {{ $corGlobal }}">{{ $porcentagemGlobal }}</h3>
+                                    <span class="text-lg font-medium text-gray-400">%</span>
+                                </div>
+                            @endif
                         </div>
 
+                        {{-- CARD 2: MATÉRIAS EM RISCO --}}
                         <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-[2rem] border border-white/20 dark:border-gray-800 p-6 flex flex-col justify-center shadow-sm">
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Matérias Em Risco</p>
-                            @if($materiasEmRisco > 0)
-                            <div class="flex items-center gap-3">
-                                <h3 class="text-4xl font-extrabold text-red-500">{{ $materiasEmRisco }}</h3>
-                                <span class="px-2 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold uppercase">Matérias</span>
-                            </div>
-                            <p class="text-xs text-red-500 mt-2 font-medium">Atenção necessária!</p>
+                            
+                            @if($estadoVazio)
+                                {{-- ESTADO VAZIO (Neutro) --}}
+                                <div class="flex items-center gap-3 opacity-60">
+                                    <div class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-300 dark:text-gray-600">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-400 leading-tight">Sem dados<br>suficientes</span>
+                                </div>
+                            @elseif($materiasEmRisco > 0)
+                                {{-- ESTADO DE ALERTA (Vermelho) --}}
+                                <div class="flex items-center gap-3">
+                                    <h3 class="text-4xl font-extrabold text-red-500">{{ $materiasEmRisco }}</h3>
+                                    <span class="px-2 py-1 rounded-md bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-bold uppercase">Matérias</span>
+                                </div>
+                                <p class="text-xs text-red-500 mt-2 font-medium">Atenção necessária!</p>
                             @else
-                            <div class="flex items-center gap-3">
-                                <h3 class="text-4xl font-extrabold text-emerald-500">0</h3>
-                                <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <p class="text-xs text-emerald-500 mt-2 font-medium">Tudo sob controle.</p>
+                                {{-- ESTADO DE SUCESSO (Verde) --}}
+                                <div class="flex items-center gap-3">
+                                    <h3 class="text-4xl font-extrabold text-emerald-500">0</h3>
+                                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-xs text-emerald-500 mt-2 font-medium">Tudo sob controle.</p>
                             @endif
                         </div>
                     </div>
