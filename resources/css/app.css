@@ -89,3 +89,9 @@
 .driver-overlay path {
     fill: rgba(0, 0, 0, 0.7) !important; /* Overlay mais escuro */
 }
+
+.overflow-hidden-mobile {
+    @media (max-width: 640px) {
+        overflow: hidden;
+    }
+}

@@ -100,6 +100,7 @@
             });
         }
     </script>
+    <x-cookie-banner />
 </body>
 
 </html>
