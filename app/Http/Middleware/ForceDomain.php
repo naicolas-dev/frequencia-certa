@@ -11,7 +11,7 @@ class ForceDomain
     public function handle(Request $request, Closure $next): Response
     {
         // Substitua pelo seu domínio oficial
-        $dominioOficial = 'frequenciacerta.com.br'; 
+        $dominioOficial = 'frequenciacerta.app.br'; 
 
         // Se estiver em produção E o domínio atual NÃO for o oficial
         if (app()->environment('production') && $request->getHost() !== $dominioOficial) {
