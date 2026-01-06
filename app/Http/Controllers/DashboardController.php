@@ -15,15 +15,14 @@ class DashboardController extends Controller
             return redirect()->route('intro');
         }
 
-        // 1. Busca TODAS as matérias (Para estatísticas globais reais)
-        // Trazemos tudo do banco de uma vez (Eager Loading)
+        // 1. Busca TODAS as matérias
         $todasDisciplinas = $user->disciplinas()
             ->with(['frequencias', 'horarios'])
             ->orderBy('nome', 'asc')
             ->get();
 
         // ---------------------------------------------------------
-        // CÁLCULO DE ESTATÍSTICAS (Baseado em TUDO)
+        // CÁLCULO DE ESTATÍSTICAS
         // ---------------------------------------------------------
         
         $todasFrequencias = $todasDisciplinas->pluck('frequencias')->collapse();
@@ -31,39 +30,42 @@ class DashboardController extends Controller
         $totalFaltasGeral = $todasFrequencias->where('presente', false)->count();
         $totalPresencasGeral = $todasFrequencias->where('presente', true)->count();
 
-        // Porcentagem Global Real
-        $porcentagemGlobal = 100;
+        // LÓGICA DO ESTADO VAZIO (Novo) ✨
+        // Verdadeiro se: não tem matérias OU tem matérias mas nunca registrou aula
+        $temAlgumRegistro = $totalAulasGeral > 0;
+        $estadoVazio = $todasDisciplinas->isEmpty() || !$temAlgumRegistro;
+
+        // Porcentagem Global
+        $porcentagemGlobal = 0; // Começa zerado para não bugar
         if ($totalAulasGeral > 0) {
             $porcentagemGlobal = round((($totalAulasGeral - $totalFaltasGeral) / $totalAulasGeral) * 100);
         }
 
         // Cor do texto Global
-        $corGlobal = 'text-emerald-600 dark:text-emerald-400';
+        $corGlobal = 'text-emerald-500'; // Padrão
         if($porcentagemGlobal < 75) {
-            $corGlobal = 'text-red-600 dark:text-red-400';
+            $corGlobal = 'text-red-500';
         } elseif($porcentagemGlobal < 85) {
-            $corGlobal = 'text-yellow-600 dark:text-yellow-400';
+            $corGlobal = 'text-yellow-500';
         }
 
-        // Contagem Real de Riscos (Independente do dia)
+        // Contagem de Riscos
+        // FIX: Só conta como risco se a matéria tiver pelo menos 1 registro de frequência.
+        // Matérias novas (0 aulas) não devem contar como "Em Risco".
         $materiasEmRisco = $todasDisciplinas->filter(function($d) {
-            return $d->taxa_presenca < 75;
+            return $d->frequencias->count() > 0 && $d->taxa_presenca <= 75;
         })->count();
 
         // ---------------------------------------------------------
-        // APLICAÇÃO DOS FILTROS (Apenas para a Lista de Cards)
+        // APLICAÇÃO DOS FILTROS
         // ---------------------------------------------------------
         
-        // Começamos com a lista completa
         $disciplinasFiltradas = $todasDisciplinas;
 
         // Filtro: HOJE
         if ($request->filtro === 'hoje') {
-            $diaHoje = now()->dayOfWeek; // 0 (Dom) - 6 (Sab)
-            
-            // Filtramos a coleção em memória (mais rápido que nova query)
+            $diaHoje = now()->dayOfWeek; 
             $disciplinasFiltradas = $todasDisciplinas->filter(function ($d) use ($diaHoje) {
-                // Verifica se a matéria tem horário hoje
                 return $d->horarios->contains('dia_semana', $diaHoje);
             });
         }
@@ -71,7 +73,8 @@ class DashboardController extends Controller
         // Filtro: EM RISCO
         if ($request->filtro === 'risco') {
             $disciplinasFiltradas = $todasDisciplinas->filter(function ($d) {
-                return $d->taxa_presenca < 75;
+                // Mesma lógica: só exibe no filtro se tiver aulas registradas E estiver mal
+                return $d->frequencias->count() > 0 && $d->taxa_presenca <= 75;
             });
         }
 
@@ -83,6 +86,7 @@ class DashboardController extends Controller
             'materiasEmRisco', 
             'totalPresencasGeral', 
             'totalFaltasGeral',
+            'estadoVazio'
         ));
     }
 }
