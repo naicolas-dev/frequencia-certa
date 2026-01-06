@@ -347,7 +347,7 @@
                             @if($estadoVazio)
                                 {{-- ESTADO VAZIO (Neutro) --}}
                                 <div class="flex items-center gap-3 opacity-60">
-                                    <h3 class="text-4xl font-extrabold text-gray-300 dark:text-gray-600">--</h3>
+                                    <h3 class="text-4xl font-extrabold text-gray-300 dark:text-gray-600">-</h3>
                                     <span class="text-xs font-medium text-gray-400 leading-tight">Aguardando<br>primeiros dados</span>
                                 </div>
                             @else
@@ -485,7 +485,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
-                        Matérias com frequência abaixo ou igual a 75%
+                        Mostrando apenas matérias com frequência abaixo ou igual a 75%
                     </div>
                     @endif
 
@@ -495,19 +495,20 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        @if(!request('filtro') || $disciplinasFiltradas->isNotEmpty())
-                            <a href="{{ route('disciplinas.criar') }}"
-                                id="tour-nova-materia"
-                                class="hidden md:flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group min-h-[200px]">
-                                <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                </div>
-                                <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Nova Matéria</h4>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">Adicionar à grade</p>
-                            </a>
-                        @endif
+                            {{-- BOTÃO DE ADICIONAR (Só aparece se já existirem matérias) --}}
+                            @if($disciplinasFiltradas->isNotEmpty())
+                                <a href="{{ route('disciplinas.criar') }}"
+                                   id="tour-nova-materia"
+                                   class="hidden md:flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-3xl hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all duration-300 group min-h-[200px]">
+                                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                        </svg>
+                                    </div>
+                                    <h4 class="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Nova Matéria</h4>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 text-center mt-1">Adicionar à grade</p>
+                                </a>
+                            @endif
 
                             @forelse($disciplinasFiltradas as $disciplina)
                             @php
@@ -701,6 +702,39 @@
                                                 </svg>
                                             </div>
                                         </div>
+
+                                        {{-- 🖥️ VERSÃO DESKTOP (Nova - Só aparece em telas médias ou maiores) --}}
+                                        <div class="hidden md:flex flex-col items-center max-w-2xl mx-auto">
+                                            {{-- Ícone Hero Ilustrativo --}}
+                                            <div class="relative mb-10 group cursor-default">
+                                                <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                                                <div class="relative w-32 h-32 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center border-4 border-blue-50 dark:border-blue-900/30 shadow-2xl">
+                                                    <svg class="w-14 h-14 text-blue-600 dark:text-blue-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+
+                                            <h3 class="text-3xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight">
+                                                Sua grade está vazia
+                                            </h3>
+                                            
+                                            <p class="text-lg text-gray-500 dark:text-gray-400 mb-10 leading-relaxed max-w-lg">
+                                                Para o Frequência Certa funcionar, precisamos saber quais matérias você cursa. Cadastre sua grade horária e deixe o resto com a gente.
+                                            </p>
+
+                                            {{-- Botão de Ação Principal (CTA) --}}
+                                            <a href="{{ route('disciplinas.criar') }}" id= "tour-nova-materia" class="group relative inline-flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold py-4 px-10 rounded-2xl shadow-xl shadow-blue-600/20 active:scale-[0.98] transition-all duration-200 transform hover:-translate-y-1">
+                                                <svg class="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                                <span>Adicionar Primeira Matéria</span>
+                                                
+                                                {{-- Efeito de brilho no botão --}}
+                                                <div class="absolute inset-0 rounded-2xl ring-2 ring-white/20 group-hover:ring-white/40 transition-all"></div>
+                                            </a>
+                                        </div>
+
                                     @endif
                                     
                                 </div>
@@ -738,16 +772,10 @@
 
             if (isMobile) {
                 tourSteps.push({
-                    element: '#tour-add-mobile',
-                    popover: {
-                        title: 'Adicione uma Matéria',
-                        description: 'Toque no botão central para adicionar suas disciplinas.'
-                    }
-                }, {
                     element: '#tour-grade-mobile',
                     popover: {
                         title: 'Sua Grade',
-                        description: 'Veja seus horários nesta aba.'
+                        description: 'Acesse a visão completa da sua semana.'
                     }
                 }, {
                     element: '#tour-profile-mobile',
@@ -755,19 +783,25 @@
                         title: 'Seu Perfil',
                         description: 'Gerencie sua conta e outras configurações aqui.'
                     }
+                }, {
+                    element: '#tour-add-mobile',
+                    popover: {
+                        title: 'Adicione uma Matéria',
+                        description: 'Toque no botão central para adicionar suas matérias.'
+                    }
                 });
             } else {
                 tourSteps.push({
-                    element: '#tour-nova-materia',
-                    popover: {
-                        title: 'Adicione uma Matéria',
-                        description: 'Comece clicando aqui para cadastrar disciplinas.'
-                    }
-                }, {
                     element: '#tour-grade-desktop',
                     popover: {
                         title: 'Grade Horária',
                         description: 'Acesse a visão completa da sua semana.'
+                    }
+                }, {
+                    element: '#tour-nova-materia',
+                    popover: {
+                        title: 'Adicione uma Matéria',
+                        description: 'Comece clicando aqui para cadastrar suas matérias.'
                     }
                 });
             }
@@ -788,11 +822,17 @@
                             'Content-Type': 'application/json'
                         }
                     });
+                    // AVISA O BANNER QUE O TOUR ACABOU
+                    window.dispatchEvent(new CustomEvent('tour-finished'));
+
                     driverObj.destroy();
                 }
             });
 
-            setTimeout(() => driverObj.drive(), 1000);
+            // AVISA QUE O TOUR VAI COMEÇAR (Imediatamente)
+            window.dispatchEvent(new CustomEvent('tour-starting'));
+
+            setTimeout(() => driverObj.drive(), 100);
         });
     </script>
     @endif

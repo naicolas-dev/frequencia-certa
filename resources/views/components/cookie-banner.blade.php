@@ -1,13 +1,14 @@
-<div x-data="{ 
+<div id="cookie-banner" x-data="{ 
         show: false,
         init() {
             setTimeout(() => {
-                if (!localStorage.getItem('cookie_seen')) {
+                // ADICIONADO: Verifica se o tour NÃO está ativo antes de mostrar
+                if (!localStorage.getItem('cookie_seen') && !document.body.classList.contains('driver-active')) {
                     this.show = true;
                     // TRAVA A ROLAGEM DA TELA (Congela o fundo)
                     document.body.style.overflow = 'hidden'; 
                 }
-            }, 700);
+            }, 200);
         },
         accept() {
             localStorage.setItem('cookie_seen', 'true'); 
@@ -16,6 +17,10 @@
             document.body.style.overflow = ''; 
         }
      }"
+     {{-- 👇 EVENTOS NECESSÁRIOS ADICIONADOS AQUI 👇 --}}
+     @tour-starting.window="show = false; document.body.style.overflow = '';" 
+     @tour-finished.window="if(!localStorage.getItem('cookie_seen')) { setTimeout(() => { show = true; document.body.style.overflow = 'hidden'; }, 800) }"
+     
      x-init="init()"
      style="display: none;"
      x-show="show"
