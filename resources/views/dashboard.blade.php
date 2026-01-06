@@ -338,7 +338,7 @@
 
                 {{-- WRAPPER PARA ATUALIZAR STATUS VIA AJAX --}}
                 <div id="tour-status" class="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
-<div id="dashboard-stats" class="contents">
+                    <div id="dashboard-stats" class="contents">
                         
                         {{-- CARD 1: PRESENÇA TOTAL --}}
                         <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-[2rem] border border-white/20 dark:border-gray-800 p-6 flex flex-col justify-center shadow-sm">
@@ -351,9 +351,53 @@
                                     <span class="text-xs font-medium text-gray-400 leading-tight">Aguardando<br>primeiros dados</span>
                                 </div>
                             @else
-                                {{-- ESTADO ATIVO --}}
-                                <div class="flex items-baseline gap-1">
-                                    <h3 class="text-4xl font-extrabold {{ $corGlobal }}">{{ $porcentagemGlobal }}</h3>
+                                {{-- ESTADO ATIVO (Com Animação Inteligente e Bidirecional) --}}
+                                <div class="flex items-baseline gap-1"
+                                     x-data="{ 
+                                        current: window.lastPercentage ?? 0, 
+                                        target: {{ $porcentagemGlobal }} 
+                                     }"
+                                     x-init="
+                                         // Delay para garantir que o DOM renderizou
+                                         setTimeout(() => {
+                                             const duration = 1500; 
+                                             const startValue = current;
+                                             const endValue = target;
+                                             const change = endValue - startValue; // Calcula a diferença (pode ser negativa)
+                                             let start = null;
+                                             
+                                             // Função de Easing (Suave)
+                                             const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4);
+
+                                             const step = (timestamp) => {
+                                                 if (!start) start = timestamp;
+                                                 const progress = Math.min((timestamp - start) / duration, 1);
+                                                 
+                                                 // A mágica: soma a diferença (positiva ou negativa) ao valor inicial
+                                                 current = Math.floor(startValue + (change * easeOutQuart(progress)));
+
+                                                 if (progress < 1) {
+                                                     window.requestAnimationFrame(step);
+                                                 } else {
+                                                     // Garante que termina no número exato
+                                                     current = endValue;
+                                                     // SALVA NA MEMÓRIA GLOBAL para a próxima vez
+                                                     window.lastPercentage = endValue;
+                                                 }
+                                             };
+                                             
+                                             // Só anima se houver mudança
+                                             if (startValue !== endValue) {
+                                                 window.requestAnimationFrame(step);
+                                             } else {
+                                                 window.lastPercentage = endValue;
+                                             }
+                                         }, 200);
+                                     ">
+                                    <h3 class="text-4xl font-extrabold {{ $corGlobal }}" x-text="current">
+                                        {{-- Fallback visual enquanto o Alpine carrega --}}
+                                        {{ $porcentagemGlobal }}
+                                    </h3>
                                     <span class="text-lg font-medium text-gray-400">%</span>
                                 </div>
                             @endif
