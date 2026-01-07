@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DisciplinaController;
 use App\Http\Controllers\GradeHorariaController;
+use App\Http\Controllers\GradeImportController;
 use App\Http\Controllers\FrequenciaController;
 use App\Http\Controllers\IntroController;
 use App\Http\Controllers\EventoController;
@@ -30,17 +31,14 @@ Route::get('/offline', function () {
     return view('offline');
 });
 
-// --- GRUPO PROTEGIDO (Geral do App - SEM LIMITES DE ACESSO) ---
+// --- GRUPO PROTEGIDO (Geral do App) ---
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // 1. DASHBOARD & ONBOARDING
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // ... (Suas rotas de Intro e Tour mantidas aqui) ...
-    Route::get('/intro', [IntroController::class, 'index'])->name('intro'); // Usei a versão do controller que parece ser a final
+    Route::get('/intro', [IntroController::class, 'index'])->name('intro');
     Route::post('/intro', [IntroController::class, 'store'])->name('intro.store');
-    
-    // API Tour Finish
+
     Route::post('/tour/finish', function (Request $request) {
         $request->user()->update(['has_completed_tour' => true]);
         return response()->json(['success' => true]);
@@ -62,6 +60,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/grade/{id}', [GradeHorariaController::class, 'update'])->name('grade.update');
     Route::delete('/grade/{id}', [GradeHorariaController::class, 'destroy'])->name('grade.destroy');
 
+    // Importação de Grade com IA (Texto/Foto)
+
+    // 1. Rota para EXIBIR a tela (GET) - COLOCAR ANTES DAS ROTAS DE CRUD
+    Route::get('/grade/importar', [GradeImportController::class, 'index'])
+        ->name('grade.importar.view');
+
+    Route::post('/api/grade/salvar-lote', [GradeImportController::class, 'salvarLote'])
+        ->name('grade.salvar.lote');
+
+    Route::middleware('throttle:5,1')
+         ->post('/api/grade/importar', [GradeImportController::class, 'processar'])
+         ->name('grade.importar');
+
     // 4. FREQUÊNCIA
     Route::get('/api/buscar-aulas', [FrequenciaController::class, 'buscarPorData']);
     Route::post('/api/registrar-chamada', [FrequenciaController::class, 'registrarLote']);
@@ -72,18 +83,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::resource('eventos', EventoController::class)->except(['show', 'create']); // Use resource pra simplificar se quiser, ou mantenha suas rotas manuais
+    Route::resource('eventos', EventoController::class)->except(['show', 'create']);
 
     // 6. RELATÓRIOS
     Route::get('/relatorio/baixar', [RelatorioController::class, 'gerarRelatorio'])->name('relatorio.baixar');
 
     // =========================================================================
-    // 🤖 IA ADVISOR (COM THROTTLE / LIMITE)
+    // 🤖 IA ADVISOR (Consulta de Faltas)
     // =========================================================================
-    // Só esta rota precisa de proteção contra abuso (5 requests/minuto)
-    Route::middleware('throttle:5,1')->get('/api/ai/analisar/{disciplina}', [AiAdvisorController::class, 'analisarRisco'])
-        ->name('ai.analisar');
+    Route::middleware('throttle:5,1')
+         ->get('/api/ai/analisar/{disciplina}', [AiAdvisorController::class, 'analisarRisco'])
+         ->name('ai.analisar');
 
 });
 
