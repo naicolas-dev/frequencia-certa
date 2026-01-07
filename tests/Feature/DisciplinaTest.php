@@ -37,7 +37,6 @@ class DisciplinaTest extends TestCase
             'cor' => '#FF5733',
             'data_inicio' => '2024-02-01',
             'data_fim' => '2024-12-15',
-            // Adicione outros campos obrigatórios aqui se houver (ex: professor, sala)
         ];
 
         $response = $this

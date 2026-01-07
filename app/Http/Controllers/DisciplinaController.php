@@ -17,27 +17,32 @@ class DisciplinaController extends Controller
             
         // 2. Prepara as variáveis que a Dashboard exige
         $todasDisciplinas = $disciplinas;
-        $disciplinasFiltradas = $disciplinas; // Filtros aplicados via JS ou Query param se quiser evoluir depois
+        $disciplinasFiltradas = $disciplinas; 
         
-        // 3. Cálculos básicos para não quebrar a View
+        // 3. Cálculos básicos
         $materiasEmRisco = $disciplinas->filter(function ($d) {
-            return $d->taxa_presenca < 75; // Usa o Acessor criado no Model
+            // Só conta como risco se tiver aulas registradas e frequência baixa
+            return $d->frequencias->count() > 0 && $d->taxa_presenca < 75; 
         })->count();
 
-        // Cálculo simples da média global (pode ser refinado depois)
+        // Cálculo da média global
         $somaPresencas = 0;
         $totalAulas = 0;
         foreach($disciplinas as $d) {
             $totalAulas += $d->frequencias->count();
             $somaPresencas += $d->frequencias->where('presente', true)->count();
         }
-        $porcentagemGlobal = $totalAulas > 0 ? round(($somaPresencas / $totalAulas) * 100) : 100;
+        $porcentagemGlobal = $totalAulas > 0 ? round(($somaPresencas / $totalAulas) * 100) : 0; // Inicia em 0 se vazio
         
         $corGlobal = match(true) {
             $porcentagemGlobal < 75 => 'text-red-500',
             $porcentagemGlobal < 85 => 'text-yellow-500',
             default => 'text-emerald-500',
         };
+
+        // --- CORREÇÃO DO ERRO ---
+        // Definimos a variável que estava faltando na View
+        $estadoVazio = $disciplinas->isEmpty() || $totalAulas === 0;
 
         // 4. Retorna a view com TUDO que ela precisa
         return view('dashboard', compact(
@@ -46,7 +51,8 @@ class DisciplinaController extends Controller
             'disciplinasFiltradas', 
             'materiasEmRisco', 
             'porcentagemGlobal', 
-            'corGlobal'
+            'corGlobal',
+            'estadoVazio' // <--- Agora enviamos ela aqui!
         ));
     }
 
@@ -76,7 +82,6 @@ class DisciplinaController extends Controller
             'porcentagem_minima' => 75,
         ]);
 
-        // ALTERAÇÃO: Suporte a AJAX
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['message' => 'Disciplina cadastrada com sucesso!'], 201);
         }
@@ -118,7 +123,6 @@ class DisciplinaController extends Controller
             'data_fim' => $request->data_fim
         ]);
 
-        // ALTERAÇÃO: Suporte a AJAX
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['message' => 'Disciplina atualizada com sucesso!'], 200);
         }
@@ -129,7 +133,7 @@ class DisciplinaController extends Controller
         ]);
     }
 
-    public function destroy(Request $request, $id) // Injetei o Request aqui
+    public function destroy(Request $request, $id)
     {
         $disciplina = Disciplina::findOrFail($id);
 
@@ -142,12 +146,6 @@ class DisciplinaController extends Controller
 
         $disciplina->delete();
 
-        /**
-         * ALTERAÇÃO PRINCIPAL:
-         * Se a requisição for AJAX (como no botão de excluir da dashboard),
-         * retornamos JSON. Assim o fetch() no JavaScript recebe um 200 OK limpo,
-         * sem redirecionamentos que causam erro de cache.
-         */
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json(['message' => 'Disciplina removida com sucesso!'], 200);
         }
