@@ -28,9 +28,10 @@ class GradeImportController extends Controller
         ]);
 
         try {
-            $apiKey = env('GEMINI_API_KEY');
-            $modelName = 'gemini-2.5-flash'; 
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$apiKey}";
+            $apiKey = config('gemini.key');
+            $modelName = config('gemini.model'); 
+            $base = config('gemini.url');
+            $url = "{$base}{$modelName}:generateContent?key={$apiKey}";
 
             $parts = [];
 
