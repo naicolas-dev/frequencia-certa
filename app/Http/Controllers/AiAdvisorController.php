@@ -66,10 +66,20 @@ class AiAdvisorController extends Controller
             return $this->fallbackResponse('Erro de configuração no servidor (API Key).');
         }
 
-        $modelName = 'gemini-2.5-flash';
+        $modelName = config('gemini.model');
+        if (empty($modelName)) {
+            Log::error('GEMINI_MODEL não configurada no .env');
+            return $this->fallbackResponse('Erro de configuração no servidor (Model Name).');
+        }
 
-        // URL da API (Usando a versão flash sugerida)
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$apiKey}";
+        $base = config('gemini.url');
+        if (empty($base)) {
+            Log::error('GEMINI_URL não configurada no .env');
+            return $this->fallbackResponse('Erro de configuração no servidor (Base URL).');
+        }
+
+        // URL da API
+        $url = "{$base}{$modelName}:generateContent?key={$apiKey}";
 
         // [NOVO] 7. Prompt com Contexto de Tempo
         $prompt = "
@@ -99,7 +109,7 @@ class AiAdvisorController extends Controller
             // 8. Requisição Segura (Sem withoutVerifying para produção)
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->timeout(10)->post($url, [
+            ])->timeout(20)->post($url, [
                 'contents' => [['parts' => [['text' => $prompt]]]],
                 'generationConfig' => [
                     'response_mime_type' => 'application/json',
