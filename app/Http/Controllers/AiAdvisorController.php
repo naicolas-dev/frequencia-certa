@@ -46,7 +46,7 @@ class AiAdvisorController extends Controller
         // [NOVO] 5. Contexto Temporal (Para evitar redundância)
         $hoje = now()->format('d/m/Y');
         $mes = now()->month;
-        
+
         // Define a fase do ano para a IA entender a gravidade
         $contextoTemporal = match(true) {
             $mes <= 3 => "INÍCIO do ano letivo. (Faltar agora é perigoso pois queima margem cedo)",
@@ -60,13 +60,13 @@ class AiAdvisorController extends Controller
         // --- CHAMADA À API ---
 
         // 6. Validação da API Key
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('gemini.key');
         if (empty($apiKey)) {
             Log::error('GEMINI_API_KEY não configurada no .env');
             return $this->fallbackResponse('Erro de configuração no servidor (API Key).');
         }
 
-        $modelName = 'gemini-3-flash';
+        $modelName = 'gemini-2.5-flash';
 
         // URL da API (Usando a versão flash sugerida)
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$modelName}:generateContent?key={$apiKey}";
@@ -91,7 +91,7 @@ class AiAdvisorController extends Controller
             2. RISCO MÉDIO: Se o saldo está condizente com o tempo que falta, mas exige cautela para não acumular.
             3. RISCO BAIXO: Se ele tem muitas faltas sobrando e já estamos na RETA FINAL. Pode ser mais flexível e dizer que ele conquistou esse descanso.
             4. PONTO CRÍTICO: Se {$restantes} for menor que 3, o risco é ALTO independente da data.
-            
+
             Retorne APENAS JSON: { \"analise\": \"frase curta e direta\", \"risco\": \"BAIXO/MEDIO/ALTO\", \"emoji\": \"icone\" }
         ";
 
