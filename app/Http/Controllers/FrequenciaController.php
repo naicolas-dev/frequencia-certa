@@ -54,8 +54,8 @@ class FrequenciaController extends Controller
             });
             })
             ->with('disciplina')
-            ->get()
-            ->unique('disciplina_id');
+            ->orderBy('horario_inicio', 'asc')
+            ->get();
 
         // 2. Busca o Histórico: O que já foi gravado nessa data?
         $historico = Frequencia::where('user_id', Auth::id())
@@ -72,6 +72,7 @@ class FrequenciaController extends Controller
                 'nome' => $aula->disciplina->nome,
                 'cor' => $aula->disciplina->cor,
                 'horario' => $aula->horario_inicio,
+                'horario_fim' => $aula->horario_fim,
                 // Se existir registro, usa ele. Se não, padrão é true (Presente)
                 'presente' => $registro ? (bool)$registro->presente : true,
                 'ja_registrado' => $registro ? true : false // Para saber se é edição ou novo

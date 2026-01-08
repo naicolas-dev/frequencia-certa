@@ -285,7 +285,10 @@
                                                             <h4 class="font-bold text-gray-800 dark:text-gray-100" x-text="aula.nome"></h4>
                                                             <span x-show="aula.ja_registrado" class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Editando</span>
                                                         </div>
-                                                        <p class="text-xs text-gray-500 mt-1 font-mono" x-text="aula.horario.substring(0,5)"></p>
+                                                        <p class="text-xs text-gray-500 mt-1 font-mono">
+                                                            <span x-text="aula.horario.substring(0,5)"></span> - 
+                                                            <span x-text="aula.horario_fim.substring(0,5)"></span>
+                                                        </p>
                                                     </div>
                                                     <button @click="aula.presente = !aula.presente" class="w-12 h-12 rounded-xl flex items-center justify-center transition-all active:scale-90 shadow-sm border" :class="aula.presente ? 'bg-emerald-50 border-emerald-200 text-emerald-600' : 'bg-red-50 border-red-200 text-red-600'">
                                                         <span class="font-bold text-lg" x-text="aula.presente ? 'P' : 'F'"></span>
