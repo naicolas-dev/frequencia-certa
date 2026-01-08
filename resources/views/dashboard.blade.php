@@ -143,7 +143,7 @@
                             try {
                                 let payload = {
                                     data: this.dataSelecionada,
-                                    chamada: this.aulas.map(a => ({ disciplina_id: a.disciplina_id, presente: a.presente }))
+                                    chamada: this.aulas.map(a => ({ disciplina_id: a.disciplina_id, presente: a.presente, horario: a.horario }))
                                 };
                                 let response = await fetch('/api/registrar-chamada', {
                                     method: 'POST',

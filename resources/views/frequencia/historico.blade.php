@@ -116,6 +116,13 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400 capitalize">
                                 {{ $data->translatedFormat('l') }}
                             </p>
+                            <span class="inline-flex items-center gap-1 text-xs text-gray-500">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                {{ \Carbon\Carbon::parse($registro->horario)->format('H:i') }}
+                            </span>
                         </div>
 
                         <div class="ml-2">
@@ -144,6 +151,7 @@
                         <tr>
                             <th class="px-6 py-4">Data</th>
                             <th class="px-6 py-4">Disciplina</th>
+                            <th class="px-6 py-4">Horário</th>
                             <th class="px-6 py-4">Dia da Semana</th>
                             <th class="px-6 py-4 text-center">Status</th>
                         </tr>
@@ -159,6 +167,9 @@
                                         <div class="w-3 h-3 rounded-full shadow-sm" style="background-color: {{ $registro->disciplina->cor }}"></div>
                                         <span class="font-semibold text-gray-700 dark:text-gray-200">{{ $registro->disciplina->nome }}</span>
                                     </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    {{ \Carbon\Carbon::parse($registro->horario)->format('H:i') }}
                                 </td>
                                 <td class="px-6 py-4 capitalize">
                                     {{ \Carbon\Carbon::parse($registro->data)->translatedFormat('l') }}
