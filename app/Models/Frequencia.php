@@ -13,6 +13,7 @@ class Frequencia extends Model
         'user_id',
         'disciplina_id',
         'data',
+        'horario',
         'presente', // true = veio, false = faltou
         'observacao',
     ];

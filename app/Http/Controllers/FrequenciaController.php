@@ -60,12 +60,14 @@ class FrequenciaController extends Controller
         // 2. Busca o Histórico: O que já foi gravado nessa data?
         $historico = Frequencia::where('user_id', Auth::id())
             ->whereDate('data', $dataAlvo)
-            ->get()
-            ->keyBy('disciplina_id'); // Facilita a busca
+            ->get();
 
         // 3. Mescla os dois: Grade + O que foi marcado
         $resultado = $grade->map(function($aula) use ($historico) {
-            $registro = $historico->get($aula->disciplina_id);
+            $registro = $historico->first(function($h) use ($aula) {
+                return $h->disciplina_id == $aula->disciplina->id 
+                    && substr($h->horario, 0, 5) == substr($aula->horario_inicio, 0, 5);
+            });
 
             return [
                 'disciplina_id' => $aula->disciplina->id,
@@ -88,6 +90,9 @@ class FrequenciaController extends Controller
         $dados = $request->validate([
             'data' => 'required|date',
             'chamada' => 'required|array',
+            'chamada.*.disciplina_id' => 'required|exists:disciplinas,id',
+            'chamada.*.presente' => 'required|boolean',
+            'chamada.*.horario' => 'required',
         ]);
 
         $diaLivre = app(CalendarioService::class)
@@ -105,6 +110,7 @@ class FrequenciaController extends Controller
                     'user_id' => Auth::id(),
                     'disciplina_id' => $item['disciplina_id'],
                     'data' => $dados['data'], // Usa a data escolhida no calendário
+                    'horario' => $item['horario'],
                 ],
                 [
                     'presente' => $item['presente'],
