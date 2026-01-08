@@ -13,13 +13,11 @@ use App\Models\GradeHoraria;
 
 class GradeImportController extends Controller
 {
-    // Exibe a tela
     public function index()
     {
         return view('grade.importar');
     }
 
-    // Processa a IA (Lê a grade)
     public function processar(Request $request)
     {
         $request->validate([
@@ -36,7 +34,6 @@ class GradeImportController extends Controller
             $parts = [];
 
             if ($request->hasFile('foto_grade')) {
-                // Lógica de imagem
                 $image = $request->file('foto_grade');
                 $parts[] = [
                     'inline_data' => [
@@ -50,28 +47,26 @@ class GradeImportController extends Controller
                 $contexto = "Analise este texto cru fornecido pelo aluno:\n\n---\n$textoUsuario\n---";
             }
 
-            // PROMPT
+            // --- ALTERAÇÃO 1: Prompt pedindo a COR ---
             $promptInstruction = "
                 $contexto
                 
                 TAREFA:
                 Converta essa grade escolar em um JSON Array estrito.
                 
-                PADRÃO DE ENTRADA:
-                O aluno mandou algo como '1º-Matéria' ou '1 - Matéria'. 
-                
                 REGRAS:
                 1. Identifique o Dia.
                 2. Extraia a ordem (número da aula) e o nome da disciplina limpo.
-                3. NÃO inclua explicações. NÃO use Markdown. Apenas o JSON cru.
+                3. Tente identificar uma cor para a matéria (hexadecimal) se houver dica visual ou no texto. Caso contrário, retorne null.
+                4. NÃO inclua explicações. Apenas JSON.
 
                 MODELO DE SAÍDA (Array de Objetos):
                 [
                     {
                         \"nome_dia\": \"Segunda-Feira\",
                         \"aulas\": [
-                            { \"ordem\": 1, \"disciplina\": \"Matemática\" },
-                            { \"ordem\": 2, \"disciplina\": \"História\" }
+                            { \"ordem\": 1, \"disciplina\": \"Matemática\", \"cor\": \"#FF0000\" },
+                            { \"ordem\": 2, \"disciplina\": \"História\", \"cor\": null }
                         ]
                     }
                 ]
@@ -79,7 +74,6 @@ class GradeImportController extends Controller
 
             $parts[] = ['text' => $promptInstruction];
 
-            // Chamada API
             $response = Http::withHeaders(['Content-Type' => 'application/json'])
                 ->post($url, [
                     'contents' => [['parts' => $parts]],
@@ -96,9 +90,6 @@ class GradeImportController extends Controller
 
             $jsonRaw = data_get($response->json(), 'candidates.0.content.parts.0.text');
             
-            // Log e Limpeza
-            Log::info("RESPOSTA BRUTA IA: " . $jsonRaw);
-
             if (preg_match('/\[.*\]/s', $jsonRaw, $matches)) {
                 $jsonRaw = $matches[0];
             }
@@ -106,9 +97,22 @@ class GradeImportController extends Controller
             $dados = json_decode($jsonRaw, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                Log::error('JSON ERROR: ' . json_last_error_msg());
-                return response()->json(['error' => 'A IA respondeu, mas o formato veio quebrado. Tente de novo.'], 422);
+                return response()->json(['error' => 'Erro no formato da resposta da IA.'], 422);
             }
+
+            // --- ALTERAÇÃO 2: Preencher cores vazias antes de enviar pro front ---
+            foreach ($dados as &$dia) {
+                if (isset($dia['aulas']) && is_array($dia['aulas'])) {
+                    foreach ($dia['aulas'] as &$aula) {
+                        // Se a IA não mandou cor ou mandou inválida, gera aqui
+                        if (empty($aula['cor']) || !preg_match('/^#[a-f0-9]{6}$/i', $aula['cor'])) {
+                            $aula['cor'] = $this->gerarCorAleatoria();
+                        }
+                    }
+                }
+            }
+            unset($dia); // Quebra a referência do foreach
+            unset($aula);
 
             return response()->json(['data' => $dados]);
 
@@ -118,11 +122,10 @@ class GradeImportController extends Controller
         }
     }
 
-    // Salva no Banco (Lote)
     public function salvarLote(Request $request)
     {
         $dados = $request->input('dados');
-        $config = $request->input('configuracao'); // Recebe do front
+        $config = $request->input('configuracao');
 
         if (!$dados || !is_array($dados)) {
             return response()->json(['error' => 'Dados inválidos.'], 400);
@@ -132,7 +135,6 @@ class GradeImportController extends Controller
 
         try {
             $user = Auth::user();
-            // Usa os campos corretos do Model User.php
             $dataInicio = $user->ano_letivo_inicio ?? now(); 
             $dataFim    = $user->ano_letivo_fim    ?? now()->addMonths(6);
 
@@ -143,18 +145,22 @@ class GradeImportController extends Controller
                 foreach ($dia['aulas'] as $aula) {
                     $nomeDisciplina = mb_convert_case($aula['disciplina'], MB_CASE_TITLE, "UTF-8");
                     
-                    // Cria ou recupera a disciplina
-                    $disciplina = Disciplina::firstOrCreate(
-                        ['user_id' => Auth::id(), 'nome' => $nomeDisciplina],
+                    // --- ALTERAÇÃO 3: Usar a cor que veio do Front-end ---
+                    // Usamos updateOrCreate para garantir que a cor escolhida seja salva,
+                    // mesmo que a disciplina já exista.
+                    $disciplina = Disciplina::updateOrCreate(
+                        [
+                            'user_id' => Auth::id(), 
+                            'nome' => $nomeDisciplina
+                        ],
                         [
                             'data_inicio' => $dataInicio, 
                             'data_fim' => $dataFim,    
                             'total_aulas_previstas' => 80, 
-                            'cor' => $this->gerarCorAleatoria() 
+                            'cor' => $aula['cor'] // <--- Salva a cor escolhida
                         ]
                     );
 
-                    // CÁLCULO DINÂMICO DE HORÁRIO
                     $horarios = $this->calcularHorarioDinamico($aula['ordem'], $config);
 
                     GradeHoraria::create([
@@ -177,11 +183,8 @@ class GradeImportController extends Controller
         }
     }
 
-    /**
-     * Calcula o horário baseado na ordem da aula e config do usuário.
-     */
-    private function calcularHorarioDinamico($ordem, $config)
-    {
+    // ... (Métodos auxiliares calcularHorarioDinamico, converterDiaParaInt e gerarCorAleatoria permanecem iguais)
+    private function calcularHorarioDinamico($ordem, $config) {
         $horaBaseStr    = $config['inicio'] ?? '07:00';
         $duracaoAula    = intval($config['duracao'] ?? 50);
         $duracaoRecreio = intval($config['intervaloTempo'] ?? 15);
@@ -204,9 +207,6 @@ class GradeImportController extends Controller
         return ['inicio' => $inicio, 'fim' => $fim];
     }
 
-    /**
-     * Converte string de dia para inteiro (Segunda = 1)
-     */
     private function converterDiaParaInt($texto) {
         $texto = mb_strtolower($texto);
         if (str_contains($texto, 'segunda')) return 1;
