@@ -150,7 +150,7 @@ class GradeImportController extends Controller
                             'data_inicio' => $dataInicio, 
                             'data_fim' => $dataFim,    
                             'total_aulas_previstas' => 80, 
-                            'cor_hex' => $this->gerarCorAleatoria() 
+                            'cor' => $this->gerarCorAleatoria() 
                         ]
                     );
 

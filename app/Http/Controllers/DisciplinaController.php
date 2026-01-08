@@ -70,6 +70,11 @@ class DisciplinaController extends Controller
             'data_fim' => 'nullable|date|after_or_equal:data_inicio',
         ]);
 
+        // Se não veio cor do formulário, gera uma aleatória
+        if (empty($dados['cor'])) {
+            $dados['cor'] = $this->gerarCorAleatoria();
+        }
+
         $inicio = $request->data_inicio ?? Auth::user()->ano_letivo_inicio;
         $fim    = $request->data_fim    ?? Auth::user()->ano_letivo_fim;
 
