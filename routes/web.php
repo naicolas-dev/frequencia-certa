@@ -34,6 +34,23 @@ Route::get('/offline', function () {
 // --- GRUPO PROTEGIDO (Geral do App) ---
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    Route::post('/push/subscribe', function (Request $request) {
+        $request->validate([
+            'endpoint'    => 'required',
+            'keys.auth'   => 'required',
+            'keys.p256dh' => 'required',
+        ]);
+
+        $endpoint = $request->endpoint;
+        $token = $request->keys['auth'];
+        $key = $request->keys['p256dh'];
+
+        $user = $request->user();
+        $user->updatePushSubscription($endpoint, $key, $token);
+
+        return response()->json(['success' => true]);
+    });
+
     // 1. DASHBOARD & ONBOARDING
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/intro', [IntroController::class, 'index'])->name('intro');
