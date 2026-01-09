@@ -124,3 +124,53 @@ if ('serviceWorker' in navigator) {
             });
     });
 }
+
+/* =========================
+   NOTIFICAÇÕES PUSH
+========================= */
+
+// Função auxiliar para converter a chave VAPID
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+window.pedirPermissaoNotificacao = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        return;
+    }
+
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'granted') {
+        // 1. Obter o registo do Service Worker
+        const registration = await navigator.serviceWorker.ready;
+
+        // 2. Subscrever no PushManager (Browser)
+        const subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(window.VAPID_PUBLIC_KEY) 
+            // Dica: Pode imprimir {{ config('webpush.vapid.public_key') }} num <script> no blade para não deixar hardcoded
+        });
+
+        // 3. Enviar para o Laravel
+        await fetch('/push/subscribe', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify(subscription)
+        });
+
+        window.toastSuccess('Notificações ativadas com sucesso!');
+    }
+};

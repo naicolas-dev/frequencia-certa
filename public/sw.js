@@ -65,3 +65,53 @@ self.addEventListener('fetch', (event) => {
             })
     );
 });
+
+// 4. ESCUTAR NOTIFICAÇÕES PUSH
+self.addEventListener('push', (event) => {
+    let data = {};
+    
+    if (event.data) {
+        try {
+            data = event.data.json();
+        } catch (e) {
+            data = { title: 'Nova Notificação', body: event.data.text() };
+        }
+    } else {
+        data = { title: 'Frequência Certa', body: 'Tem uma nova mensagem.' };
+    }
+
+    const options = {
+        body: data.body,
+        icon: '/img/icons/icon-192x192.png', // Usando ícone do seu manifest
+        badge: '/img/icons/icon-192x192.png',
+        vibrate: [100, 50, 100],
+        data: {
+            url: data.url || '/' // URL para abrir ao clicar
+        },
+        actions: data.actions || []
+    };
+
+    event.waitUntil(
+        self.registration.showNotification(data.title, options)
+    );
+});
+
+// 5. CLIQUE NA NOTIFICAÇÃO
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close(); // Fecha a notificação
+
+    event.waitUntil(
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+            // Se a aba já estiver aberta, foca nela
+            for (const client of clientList) {
+                if (client.url === event.notification.data.url && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // Se não, abre uma nova janela
+            if (clients.openWindow) {
+                return clients.openWindow(event.notification.data.url);
+            }
+        })
+    );
+});

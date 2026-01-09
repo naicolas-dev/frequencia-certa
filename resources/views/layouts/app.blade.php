@@ -20,6 +20,10 @@
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
 
     <script>
+        window.VAPID_PUBLIC_KEY = "{{ config('webpush.vapid.public_key') }}";
+    </script>
+
+    <script>
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark')
         } else {
