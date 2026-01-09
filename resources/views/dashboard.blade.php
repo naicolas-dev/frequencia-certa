@@ -973,6 +973,9 @@
     window.memoriaBarras = window.memoriaBarras || {};
     </script>
 
+    {{-- BANNER DE NOTIFICAÇÕES --}}
+    <x-notification-banner />
+
     {{-- SCRIPT DA I.A. --}}
     <script>
         window.consultarIa = async function(disciplinaId) {
