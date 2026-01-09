@@ -129,12 +129,9 @@ if ('serviceWorker' in navigator) {
    NOTIFICAÇÕES PUSH
 ========================= */
 
-// Função auxiliar para converter a chave VAPID
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);
     for (let i = 0; i < rawData.length; ++i) {
@@ -145,32 +142,48 @@ function urlBase64ToUint8Array(base64String) {
 
 window.pedirPermissaoNotificacao = async () => {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        return;
+        console.error('Push notifications não suportadas.');
+        return false;
     }
 
+    // 1. Pede permissão ao navegador
     const permission = await Notification.requestPermission();
     
     if (permission === 'granted') {
-        // 1. Obter o registo do Service Worker
-        const registration = await navigator.serviceWorker.ready;
+        try {
+            // 2. Obtém o SW e a chave pública (definida no blade ou .env)
+            const registration = await navigator.serviceWorker.ready;
+            
+            // IMPORTANTE: Adicione VITE_VAPID_PUBLIC_KEY=sua_chave no .env
+            const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY; 
 
-        // 2. Subscrever no PushManager (Browser)
-        const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(window.VAPID_PUBLIC_KEY) 
-            // Dica: Pode imprimir {{ config('webpush.vapid.public_key') }} num <script> no blade para não deixar hardcoded
-        });
+            if (!vapidPublicKey) {
+                console.error('Chave VAPID não configurada no .env');
+                return false;
+            }
 
-        // 3. Enviar para o Laravel
-        await fetch('/push/subscribe', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify(subscription)
-        });
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+            });
 
-        window.toastSuccess('Notificações ativadas com sucesso!');
+            // 3. Envia para o Laravel
+            await fetch('/push/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify(subscription)
+            });
+
+            window.toastSuccess('Notificações ativadas!');
+            return true;
+        } catch (error) {
+            console.error('Erro ao inscrever push:', error);
+            window.toastError('Erro ao ativar notificações.');
+            return false;
+        }
     }
+    return false;
 };
