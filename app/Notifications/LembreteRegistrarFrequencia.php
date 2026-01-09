@@ -22,7 +22,6 @@ class LembreteRegistrarFrequencia extends Notification
         return (new WebPushMessage)
             ->title('Chamada! 📢')
             ->body('Você tem aulas hoje! Não se esqueça de registrar sua frequência para manter a média.')
-            ->action('Registrar Agora', 'frequencia_hoje')
             ->data(['url' => '/dashboard']);
     }
 }

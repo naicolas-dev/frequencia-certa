@@ -22,7 +22,6 @@ class LembreteAdicionarDisciplina extends Notification
         return (new WebPushMessage)
             ->title('Comece seus estudos! 📚')
             ->body('Percebemos que você ainda não cadastrou nenhuma matéria. Vamos resolver isso?')
-            ->action('Adicionar Matéria', 'add_disciplina')
             ->data(['url' => '/disciplinas/criar']); // Redireciona direto para o form
     }
 }
