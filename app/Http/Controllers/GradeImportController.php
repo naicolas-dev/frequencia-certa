@@ -47,7 +47,6 @@ class GradeImportController extends Controller
                 $contexto = "Analise este texto cru fornecido pelo aluno:\n\n---\n$textoUsuario\n---";
             }
 
-            // --- ALTERAÇÃO 1: Prompt pedindo a COR ---
             $promptInstruction = "
                 $contexto
                 
@@ -100,18 +99,41 @@ class GradeImportController extends Controller
                 return response()->json(['error' => 'Erro no formato da resposta da IA.'], 422);
             }
 
-            // --- ALTERAÇÃO 2: Preencher cores vazias antes de enviar pro front ---
+            // Mapa para consistência de cores
+            $coresDefinidas = [];
+
             foreach ($dados as &$dia) {
                 if (isset($dia['aulas']) && is_array($dia['aulas'])) {
                     foreach ($dia['aulas'] as &$aula) {
-                        // Se a IA não mandou cor ou mandou inválida, gera aqui
-                        if (empty($aula['cor']) || !preg_match('/^#[a-f0-9]{6}$/i', $aula['cor'])) {
-                            $aula['cor'] = $this->gerarCorAleatoria();
+                        
+                        // 1. Evitar "Matéria Indefinida" genérica
+                        $rawDisciplina = $aula['disciplina'] ?? '';
+                        
+                        if (!is_string($rawDisciplina) || trim($rawDisciplina) === '') {
+                            $diaNome = $dia['nome_dia'] ?? 'Dia';
+                            $ordemAula = $aula['ordem'] ?? '?';
+                            $rawDisciplina = "Matéria ($diaNome - $ordemAula)";
+                            $aula['disciplina'] = $rawDisciplina;
+                        }
+
+                        $nomeKey = mb_strtoupper(trim($rawDisciplina));
+
+                        // 2. Lógica de Cores (Consistente)
+                        if (!empty($aula['cor']) && preg_match('/^#[a-f0-9]{6}$/i', $aula['cor'])) {
+                            $coresDefinidas[$nomeKey] = $aula['cor'];
+                        } 
+                        elseif (isset($coresDefinidas[$nomeKey])) {
+                            $aula['cor'] = $coresDefinidas[$nomeKey];
+                        } 
+                        else {
+                            $novaCor = $this->gerarCorAleatoria();
+                            $coresDefinidas[$nomeKey] = $novaCor;
+                            $aula['cor'] = $novaCor;
                         }
                     }
                 }
             }
-            unset($dia); // Quebra a referência do foreach
+            unset($dia);
             unset($aula);
 
             return response()->json(['data' => $dados]);
@@ -143,23 +165,28 @@ class GradeImportController extends Controller
                 if ($diaSemanaInt === null) continue;
 
                 foreach ($dia['aulas'] as $aula) {
-                    $nomeDisciplina = mb_convert_case($aula['disciplina'], MB_CASE_TITLE, "UTF-8");
                     
-                    // --- ALTERAÇÃO 3: Usar a cor que veio do Front-end ---
-                    // Usamos updateOrCreate para garantir que a cor escolhida seja salva,
-                    // mesmo que a disciplina já exista.
-                    $disciplina = Disciplina::updateOrCreate(
-                        [
-                            'user_id' => Auth::id(), 
-                            'nome' => $nomeDisciplina
-                        ],
-                        [
-                            'data_inicio' => $dataInicio, 
-                            'data_fim' => $dataFim,    
-                            'total_aulas_previstas' => 80, 
-                            'cor' => $aula['cor'] // <--- Salva a cor escolhida
-                        ]
-                    );
+                    $nomeRaw = $aula['disciplina'] ?? 'Matéria Desconhecida';
+                    $nomeDisciplina = mb_convert_case($nomeRaw, MB_CASE_TITLE, "UTF-8");
+                    
+                    $disciplina = Disciplina::firstOrNew([
+                        'user_id' => Auth::id(),
+                        'nome' => $nomeDisciplina
+                    ]);
+
+                    $disciplina->data_inicio = $dataInicio;
+                    $disciplina->data_fim = $dataFim;
+
+                    $disciplina->carga_horaria_total = 80; 
+
+                    // Lógica de blindagem da cor
+                    $corSegura = !empty($aula['cor']) ? $aula['cor'] : $this->gerarCorAleatoria();
+
+                    if (!$disciplina->exists || empty($disciplina->cor)) {
+                        $disciplina->cor = $corSegura;
+                    }
+
+                    $disciplina->save();
 
                     $horarios = $this->calcularHorarioDinamico($aula['ordem'], $config);
 
@@ -183,7 +210,6 @@ class GradeImportController extends Controller
         }
     }
 
-    // ... (Métodos auxiliares calcularHorarioDinamico, converterDiaParaInt e gerarCorAleatoria permanecem iguais)
     private function calcularHorarioDinamico($ordem, $config) {
         $horaBaseStr    = $config['inicio'] ?? '07:00';
         $duracaoAula    = intval($config['duracao'] ?? 50);
@@ -194,7 +220,6 @@ class GradeImportController extends Controller
 
         for ($i = 1; $i < $ordem; $i++) {
             $horaAtual->addMinutes($duracaoAula);
-            
             if ($i == $aposAulaNum) {
                 $horaAtual->addMinutes($duracaoRecreio);
             }
