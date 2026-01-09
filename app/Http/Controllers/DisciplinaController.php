@@ -52,7 +52,7 @@ class DisciplinaController extends Controller
             'materiasEmRisco', 
             'porcentagemGlobal', 
             'corGlobal',
-            'estadoVazio' // <--- Agora enviamos ela aqui!
+            'estadoVazio'
         ));
     }
 
@@ -65,7 +65,7 @@ class DisciplinaController extends Controller
     {
         $request->validate([
             'nome' => 'required|string|max:255',
-            'cor' => 'required|string|max:7',
+            'cor' => 'nullable|string|max:7',
             'data_inicio' => 'nullable|date',
             'data_fim' => 'nullable|date|after_or_equal:data_inicio',
         ]);
@@ -159,5 +159,23 @@ class DisciplinaController extends Controller
             'type' => 'success',
             'message' => 'Disciplina removida com sucesso!'
         ]);
+    }
+
+    private function gerarCorAleatoria(): string
+    {
+        $cores = [
+            '#EF4444', // Red
+            '#F97316', // Orange
+            '#F59E0B', // Amber
+            '#84CC16', // Lime
+            '#10B981', // Emerald
+            '#06B6D4', // Cyan
+            '#3B82F6', // Blue
+            '#6366F1', // Indigo
+            '#8B5CF6', // Violet
+            '#EC4899', // Pink
+        ];
+
+        return $cores[array_rand($cores)];
     }
 }
