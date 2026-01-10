@@ -5,51 +5,59 @@ FROM node:20-alpine AS node_builder
 
 WORKDIR /app
 
-# 📦 Instala dependências JS
+# 📦 Instala dependências JS (cacheável)
 COPY package*.json ./
 RUN echo "📦 Instalando dependências frontend..." \
- && npm ci
+ && npm ci --no-audit --no-fund
 
-# 🏗️ Build dos assets
-COPY . .
+# 🏗️ Copia somente o necessário pro build do Vite
+COPY vite.config.* postcss.config.* tailwind.config.* ./
+COPY resources ./resources
+COPY public ./public
+
 RUN echo "🏗️ Buildando assets frontend..." \
  && npm run build
 
 
 # ============================================================
-# 🟩 STAGE 2 — PHP DEPENDENCIES (Composer)
+# 🟩 STAGE 2 — PHP DEPENDENCIES (Composer + Vendor)
 # ============================================================
 FROM php:8.2-cli-alpine AS composer_builder
 
 WORKDIR /app
 
-# 🔧 Dependências do sistema + extensões PHP exigidas
-RUN echo "🔧 Instalando dependências PHP e extensões..." \
+# 🔧 Pacotes + build deps (pra compilar extensões) + extensões PHP
+RUN echo "🔧 Instalando dependências do sistema e extensões PHP (builder)..." \
  && apk add --no-cache \
-    git unzip curl \
-    libzip-dev icu-dev oniguruma-dev postgresql-dev \
+      bash git unzip curl \
+      icu-libs libzip postgresql-libs oniguruma \
+ && apk add --no-cache --virtual .build-deps \
+      $PHPIZE_DEPS icu-dev libzip-dev postgresql-dev oniguruma-dev \
  && docker-php-ext-install \
-    intl zip pdo_pgsql
+      intl zip pdo_pgsql mbstring \
+ && apk del .build-deps
 
 # 🎼 Composer
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# 📦 Instala dependências PHP
-COPY composer.json composer.lock ./
+# ✅ IMPORTANTE:
+# Copie o código (incluindo artisan) ANTES do composer install,
+# senão o post-autoload-dump tenta rodar "php artisan ..." e falha.
+COPY . .
+
+# 📦 Instala dependências PHP (gera vendor/)
 RUN echo "📦 Instalando dependências PHP (composer)..." \
  && composer install \
-    --no-dev \
-    --optimize-autoloader \
-    --no-interaction \
-    --prefer-dist \
-    --no-progress
+      --no-dev \
+      --optimize-autoloader \
+      --no-interaction \
+      --prefer-dist \
+      --no-progress
 
-# 📁 Copia código para autoload e discovery
-COPY . .
-RUN echo "🔍 Descobrindo packages Laravel..." \
- && php artisan package:discover --ansi \
- && composer dump-autoload --optimize
+# (Opcional, mas ajuda em algumas imagens) garante cache dirs existirem
+RUN mkdir -p storage bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache || true
 
 
 # ============================================================
@@ -59,23 +67,25 @@ FROM php:8.2-cli-alpine
 
 WORKDIR /var/www/html
 
-# 🔧 Extensões PHP em runtime
+# 🔧 Runtime libs + build deps temporários pra compilar extensões (e remover depois)
 RUN echo "🔧 Instalando extensões PHP em runtime..." \
  && apk add --no-cache \
-    bash unzip \
-    libzip-dev icu-dev oniguruma-dev postgresql-dev \
+      bash unzip \
+      icu-libs libzip postgresql-libs oniguruma \
+ && apk add --no-cache --virtual .build-deps \
+      $PHPIZE_DEPS icu-dev libzip-dev postgresql-dev oniguruma-dev \
  && docker-php-ext-install \
-    intl zip pdo_pgsql
+      intl zip pdo_pgsql mbstring \
+ && apk del .build-deps
 
-# 📁 Código da aplicação
-COPY . .
+# 📁 Copia app já com vendor pronto do builder
+COPY --from=composer_builder /app /var/www/html
 
-# 📦 Dependências PHP + assets compilados
-COPY --from=composer_builder /app/vendor ./vendor
+# ✅ Copia assets compilados do Vite
 COPY --from=node_builder /app/public/build ./public/build
 
-# 🔐 Permissões
-RUN echo "🔐 Ajustando permissões..." \
+# 🔐 Permissões (sem quebrar build se não existir algo)
+RUN echo "🔐 Ajustando permississões..." \
  && chmod -R 775 storage bootstrap/cache || true
 
 
