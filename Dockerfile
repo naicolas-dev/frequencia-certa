@@ -1,64 +1,97 @@
-# ---------- Frontend build ----------
+# ============================================================
+# 🟦 STAGE 1 — FRONTEND BUILD (Vite / Node)
+# ============================================================
 FROM node:20-alpine AS node_builder
+
 WORKDIR /app
 
+# 📦 Instala dependências JS
 COPY package*.json ./
-RUN npm ci
+RUN echo "📦 Instalando dependências frontend..." \
+ && npm ci
 
+# 🏗️ Build dos assets
 COPY . .
-RUN npm run build
+RUN echo "🏗️ Buildando assets frontend..." \
+ && npm run build
 
 
-# ---------- Composer deps (PHP 8.2) ----------
+# ============================================================
+# 🟩 STAGE 2 — PHP DEPENDENCIES (Composer)
+# ============================================================
 FROM php:8.2-cli-alpine AS composer_builder
+
 WORKDIR /app
 
-RUN apk add --no-cache git unzip curl
+# 🔧 Dependências do sistema + extensões PHP exigidas
+RUN echo "🔧 Instalando dependências PHP e extensões..." \
+ && apk add --no-cache \
+    git unzip curl \
+    libzip-dev icu-dev oniguruma-dev postgresql-dev \
+ && docker-php-ext-install \
+    intl zip pdo_pgsql
+
+# 🎼 Composer
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+# 📦 Instala dependências PHP
 COPY composer.json composer.lock ./
-RUN composer install \
-  --no-dev \
-  --optimize-autoloader \
-  --no-interaction \
-  --prefer-dist \
-  --no-progress \
-  --no-scripts
+RUN echo "📦 Instalando dependências PHP (composer)..." \
+ && composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction \
+    --prefer-dist \
+    --no-progress
 
+# 📁 Copia código para autoload e discovery
 COPY . .
+RUN echo "🔍 Descobrindo packages Laravel..." \
+ && php artisan package:discover --ansi \
+ && composer dump-autoload --optimize
 
-RUN php artisan package:discover --ansi \
-  && composer dump-autoload --optimize
 
-
-# ---------- Runtime (PHP 8.2) ----------
+# ============================================================
+# 🟨 STAGE 3 — RUNTIME (PHP 8.2)
+# ============================================================
 FROM php:8.2-cli-alpine
+
 WORKDIR /var/www/html
 
-RUN apk add --no-cache \
+# 🔧 Extensões PHP em runtime
+RUN echo "🔧 Instalando extensões PHP em runtime..." \
+ && apk add --no-cache \
     bash unzip \
     libzip-dev icu-dev oniguruma-dev postgresql-dev \
-  && docker-php-ext-install pdo_pgsql intl zip
+ && docker-php-ext-install \
+    intl zip pdo_pgsql
 
-# App code
+# 📁 Código da aplicação
 COPY . .
 
-# Deps + assets buildados
+# 📦 Dependências PHP + assets compilados
 COPY --from=composer_builder /app/vendor ./vendor
 COPY --from=node_builder /app/public/build ./public/build
 
-RUN chmod -R 775 storage bootstrap/cache || true
+# 🔐 Permissões
+RUN echo "🔐 Ajustando permissões..." \
+ && chmod -R 775 storage bootstrap/cache || true
 
 
-# Migrations com DIRECT; runtime com POOLER
+# ============================================================
+# 🚀 STARTUP — MIGRATIONS + OPTIMIZE + SERVER
+# ============================================================
 CMD sh -c '\
   set -e; \
-  echo "➡️ Rodando migrations com Neon DIRECT"; \
+  echo "🚀 Inicializando aplicação Laravel"; \
+  echo "➡️ Usando Neon DIRECT para migrations"; \
   export DATABASE_URL="${DATABASE_URL_DIRECT:-$DATABASE_URL}"; \
   php artisan migrate --force --no-interaction; \
-  echo "➡️ Subindo app com Neon POOLER"; \
-  export DATABASE_URL="${DATABASE_URL_POOLER:-$DATABASE_URL}"; \
+  echo "⚡ Otimizando Laravel"; \
   php artisan optimize; \
+  echo "➡️ Subindo aplicação com Neon POOLER"; \
+  export DATABASE_URL="${DATABASE_URL_POOLER:-$DATABASE_URL}"; \
+  echo "🌍 Servidor disponível na porta ${PORT:-10000}"; \
   php -S 0.0.0.0:${PORT:-10000} -t public \
 '
