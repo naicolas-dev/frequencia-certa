@@ -119,6 +119,8 @@ class FrequenciaController extends Controller
             );
         }
 
+        app(GamificationService::class)->verificarOfensiva(Auth::user());
+
         return response()->json(['sucesso' => true]);
     }
 
