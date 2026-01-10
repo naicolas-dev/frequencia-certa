@@ -66,6 +66,102 @@
                 </div>
             </div>
 
+            <div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4">
+
+                @php
+                    // LÓGICA DE ESTADOS DA OFENSIVA
+                    $streak = Auth::user()->current_streak;
+                    $hoje = \Carbon\Carbon::now()->startOfDay();
+                    $ultimoRegistro = Auth::user()->last_streak_date ? \Carbon\Carbon::parse(Auth::user()->last_streak_date)->startOfDay() : null;
+                    
+                    // Verifica se marcou hoje
+                    $marcouHoje = $ultimoRegistro && $ultimoRegistro->equalTo($hoje);
+
+                    // Definição dos Estilos baseados no estado
+                    if ($streak == 0) {
+                        // ESTADO 0: INATIVO (Cinza Claro / Fantasma)
+                        $cardClasses = "bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700";
+                        $textClasses = "text-gray-500 dark:text-gray-400";
+                        $numClasses = "text-gray-400 dark:text-gray-500";
+                        $iconColor = "text-gray-300 dark:text-gray-600";
+                        $msg = "Comece hoje!";
+                        $fireOpacity = "opacity-0"; // Sem brilho de fundo
+                    } elseif (!$marcouHoje) {
+                        // ESTADO 1: EM RISCO / NÃO MARCOU HOJE (Cinza Escuro TikTok - Urgência)
+                        $cardClasses = "bg-gray-500 dark:bg-gray-700 border-none shadow-inner";
+                        $textClasses = "text-gray-200";
+                        $numClasses = "text-white opacity-90";
+                        $iconColor = "text-gray-300";
+                        $msg = "Salve a ofensiva!"; // Texto de alerta
+                        $fireOpacity = "opacity-0"; // Fogo apagado
+                    } else {
+                        // ESTADO 2: ATIVO / MARCOU HOJE (Laranja - Sucesso)
+                        $cardClasses = "bg-gradient-to-br from-orange-500 to-red-600 shadow-lg shadow-orange-500/20";
+                        $textClasses = "text-orange-100";
+                        $numClasses = "text-white drop-shadow-md";
+                        $iconColor = "text-white";
+                        $msg = "Em chamas!";
+                        $fireOpacity = "opacity-100"; // Fogo brilhando
+                    }
+                @endphp
+                
+                <div class="relative overflow-hidden rounded-3xl p-4 group flex items-center justify-between h-24 sm:h-28 transition-all duration-300 hover:scale-[1.02] {{ $cardClasses }}">
+                    
+                    <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/20 blur-2xl transition-opacity duration-500 {{ $fireOpacity }}"></div>
+
+                    <div class="relative z-10 flex flex-col justify-center">
+                        <p class="text-[10px] font-bold uppercase tracking-wider opacity-80 {{ $textClasses }}">Ofensiva</p>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-4xl font-black {{ $numClasses }}">{{ $streak }}</span>
+                            <span class="text-sm font-bold opacity-80 {{ $textClasses }}">dias</span>
+                        </div>
+                        <p class="text-[10px] font-medium mt-0.5 opacity-90 truncate {{ $textClasses }}">
+                            {{ $msg }}
+                        </p>
+                    </div>
+
+                    <div class="relative z-10 mr-2 drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 {{ $iconColor }}">
+                        @if($streak > 0 && !$marcouHoje)
+                            <div class="animate-pulse">
+                                <svg class="w-10 h-10 sm:w-12 sm:h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                            </div>
+                        @elseif($streak == 0)
+                            <svg class="w-10 h-10 sm:w-12 sm:h-12" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" />
+                            </svg>
+                        @else
+                            <svg class="w-10 h-10 sm:w-12 sm:h-12" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" />
+                            </svg>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 p-4 shadow-sm flex flex-col justify-center h-24 sm:h-28 transition-transform hover:scale-[1.02]">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Conquistas</p>
+                        <span class="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-1.5 py-0.5 rounded text-gray-500">
+                            {{ count(Auth::user()->badges ?? []) }}
+                        </span>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                        @forelse(Auth::user()->badges ?? [] as $badge)
+                            <div class="shrink-0 w-10 h-10 bg-gradient-to-b from-yellow-100 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/10 rounded-xl border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center text-xl shadow-sm"
+                                title="{{ $badge }}">
+                                @if($badge == 'fire_3') 🕯️ @elseif($badge == 'warrior_7') ⚔️ @else 🏅 @endif
+                            </div>
+                        @empty
+                            <div class="flex items-center gap-2 text-gray-400 opacity-60">
+                                <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center grayscale">🏆</div>
+                                <span class="text-[10px] font-medium leading-tight">Sem medalhas<br>ainda...</span>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {{-- CARD DO DIÁRIO DE CLASSE --}}
