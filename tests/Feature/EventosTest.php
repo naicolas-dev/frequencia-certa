@@ -7,6 +7,7 @@ use App\Models\Evento;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Carbon\Carbon;
 
 class EventosTest extends TestCase
 {
@@ -35,11 +36,11 @@ class EventosTest extends TestCase
             'user_id' => $user->id,
         ]);
     
-        // 2. Busca o registro e verifica a data formatada
-        $evento = \App\Models\Evento::where('user_id', $user->id)->first();
+        // Busca o registro para confirmar
+        $evento = Evento::where('user_id', $user->id)->first();
         
-        // Compara apenas a parte da data (Y-m-d), ignorando o horário
-        $this->assertEquals('2024-02-10', \Carbon\Carbon::parse($evento->data)->format('Y-m-d'));
+        // Compara apenas a data (Y-m-d)
+        $this->assertEquals('2024-02-10', Carbon::parse($evento->data)->format('Y-m-d'));
     }
 
     /**
@@ -62,15 +63,22 @@ class EventosTest extends TestCase
             'tipo' => 'feriado'
         ]);
 
-        // 3. Tenta registrar falta nesse dia via API
-        $response = $this->postJson('/api/registrar-chamada', [
+        // 3. Payload CORRIGIDO: Array de objetos
+        $payload = [
             'data' => $hoje,
             'chamada' => [
-                ['disciplina_id' => $disciplina->id, 'presente' => false]
+                [
+                    'disciplina_id' => $disciplina->id,
+                    'presente' => false,
+                    'horario' => '07:00:00'
+                ]
             ]
-        ]);
+        ];
 
-        // 4. Deve falhar (Erro 403 - Proibido)
+        // 4. Envia requisição
+        $response = $this->postJson('/api/registrar-chamada', $payload);
+
+        // 5. Deve falhar (Erro 403 - Proibido)
         $response->assertStatus(403);
         $response->assertJsonFragment(['erro' => 'Não é possível registrar chamada em dia livre.']);
         
