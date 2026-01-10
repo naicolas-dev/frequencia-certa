@@ -69,7 +69,6 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
             'has_completed_tour' => 'boolean',
             'ano_letivo_inicio' => 'date',
             'ano_letivo_fim' => 'date',
-            'badges' => 'array', 
             'last_streak_date' => 'date',
         ];
     }
@@ -96,5 +95,17 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     {
         // Só deixa entrar quem tiver este e-mail específico
         return $this->email === config('admin.email');
+    }
+
+    public function badges()
+    {
+        return $this->belongsToMany(Badge::class)->withPivot('earned_at');
+    }
+
+    // Helper para facilitar a verificação
+    public function hasBadge(string $code): bool
+    {
+        // Usa a coleção carregada em memória para evitar N+1 queries se já estiver carregado
+        return $this->badges->contains('code', $code);
     }
 }

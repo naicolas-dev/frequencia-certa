@@ -4,9 +4,17 @@ namespace App\Services;
 
 use App\Models\User;
 use Carbon\Carbon;
+use App\Gamification\BadgeEvaluator;
 
 class GamificationService
 {
+    protected $evaluator;
+
+    public function __construct(BadgeEvaluator $evaluator)
+    {
+        $this->evaluator = $evaluator;
+    }
+
     public function verificarOfensiva(User $user)
     {
         $hoje = Carbon::now()->startOfDay();
@@ -33,6 +41,12 @@ class GamificationService
         $user->save();
         
         $this->verificarBadges($user);
+
+        // RODA A AVALIAÇÃO DE BADGES
+        $novasConquistas = $this->evaluator->evaluate($user);
+
+        // Se ganhou algo, você pode retornar para o controller avisar o front
+        return $novasConquistas;
     }
 
     private function verificarBadges(User $user)

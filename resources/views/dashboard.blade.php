@@ -66,101 +66,154 @@
                 </div>
             </div>
 
-            <div class="mb-6 grid grid-cols-2 gap-3 sm:gap-4">
-
-                @php
-                    // LÓGICA DE ESTADOS DA OFENSIVA
-                    $streak = Auth::user()->current_streak;
-                    $hoje = \Carbon\Carbon::now()->startOfDay();
-                    $ultimoRegistro = Auth::user()->last_streak_date ? \Carbon\Carbon::parse(Auth::user()->last_streak_date)->startOfDay() : null;
+           @if(Auth::user()->current_streak == 0 && Auth::user()->badges->count() == 0)
+                <div class="mb-6 relative overflow-hidden rounded-2xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-lg group transition-colors duration-300">
                     
-                    // Verifica se marcou hoje
-                    $marcouHoje = $ultimoRegistro && $ultimoRegistro->equalTo($hoje);
-
-                    // Definição dos Estilos baseados no estado
-                    if ($streak == 0) {
-                        // ESTADO 0: INATIVO (Cinza Claro / Fantasma)
-                        $cardClasses = "bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700";
-                        $textClasses = "text-gray-500 dark:text-gray-400";
-                        $numClasses = "text-gray-400 dark:text-gray-500";
-                        $iconColor = "text-gray-300 dark:text-gray-600";
-                        $msg = "Comece hoje!";
-                        $fireOpacity = "opacity-0"; // Sem brilho de fundo
-                    } elseif (!$marcouHoje) {
-                        // ESTADO 1: EM RISCO / NÃO MARCOU HOJE (Cinza Escuro TikTok - Urgência)
-                        $cardClasses = "bg-gray-500 dark:bg-gray-700 border-none shadow-inner";
-                        $textClasses = "text-gray-200";
-                        $numClasses = "text-white opacity-90";
-                        $iconColor = "text-gray-300";
-                        $msg = "Salve a ofensiva!"; // Texto de alerta
-                        $fireOpacity = "opacity-0"; // Fogo apagado
-                    } else {
-                        // ESTADO 2: ATIVO / MARCOU HOJE (Laranja - Sucesso)
-                        $cardClasses = "bg-gradient-to-br from-orange-500 to-red-600 shadow-lg shadow-orange-500/20";
-                        $textClasses = "text-orange-100";
-                        $numClasses = "text-white drop-shadow-md";
-                        $iconColor = "text-white";
-                        $msg = "Em chamas!";
-                        $fireOpacity = "opacity-100"; // Fogo brilhando
-                    }
-                @endphp
-                
-                <div class="relative overflow-hidden rounded-3xl p-4 group flex items-center justify-between h-24 sm:h-28 transition-all duration-300 hover:scale-[1.02] {{ $cardClasses }}">
+                    <div class="absolute top-0 right-0 -mt-2 -mr-2 w-24 h-24 bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-2xl group-hover:bg-blue-500/20 dark:group-hover:bg-blue-500/30 transition-colors"></div>
                     
-                    <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/20 blur-2xl transition-opacity duration-500 {{ $fireOpacity }}"></div>
-
-                    <div class="relative z-10 flex flex-col justify-center">
-                        <p class="text-[10px] font-bold uppercase tracking-wider opacity-80 {{ $textClasses }}">Ofensiva</p>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-4xl font-black {{ $numClasses }}">{{ $streak }}</span>
-                            <span class="text-sm font-bold opacity-80 {{ $textClasses }}">dias</span>
+                    <div class="relative z-10 flex items-center justify-between p-4 sm:p-5">
+                        <div class="flex items-center gap-4">
+                            <div class="shrink-0 w-12 h-12 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-2xl shadow-sm text-gray-400 dark:text-gray-500">
+                                🔒
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-base font-bold text-gray-800 dark:text-white leading-tight">
+                                    Painel de Conquistas
+                                </h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 max-w-[220px] sm:max-w-none leading-relaxed">
+                                    Registre presença para liberar a <span class="text-orange-500 dark:text-orange-400 font-bold">Ofensiva</span> e ganhar <span class="text-yellow-600 dark:text-yellow-400 font-bold">Medalhas</span>.
+                                </p>
+                            </div>
                         </div>
-                        <p class="text-[10px] font-medium mt-0.5 opacity-90 truncate {{ $textClasses }}">
-                            {{ $msg }}
-                        </p>
+
+                        <div class="hidden sm:flex text-gray-300 dark:text-gray-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
+                            <svg class="w-5 h-5 animate-bounce-x" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                        </div>
                     </div>
 
-                    <div class="relative z-10 mr-2 drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 {{ $iconColor }}">
-                        @if($streak > 0 && !$marcouHoje)
-                            <div class="animate-pulse">
-                                <svg class="w-10 h-10 sm:w-12 sm:h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                </svg>
-                            </div>
-                        @elseif($streak == 0)
-                            <svg class="w-10 h-10 sm:w-12 sm:h-12" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" />
-                            </svg>
-                        @else
-                            <svg class="w-10 h-10 sm:w-12 sm:h-12" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" />
-                            </svg>
-                        @endif
+                    <div class="h-1 w-full bg-gray-100 dark:bg-gray-800">
+                        <div class="h-full bg-blue-500 w-[5%] shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
                     </div>
                 </div>
 
-                <div class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 p-4 shadow-sm flex flex-col justify-center h-24 sm:h-28 transition-transform hover:scale-[1.02]">
-                    <div class="flex items-center justify-between mb-2">
-                        <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Conquistas</p>
-                        <span class="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-1.5 py-0.5 rounded text-gray-500">
-                            {{ count(Auth::user()->badges ?? []) }}
-                        </span>
-                    </div>
-                    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                        @forelse(Auth::user()->badges ?? [] as $badge)
-                            <div class="shrink-0 w-10 h-10 bg-gradient-to-b from-yellow-100 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/10 rounded-xl border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center text-xl shadow-sm"
-                                title="{{ $badge }}">
-                                @if($badge == 'fire_3') 🕯️ @elseif($badge == 'warrior_7') ⚔️ @else 🏅 @endif
+            @else
+
+                <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    
+                    @php
+                        $streak = Auth::user()->current_streak;
+                        $hoje = \Carbon\Carbon::now()->startOfDay();
+                        $ultimoRegistro = Auth::user()->last_streak_date ? \Carbon\Carbon::parse(Auth::user()->last_streak_date)->startOfDay() : null;
+                        $marcouHoje = $ultimoRegistro && $ultimoRegistro->equalTo($hoje);
+
+                        // Ajuste fino das cores para Light Mode
+                        if ($streak == 0) {
+                            // Cinza claro no light, Cinza escuro no dark
+                            $cardClasses = "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm";
+                            $textClasses = "text-gray-500 dark:text-gray-400";
+                            $numClasses = "text-gray-400 dark:text-gray-500";
+                            $iconColor = "text-gray-300 dark:text-gray-600";
+                            $msg = "Comece hoje!";
+                            $fireOpacity = "opacity-0";
+                        } elseif (!$marcouHoje) {
+                            // Alerta: Cinza escuro no dark, Cinza médio no light
+                            $cardClasses = "bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-transparent shadow-inner";
+                            $textClasses = "text-gray-600 dark:text-gray-200";
+                            $numClasses = "text-gray-800 dark:text-white opacity-90";
+                            $iconColor = "text-gray-400 dark:text-gray-300";
+                            $msg = "Salve a ofensiva!";
+                            $fireOpacity = "opacity-0";
+                        } else {
+                            // Sucesso: Gradiente (igual para ambos pois é vibrante)
+                            $cardClasses = "bg-gradient-to-br from-orange-500 to-red-600 shadow-lg shadow-orange-500/20";
+                            $textClasses = "text-orange-100";
+                            $numClasses = "text-white drop-shadow-md";
+                            $iconColor = "text-white";
+                            $msg = "Em chamas!";
+                            $fireOpacity = "opacity-100";
+                        }
+                    @endphp
+
+                    <div class="relative overflow-hidden rounded-3xl p-5 group flex items-center justify-between h-32 transition-all duration-300 hover:scale-[1.01] {{ $cardClasses }}">
+                        <div class="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/20 blur-3xl transition-opacity duration-500 {{ $fireOpacity }}"></div>
+                        <div class="relative z-10 flex flex-col justify-center">
+                            <p class="text-[10px] font-bold uppercase tracking-widest opacity-80 {{ $textClasses }}">Ofensiva</p>
+                            <div class="flex items-baseline gap-1 my-1">
+                                <span class="text-5xl font-black {{ $numClasses }}">{{ $streak }}</span>
+                                <span class="text-base font-bold opacity-90 {{ $textClasses }}">dias</span>
                             </div>
-                        @empty
-                            <div class="flex items-center gap-2 text-gray-400 opacity-60">
-                                <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center grayscale">🏆</div>
-                                <span class="text-[10px] font-medium leading-tight">Sem medalhas<br>ainda...</span>
-                            </div>
-                        @endforelse
+                            <p class="text-xs font-medium opacity-90 truncate {{ $textClasses }}">{{ $msg }}</p>
+                        </div>
+                        <div class="relative z-10 mr-1 drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 {{ $iconColor }}">
+                            @if($streak > 0 && !$marcouHoje)
+                                <div class="animate-pulse">
+                                    <svg class="w-14 h-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                </div>
+                            @elseif($streak == 0)
+                                <svg class="w-14 h-14 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            @else
+                                <svg class="w-14 h-14" fill="currentColor" viewBox="0 0 24 24"><path d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" /></svg>
+                            @endif
+                        </div>
                     </div>
+
+                    <div x-data @click="$dispatch('open-modal', 'badges-gallery')" class="bg-white/80 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/40 dark:border-gray-800 p-5 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden cursor-pointer group hover:bg-white dark:hover:bg-gray-800/80 transition-colors">
+                        <div class="flex items-center justify-between z-10 mb-2">
+                            <div class="flex items-center gap-2">
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Sua Coleção</p>
+                                <span class="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                                    {{ Auth::user()->badges->count() }}
+                                </span>
+                            </div>
+                            <div class="text-gray-300 dark:text-gray-600 group-hover:text-yellow-500 transition-colors">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x relative z-10">
+                            @forelse(Auth::user()->badges->sortByDesc('pivot.earned_at')->take(4) as $badge)
+                                <div class="shrink-0 snap-start w-11 h-11 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-center text-2xl shadow-sm">
+                                    {{ $badge->icon }}
+                                </div>
+                            @empty
+                                <div class="flex items-center gap-2 text-gray-400 opacity-60 w-full">
+                                    <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center grayscale">🏆</div>
+                                    <span class="text-xs italic">Sem medalhas...</span>
+                                </div>
+                            @endforelse
+                            @if(Auth::user()->badges->count() > 4)
+                                <div class="shrink-0 w-11 h-11 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200 dark:border-gray-700">+{{ Auth::user()->badges->count() - 4 }}</div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <x-modal name="badges-gallery" focusable>
+                        <div class="bg-white dark:bg-gray-900 flex flex-col max-h-[85vh]">
+                            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-10 flex justify-between items-center">
+                                <div>
+                                    <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">🏆 Sala de Troféus</h2>
+                                    <p class="text-xs text-gray-500">{{ Auth::user()->badges->count() }} desbloqueadas</p>
+                                </div>
+                                <button x-on:click.stop="$dispatch('close-modal', 'badges-gallery')" class="p-2 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+                            <div class="p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900/50">
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                    @foreach(Auth::user()->badges->sortByDesc('pivot.earned_at') as $badge)
+                                        <div class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+                                            <div class="text-4xl mb-2 drop-shadow-md">{{ $badge->icon }}</div>
+                                            <h3 class="font-bold text-gray-800 dark:text-white text-xs leading-tight mb-1">{{ $badge->name }}</h3>
+                                            <p class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-2 h-7 mb-2">{{ $badge->description }}</p>
+                                            <span class="text-[9px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">{{ \Carbon\Carbon::parse($badge->pivot->earned_at)->format('d/m/y') }}</span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </x-modal>
                 </div>
-            </div>
+            @endif
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 

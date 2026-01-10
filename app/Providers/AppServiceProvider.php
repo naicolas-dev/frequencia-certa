@@ -6,12 +6,20 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
+use App\Gamification\BadgeEvaluator;
+use App\Gamification\Rules\Fire7Rule;
+use App\Gamification\Rules\EarlyBirdRule;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->singleton(BadgeEvaluator::class, function ($app) {
+            return new BadgeEvaluator([
+                Fire7Rule::class,
+                EarlyBirdRule::class,
+            ]);
+        });
     }
 
     public function boot(): void
