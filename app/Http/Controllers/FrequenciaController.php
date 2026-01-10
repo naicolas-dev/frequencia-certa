@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GamificationService;
 use App\Models\GradeHoraria;
 use App\Models\Frequencia;
 use App\Services\CalendarioService;
