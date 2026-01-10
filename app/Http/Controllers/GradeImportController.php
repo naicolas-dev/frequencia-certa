@@ -22,7 +22,7 @@ class GradeImportController extends Controller
     {
         $request->validate([
             'texto_grade' => 'nullable|string|required_without:foto_grade',
-            'foto_grade'  => 'nullable|image|max:5120|required_without:texto_grade',
+            'foto_grade'  => 'nullable|image|mimes:jpeg,png,jpg|max:5120|required_without:texto_grade',
         ]);
 
         try {
