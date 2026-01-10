@@ -67,6 +67,7 @@
             </div>
 
            @if(Auth::user()->current_streak == 0 && Auth::user()->badges->count() == 0)
+    
                 <div class="mb-6 relative overflow-hidden rounded-2xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-lg group transition-colors duration-300">
                     
                     <div class="absolute top-0 right-0 -mt-2 -mr-2 w-24 h-24 bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-2xl group-hover:bg-blue-500/20 dark:group-hover:bg-blue-500/30 transition-colors"></div>
@@ -102,14 +103,13 @@
                 <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     
                     @php
+                        // Lógica da Ofensiva
                         $streak = Auth::user()->current_streak;
                         $hoje = \Carbon\Carbon::now()->startOfDay();
                         $ultimoRegistro = Auth::user()->last_streak_date ? \Carbon\Carbon::parse(Auth::user()->last_streak_date)->startOfDay() : null;
                         $marcouHoje = $ultimoRegistro && $ultimoRegistro->equalTo($hoje);
 
-                        // Ajuste fino das cores para Light Mode
                         if ($streak == 0) {
-                            // Cinza claro no light, Cinza escuro no dark
                             $cardClasses = "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm";
                             $textClasses = "text-gray-500 dark:text-gray-400";
                             $numClasses = "text-gray-400 dark:text-gray-500";
@@ -117,7 +117,6 @@
                             $msg = "Comece hoje!";
                             $fireOpacity = "opacity-0";
                         } elseif (!$marcouHoje) {
-                            // Alerta: Cinza escuro no dark, Cinza médio no light
                             $cardClasses = "bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-transparent shadow-inner";
                             $textClasses = "text-gray-600 dark:text-gray-200";
                             $numClasses = "text-gray-800 dark:text-white opacity-90";
@@ -125,7 +124,6 @@
                             $msg = "Salve a ofensiva!";
                             $fireOpacity = "opacity-0";
                         } else {
-                            // Sucesso: Gradiente (igual para ambos pois é vibrante)
                             $cardClasses = "bg-gradient-to-br from-orange-500 to-red-600 shadow-lg shadow-orange-500/20";
                             $textClasses = "text-orange-100";
                             $numClasses = "text-white drop-shadow-md";
@@ -135,54 +133,58 @@
                         }
                     @endphp
 
-                    <div class="relative overflow-hidden rounded-3xl p-5 group flex items-center justify-between h-32 transition-all duration-300 hover:scale-[1.01] {{ $cardClasses }}">
-                        <div class="absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/20 blur-3xl transition-opacity duration-500 {{ $fireOpacity }}"></div>
+                    <div class="relative overflow-hidden rounded-3xl p-4 group flex items-center justify-between h-24 sm:h-28 transition-all duration-300 hover:scale-[1.01] {{ $cardClasses }}">
+                        <div class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/20 blur-2xl transition-opacity duration-500 {{ $fireOpacity }}"></div>
+                        
                         <div class="relative z-10 flex flex-col justify-center">
-                            <p class="text-[10px] font-bold uppercase tracking-widest opacity-80 {{ $textClasses }}">Ofensiva</p>
-                            <div class="flex items-baseline gap-1 my-1">
-                                <span class="text-5xl font-black {{ $numClasses }}">{{ $streak }}</span>
-                                <span class="text-base font-bold opacity-90 {{ $textClasses }}">dias</span>
+                            <p class="text-[10px] font-bold uppercase tracking-wider opacity-80 {{ $textClasses }}">Ofensiva</p>
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-4xl font-black {{ $numClasses }}">{{ $streak }}</span>
+                                <span class="text-sm font-bold opacity-80 {{ $textClasses }}">dias</span>
                             </div>
-                            <p class="text-xs font-medium opacity-90 truncate {{ $textClasses }}">{{ $msg }}</p>
+                            <p class="text-[10px] font-medium mt-0.5 opacity-90 truncate {{ $textClasses }}">{{ $msg }}</p>
                         </div>
-                        <div class="relative z-10 mr-1 drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 {{ $iconColor }}">
+
+                        <div class="relative z-10 mr-2 drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 {{ $iconColor }}">
                             @if($streak > 0 && !$marcouHoje)
                                 <div class="animate-pulse">
-                                    <svg class="w-14 h-14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                    <svg class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                                 </div>
                             @elseif($streak == 0)
-                                <svg class="w-14 h-14 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                    <svg class="w-12 h-12 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             @else
-                                <svg class="w-14 h-14" fill="currentColor" viewBox="0 0 24 24"><path d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" /></svg>
+                                <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" /></svg>
                             @endif
                         </div>
                     </div>
 
-                    <div x-data @click="$dispatch('open-modal', 'badges-gallery')" class="bg-white/80 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/40 dark:border-gray-800 p-5 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden cursor-pointer group hover:bg-white dark:hover:bg-gray-800/80 transition-colors">
-                        <div class="flex items-center justify-between z-10 mb-2">
-                            <div class="flex items-center gap-2">
-                                <p class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">Sua Coleção</p>
-                                <span class="bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
-                                    {{ Auth::user()->badges->count() }}
-                                </span>
-                            </div>
-                            <div class="text-gray-300 dark:text-gray-600 group-hover:text-yellow-500 transition-colors">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </div>
+                    <div x-data 
+                            @click="$dispatch('open-modal', 'badges-gallery')"
+                            class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 p-4 shadow-sm flex flex-col justify-center h-24 sm:h-28 transition-transform hover:scale-[1.01] cursor-pointer group hover:bg-white/80 dark:hover:bg-gray-800/80 overflow-hidden relative">
+                        
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Conquistas</p>
+                            <span class="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-1.5 py-0.5 rounded text-gray-500 group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">
+                                {{ Auth::user()->badges->count() }}
+                            </span>
                         </div>
-                        <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x relative z-10">
-                            @forelse(Auth::user()->badges->sortByDesc('pivot.earned_at')->take(4) as $badge)
-                                <div class="shrink-0 snap-start w-11 h-11 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-center text-2xl shadow-sm">
+
+                        <div class="flex gap-2 items-center">
+                            @forelse(Auth::user()->badges->sortByDesc('pivot.earned_at')->take(3) as $badge)
+                                <div class="shrink-0 w-10 h-10 bg-gradient-to-b from-yellow-100 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/10 rounded-xl border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center text-xl shadow-sm relative group-hover:-translate-y-0.5 transition-transform duration-300">
                                     {{ $badge->icon }}
                                 </div>
                             @empty
-                                <div class="flex items-center gap-2 text-gray-400 opacity-60 w-full">
+                                <div class="flex items-center gap-2 text-gray-400 opacity-60">
                                     <div class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center grayscale">🏆</div>
-                                    <span class="text-xs italic">Sem medalhas...</span>
+                                    <span class="text-[10px] font-medium leading-tight">Sem medalhas<br>ainda...</span>
                                 </div>
                             @endforelse
-                            @if(Auth::user()->badges->count() > 4)
-                                <div class="shrink-0 w-11 h-11 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200 dark:border-gray-700">+{{ Auth::user()->badges->count() - 4 }}</div>
+
+                            @if(Auth::user()->badges->count() > 3)
+                                <div class="shrink-0 w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                                    +{{ Auth::user()->badges->count() - 3 }}
+                                </div>
                             @endif
                         </div>
                     </div>
@@ -212,6 +214,7 @@
                             </div>
                         </div>
                     </x-modal>
+
                 </div>
             @endif
 
