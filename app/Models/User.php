@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,7 +13,7 @@ use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Builder;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, Prunable, HasPushSubscriptions;
@@ -82,5 +84,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         // Usa a foreign key 'user_id' na tabela 'frequencias'
         return $this->hasMany(Frequencia::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Só deixa entrar quem tiver este e-mail específico
+        return $this->email === config('admin.email');
     }
 }
