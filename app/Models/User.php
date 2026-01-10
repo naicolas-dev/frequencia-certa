@@ -32,6 +32,10 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         'estado',
         'ano_letivo_inicio',
         'ano_letivo_fim',
+        'current_streak',
+        'max_streak',
+        'last_streak_date',
+        'badges',
     ];
 
     public function prunable(): Builder
@@ -65,6 +69,8 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
             'has_completed_tour' => 'boolean',
             'ano_letivo_inicio' => 'date',
             'ano_letivo_fim' => 'date',
+            'badges' => 'array', 
+            'last_streak_date' => 'date',
         ];
     }
 
