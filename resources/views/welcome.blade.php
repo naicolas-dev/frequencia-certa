@@ -375,7 +375,6 @@
                 <div class="reveal flex items-center justify-between mb-5">
                     <div>
                         <h3 class="text-lg sm:text-xl font-extrabold text-gray-900 dark:text-white">Depois do cadastro, você desbloqueia</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sem bagunçar a landing: só o necessário agora.</p>
                     </div>
                     @guest
                         <a href="{{ route('register') }}" class="hidden sm:inline-flex px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-600/20 transition active:scale-95">
