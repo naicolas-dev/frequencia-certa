@@ -66,6 +66,7 @@
                 </div>
             </div>
 
+        <div id="gamification-area" class="contents">
            @if(Auth::user()->current_streak == 0 && Auth::user()->badges->count() == 0)
     
                 <div class="mb-6 relative overflow-hidden rounded-2xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-lg group transition-colors duration-300">
@@ -217,7 +218,7 @@
 
                 </div>
             @endif
-
+        </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {{-- CARD DO DIÁRIO DE CLASSE --}}
@@ -1008,10 +1009,12 @@
             let url = targetUrl || window.location.href;
             
             const contentDiv = document.getElementById('dashboard-content');
+            const gamificationDiv = document.getElementById('gamification-area');
             if (contentDiv) contentDiv.style.opacity = '0.6'; // Feedback visual de "carregando"
+            if (gamificationDiv) gamificationDiv.style.opacity = '0.6';
 
             try {
-                // 1. TRUQUE DO CACHE: Adiciona um timestamp na URL
+                // 1. Requisição com headers explícitos para salvar cache
                 // Isso engana o navegador e obriga ele a buscar os dados novos no servidor
                 const fetchUrl = new URL(url, window.location.origin);
                 fetchUrl.searchParams.set('t', new Date().getTime()); 
@@ -1031,7 +1034,15 @@
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
 
-                // 3. Atualiza os Cards de Status
+                // 3. Atualiza o Gamification
+                const newGamification = doc.getElementById('gamification-area');
+                const currentGamification = document.getElementById('gamification-area');
+                if (newGamification && currentGamification) {
+                    currentGamification.innerHTML = newGamification.innerHTML;
+                    if (window.Alpine) window.Alpine.initTree(currentGamification);
+                }
+
+                // 4. Atualiza os Cards de Status
                 const newStats = doc.getElementById('dashboard-stats');
                 const currentStats = document.getElementById('dashboard-stats');
                 if (newStats && currentStats) {
@@ -1043,7 +1054,7 @@
                     }
                 }
 
-                // 4. Atualiza a Grade e os Filtros
+                // 5. Atualiza a Grade e os Filtros
                 const newContent = doc.getElementById('dashboard-content');
                 if (newContent && contentDiv) {
                     contentDiv.innerHTML = newContent.innerHTML;
@@ -1062,6 +1073,7 @@
                 console.error('Erro ao atualizar dashboard:', error);
             } finally {
                 if (contentDiv) contentDiv.style.opacity = '1';
+                if (gamificationDiv) gamificationDiv.style.opacity = '1';
             }
         }
 
