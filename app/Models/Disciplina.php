@@ -121,17 +121,27 @@ public function getTotalAulasPrevistasAttribute()
         return $totalAulas;
     }
 
-    public function getTaxaPresencaAttribute(): float
+    public function getTaxaPresencaAttribute($value): float
     {
-        // Usa a coleção já carregada para evitar queries extras
-        $totalAulas = $this->frequencias->count();
-        
-        if ($totalAulas === 0) {
-            return 100.0; // Sem registros = 100% de presença
+        if ($value !== null) {
+            return (float) $value;
         }
 
-        $presencas = $this->frequencias->where('presente', true)->count();
+        if ($this->getAttribute('total_aulas_realizadas') !== null && $this->getAttribute('total_faltas') !== null) {
+            $total = (int) $this->getAttribute('total_aulas_realizadas');
+            $faltas = (int) $this->getAttribute('total_faltas');
 
-        return round(($presencas / $totalAulas) * 100, 1);
+            if ($total === 0) return 100.0;
+
+            $presencas = $total - $faltas;
+            return round(($presencas / $total) * 100, 1);
+        }
+
+        $total = $this->frequencias()->count();
+        if ($total === 0) return 100.0;
+
+        $presencas = $this->frequencias()->where('presente', true)->count();
+        return round(($presencas / $total) * 100, 1);
     }
+
 }
