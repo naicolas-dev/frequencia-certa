@@ -7,21 +7,12 @@ import { socialLogin, consumeRedirectResult } from './firebase-auth';
 window.Alpine = Alpine;
 window.Swal = Swal;
 
-/**
- * ✅ Melhor: expor num namespace e manter compat com código legado
- */
 window.firebaseAuth = window.firebaseAuth || {};
 window.firebaseAuth.socialLogin = socialLogin;
 
 // compatibilidade com seus Blades atuais (@click="handleSocial('google')" -> window.socialLogin)
 window.socialLogin = socialLogin;
 
-/**
- * ✅ Se você usar signInWithRedirect em algum cenário (popup-blocked),
- * precisa “consumir” o resultado do redirect ao carregar.
- *
- * OBS: esse helper precisa existir no seu firebase-auth.
- */
 if (typeof consumeRedirectResult === 'function') {
   consumeRedirectResult().catch((err) => {
     console.error('Erro ao finalizar login via redirect (Firebase):', err?.code || err);
@@ -74,12 +65,11 @@ window.swalTailwind = swalTailwind;
 /* =========================
    TOAST GLOBAL
 ========================= */
-
 const toast = Swal.mixin({
     toast: true,
-    position: 'top-end',
+    position: window.innerWidth > 768 ? 'bottom' : 'top',
     showConfirmButton: false,
-    timer: 4000,
+    timer: 2500,
     timerProgressBar: true,
     customClass: {
         popup: `
@@ -89,23 +79,59 @@ const toast = Swal.mixin({
             shadow-xl
             border border-gray-100 dark:border-gray-800
             px-4 py-3
+            md:mb-6
         `,
         title: 'text-sm font-semibold',
         icon: 'scale-90'
+    },
+    showClass: {
+        popup: `
+            animate__animated 
+            ${window.innerWidth > 768 ? 'animate__fadeInUp' : 'animate__fadeInDown'}
+            animate__faster
+        `
     }
 });
 
+// SUCESSO (Verde / Emerald)
 window.toastSuccess = (msg) =>
-    toast.fire({ icon: 'success', title: msg, iconColor: '#10b981' });
+    toast.fire({
+        icon: 'success',
+        title: msg,
+        iconColor: '#10b981',
+        background: '#ecfdf5', 
+        color: '#064e3b',     
+    });
 
+// ERRO (Vermelho / Red)
 window.toastError = (msg) =>
-    toast.fire({ icon: 'error', title: msg, iconColor: '#ef4444' });
+    toast.fire({
+        icon: 'error',
+        title: msg,
+        iconColor: '#ef4444', 
+        background: '#fef2f2',
+        color: '#7f1d1d',      
+    });
 
+// AVISO (Amarelo / Amber)
 window.toastWarning = (msg) =>
-    toast.fire({ icon: 'warning', title: msg, iconColor: '#f59e0b' });
+    toast.fire({
+        icon: 'warning',
+        title: msg,
+        iconColor: '#f59e0b', 
+        background: '#fffbeb',
+        color: '#78350f',      
+    });
 
+// INFO (Azul / Blue)
 window.toastInfo = (msg) =>
-    toast.fire({ icon: 'info', title: msg, iconColor: '#3b82f6' });
+    toast.fire({
+        icon: 'info',
+        title: msg,
+        iconColor: '#3b82f6',
+        background: '#eff6ff',
+        color: '#1e3a8a',     
+    });
 
 /* =========================
    CONFIRM SUBMIT LISTENER
@@ -178,7 +204,6 @@ window.pedirPermissaoNotificacao = async () => {
             // 2. Obtém o SW e a chave pública (definida no blade ou .env)
             const registration = await navigator.serviceWorker.ready;
             
-            // IMPORTANTE: Adicione VITE_VAPID_PUBLIC_KEY=sua_chave no .env
             const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY; 
 
             if (!vapidPublicKey) {
