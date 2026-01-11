@@ -16,14 +16,71 @@
         </script>
         <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
     </head>
-    <body class="antialiased bg-gray-50 dark:bg-black text-gray-900 dark:text-white min-h-screen flex items-center justify-center relative overflow-x-hidden overflow-y-auto font-sans selection:bg-blue-500 selection:text-white"
+    <body class="antialiased bg-gray-50 dark:bg-black text-gray-900 dark:text-white min-h-screen flex items-center justify-center relative overflow-x-hidden font-sans selection:bg-blue-500 selection:text-white"
+          :class="socialModalOpen ? 'overflow-hidden' : 'overflow-y-auto'"
           x-data="{ 
               loading: false, 
               showPassword: false, 
               socialModalOpen: false,
-              isApple: false 
+              isApple: false,
+              
+              // Variáveis de Swipe
+              swipeDistance: 0, 
+              touchStartY: 0,
+              isDragging: false,
+
+              init() {
+                  this.isApple = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+                  
+                  // Reseta a posição sempre que abrir para evitar flashes antigos
+                  $watch('socialModalOpen', value => {
+                      if(value) this.swipeDistance = 0;
+                  });
+              },
+
+              // Início do toque
+              handleTouchStart(e) {
+                  // Bloqueia arrasto no Desktop (telas > 640px)
+                  if (window.innerWidth >= 640) return; 
+                  
+                  this.touchStartY = e.changedTouches[0].screenY;
+                  this.isDragging = true;
+              },
+
+              // Movimento
+              handleTouchMove(e) {
+                  if (!this.isDragging) return;
+                  let currentY = e.changedTouches[0].screenY;
+                  let distance = currentY - this.touchStartY;
+                  
+                  // Só permite arrastar para baixo
+                  if (distance > 0) this.swipeDistance = distance;
+              },
+
+              // Soltou o dedo
+              handleTouchEnd() {
+                  if (!this.isDragging) return;
+                  this.isDragging = false;
+
+                  // Se arrastou mais de 100px, fecha via Swipe
+                  if (this.swipeDistance > 100) {
+                      this.swipeDistance = window.innerHeight; // Joga pra fora da tela
+                      setTimeout(() => { 
+                          this.socialModalOpen = false; 
+                      }, 200);
+                  } else {
+                      // Se não arrastou o suficiente, volta pro lugar (Snap Back)
+                      this.swipeDistance = 0;
+                  }
+              },
+
+              // Fechamento Padrão (Botão X ou Backdrop)
+              closeModal() {
+                  // Zera o swipeDistance para garantir que a animação padrão do Alpine funcione
+                  this.swipeDistance = 0; 
+                  this.socialModalOpen = false;
+              }
           }"
-          x-init="isApple = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)"
     >
 
         <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
@@ -167,10 +224,14 @@
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100"
                  x-transition:leave-end="opacity-0"
-                 @click="socialModalOpen = false" 
+                 @click="closeModal()" 
                  class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
             <div x-show="socialModalOpen"
+                 @touchstart="handleTouchStart($event)"
+                 @touchmove="handleTouchMove($event)"
+                 @touchend="handleTouchEnd()"
+                 :style="swipeDistance !== 0 ? 'transform: translateY(' + swipeDistance + 'px); transition: ' + (isDragging ? 'none' : 'transform 0.3s ease-out') : ''"
                  x-transition:enter="transition ease-out duration-300 transform"
                  x-transition:enter-start="translate-y-full sm:scale-95 sm:translate-y-0 sm:opacity-0"
                  x-transition:enter-end="translate-y-0 sm:scale-100 sm:opacity-100"
@@ -183,7 +244,7 @@
 
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">Mais opções</h3>
-                    <button @click="socialModalOpen = false" class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                    <button @click="closeModal()" class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
