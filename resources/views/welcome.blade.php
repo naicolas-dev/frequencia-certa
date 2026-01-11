@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <title>{{ config('app.name', 'Frequência Certa') }}</title>
+    <title>Frequência Certa - Falte Com Segurança</title>
     <meta name="description" content="Posso faltar hoje? Descubra suas vidas por matéria. Cadastre sua grade, registre presença e deixe o app te avisar antes da reprovação.">
 
     <meta name="theme-color" content="#2563eb">
