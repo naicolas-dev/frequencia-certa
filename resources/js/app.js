@@ -2,10 +2,34 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import Swal from 'sweetalert2';
 
+import { socialLogin, consumeRedirectResult } from './firebase-auth';
+
 window.Alpine = Alpine;
 window.Swal = Swal;
 
+/**
+ * ✅ Melhor: expor num namespace e manter compat com código legado
+ */
+window.firebaseAuth = window.firebaseAuth || {};
+window.firebaseAuth.socialLogin = socialLogin;
+
+// compatibilidade com seus Blades atuais (@click="handleSocial('google')" -> window.socialLogin)
+window.socialLogin = socialLogin;
+
+/**
+ * ✅ Se você usar signInWithRedirect em algum cenário (popup-blocked),
+ * precisa “consumir” o resultado do redirect ao carregar.
+ *
+ * OBS: esse helper precisa existir no seu firebase-auth.
+ */
+if (typeof consumeRedirectResult === 'function') {
+  consumeRedirectResult().catch((err) => {
+    console.error('Erro ao finalizar login via redirect (Firebase):', err?.code || err);
+  });
+}
+
 Alpine.start();
+
 
 /* =========================
    SWEETALERT CONFIRM GLOBAL
