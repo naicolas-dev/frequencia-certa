@@ -10,6 +10,7 @@ use App\Http\Controllers\GradeImportController;
 use App\Http\Controllers\FrequenciaController;
 use App\Http\Controllers\IntroController;
 use App\Http\Controllers\EventoController;
+use App\Http\Controllers\SocialAuthController;
 use App\Services\CalendarioService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +26,8 @@ use Illuminate\Http\Request;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/auth/social/login', [SocialAuthController::class, 'login'])->name('social.login');
 
 // Tela de offline
 Route::get('/offline', function () {
