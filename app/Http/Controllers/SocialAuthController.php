@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 
 class SocialAuthController extends Controller
 {
-    protected $firebaseAuth;
+    protected FirebaseAuth $firebaseAuth;
 
     public function __construct(FirebaseAuth $firebaseAuth)
     {
@@ -22,37 +22,55 @@ class SocialAuthController extends Controller
     {
         $idTokenString = $request->input('idToken');
 
+        if (!$idTokenString) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Token não enviado.',
+            ], 400);
+        }
+
         try {
-            // 1. Verifica o token com o Firebase
+            // 1. Verifica token
             $verifiedIdToken = $this->firebaseAuth->verifyIdToken($idTokenString);
             $claims = $verifiedIdToken->claims();
-            
-            $uid = $claims->get('sub');
+
             $email = $claims->get('email');
-            $name = $claims->get('name') ?? 'Usuário sem nome';
+            $name  = $claims->get('name') ?? 'Usuário';
             $photo = $claims->get('picture');
 
-            // 2. Procura o usuário no banco ou cria um novo
-            $user = User::where('email', $email)->first();
-
-            if (!$user) {
-                $user = User::create([
-                    'name' => $name,
-                    'email' => $email,
-                    'password' => Hash::make(Str::random(24)), // Senha aleatória segura
-                    'email_verified_at' => now(), // Firebase já valida o email
-                ]);
-                
-                // Opcional: Salvar o UID do firebase ou foto em outra tabela
+            // 2. GitHub / outros podem não retornar email
+            if (!$email) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Não foi possível obter o email da conta.',
+                ], 422);
             }
 
-            // 3. Loga o usuário no Laravel
-            Auth::login($user, true); // true = Lembrar de mim
+            // 3. Cria ou atualiza usuário
+            $user = User::updateOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $name,
+                    'password' => Hash::make(Str::random(32)),
+                    'email_verified_at' => now(), // 👈 decisão do backend
+                ]
+            );
+
+            // (Opcional) salvar foto futuramente
+            // $user->update(['avatar' => $photo]);
+
+            // 4. Login no Laravel
+            Auth::login($user, true);
 
             return response()->json(['status' => 'success']);
 
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 401);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Falha ao autenticar com o provedor social.',
+            ], 401);
         }
     }
 }
