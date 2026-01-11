@@ -21,7 +21,7 @@
                     <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm sm:text-base">
                         @php
                             $hora = now()->hour;
-                            $diaHoje = now()->dayOfWeek;
+                            $diaHoje = now()->dayOfWeekIso;
                             $mensagensPorHora = [
                                 0 => 'Já deu por hoje 🙂 — descansar também é produtividade.',
                                 1 => 'Hora de desligar um pouco. Um bom sono melhora seu rendimento.',
@@ -668,13 +668,19 @@
 
                             @forelse($disciplinasFiltradas as $disciplina)
                             @php
-                                // 1. Dados básicos
-                                $totalRegistros = $disciplina->frequencias->count(); // Conta quantas aulas teve
-                                $porcentagem = $disciplina->taxa_presenca;
+                                // Dados básicos
+
+                                // 1. Usa os atributos injetados pelo Controller (Zero Queries)
+                                $totalRegistros = $disciplina->total_aulas_realizadas; 
                                 
-                                // Dados para exibição de faltas
-                                $totalFaltas = $disciplina->frequencias->where('presente', false)->count();
-                                $totalPrevisto = $disciplina->total_aulas_previstas;
+                                // O controller já calculou e setou isso via setAttribute
+                                $porcentagem = $disciplina->taxa_presenca; 
+                                
+                                // Usa o count condicional que fizemos no controller
+                                $totalFaltas = $disciplina->total_faltas; 
+                                
+                                // Usa o valor calculado no controller, não o Accessor do Model
+                                $totalPrevisto = $disciplina->total_aulas_previstas_cache ?? 0;
                                 $limiteFaltas = floor($totalPrevisto * 0.25);
                                 $restantes = $limiteFaltas - $totalFaltas;
 
