@@ -6,7 +6,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
+
+// REGISTRO DE BADGES (GAMIFICATION)
 use App\Gamification\BadgeEvaluator;
+use App\Gamification\Rules\Fire1Rule;
 use App\Gamification\Rules\Fire7Rule;
 use App\Gamification\Rules\EarlyBirdRule;
 
@@ -16,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(BadgeEvaluator::class, function ($app) {
             return new BadgeEvaluator([
+                Fire1Rule::class,
                 Fire7Rule::class,
                 EarlyBirdRule::class,
             ]);

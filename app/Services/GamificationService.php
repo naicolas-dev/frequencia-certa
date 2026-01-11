@@ -19,56 +19,35 @@ class GamificationService
     {
         $hoje = Carbon::now()->startOfDay();
         $ultimoRegistro = $user->last_streak_date ? Carbon::parse($user->last_streak_date)->startOfDay() : null;
+        $precisaSalvar = false;
 
-        // Se já registrou hoje, não faz nada
-        if ($ultimoRegistro && $ultimoRegistro->equalTo($hoje)) {
-            return;
+        // 1. LÓGICA DA OFENSIVA (Só roda se ainda não registrou hoje)
+        if (!$ultimoRegistro || !$ultimoRegistro->equalTo($hoje)) {
+            
+            // Se foi ontem, incrementa. Se foi antes, reseta.
+            if ($ultimoRegistro && $ultimoRegistro->diffInDays($hoje) == 1) {
+                $user->current_streak++;
+            } else {
+                $user->current_streak = 1; // Começou hoje ou Recomeçou
+            }
+
+            // Atualiza recorde se necessário
+            if ($user->current_streak > $user->max_streak) {
+                $user->max_streak = $user->current_streak;
+            }
+
+            $user->last_streak_date = $hoje;
+            $precisaSalvar = true;
         }
 
-        // Se foi ontem, incrementa. Se foi antes, reseta.
-        if ($ultimoRegistro && $ultimoRegistro->diffInDays($hoje) == 1) {
-            $user->current_streak++;
-        } else {
-            $user->current_streak = 1; // Começou hoje
+        if ($precisaSalvar) {
+            $user->save();
         }
 
-        // Atualiza recorde se necessário
-        if ($user->current_streak > $user->max_streak) {
-            $user->max_streak = $user->current_streak;
-        }
-
-        $user->last_streak_date = $hoje;
-        $user->save();
-        
-        $this->verificarBadges($user);
-
-        // RODA A AVALIAÇÃO DE BADGES
+        // 2. AVALIAÇÃO DE BADGES (Roda SEMPRE, independente da ofensiva)
+        // Isso corrige o problema: mesmo se já marcou hoje, ele verifica se tem medalha nova pendente.
         $novasConquistas = $this->evaluator->evaluate($user);
 
-        // Se ganhou algo, você pode retornar para o controller avisar o front
         return $novasConquistas;
-    }
-
-    private function verificarBadges(User $user)
-    {
-        $badges = $user->badges ?? [];
-        $novasBadges = [];
-
-        // Badge 1: Chama Acesa (3 dias seguidos)
-        if ($user->current_streak >= 3 && !in_array('fire_3', $badges)) {
-            $novasBadges[] = 'fire_3';
-        }
-
-        // Badge 2: Guerreiro (7 dias seguidos)
-        if ($user->current_streak >= 7 && !in_array('warrior_7', $badges)) {
-            $novasBadges[] = 'warrior_7';
-        }
-
-        // Se ganhou algo novo, salva
-        if (!empty($novasBadges)) {
-            $user->badges = array_merge($badges, $novasBadges);
-            $user->save();
-            // Aqui você poderia disparar uma notificação visual no front
-        }
     }
 }
