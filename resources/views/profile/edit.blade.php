@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            {{-- 2. NOVA SEÇÃO: Relatórios e Documentos (Estilo Nativo) --}}
+            {{-- 2. Relatórios --}}
             <div class="p-6 sm:p-8 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md shadow-sm rounded-[2rem] border border-white/20 dark:border-gray-800">
                 <section>
                     <header class="mb-6">
@@ -180,7 +180,7 @@
                 </section>
             </div>
 
-            {{-- 5. BOTÃO DE SAIR (MOBILE APENAS) --}}
+            {{-- 5. BOTÃO DE SAIR (MOBILE) --}}
             <div class="lg:hidden">
                 <form method="POST" data-confirm="Tem certeza que deseja sair?" action="{{ route('logout') }}">
                     @csrf
@@ -195,9 +195,64 @@
                 </form>
             </div>
 
-            {{-- 6. Excluir Conta --}}
+            {{-- 6. Excluir Conta (LÓGICA NATIVA ATUALIZADA) --}}
             <div class="p-6 sm:p-8 bg-red-50/80 dark:bg-red-900/20 backdrop-blur-md shadow-sm rounded-[2rem] border border-red-100 dark:border-red-900/30"
-                 x-data="{ confirmDeletion: {{ $errors->userDeletion->isNotEmpty() ? 'true' : 'false' }} }">
+                 x-data="{ 
+                    confirmDeletion: {{ $errors->userDeletion->isNotEmpty() ? 'true' : 'false' }},
+                    
+                    // Variáveis Swipe
+                    swipeDistance: 0, 
+                    touchStartY: 0,
+                    isDragging: false,
+
+                    init() {
+                        // Scroll Lock do Body
+                        $watch('confirmDeletion', value => {
+                            if(value) {
+                                document.body.classList.add('overflow-hidden');
+                                this.swipeDistance = 0;
+                            } else {
+                                document.body.classList.remove('overflow-hidden');
+                            }
+                        });
+                    },
+
+                    // Touch Handlers
+                    handleTouchStart(e) {
+                        if (window.innerWidth >= 640) return; // Bloqueia PC
+                        this.touchStartY = e.changedTouches[0].screenY;
+                        this.isDragging = true;
+                    },
+
+                    handleTouchMove(e) {
+                        if (!this.isDragging) return;
+                        let currentY = e.changedTouches[0].screenY;
+                        let distance = currentY - this.touchStartY;
+                        if (distance > 0) this.swipeDistance = distance;
+                    },
+
+                    handleTouchEnd() {
+                        if (!this.isDragging) return;
+                        this.isDragging = false;
+
+                        if (this.swipeDistance > 100) {
+                            // Swipe Out Physics
+                            this.swipeDistance = window.innerHeight; 
+                            setTimeout(() => { 
+                                this.confirmDeletion = false; 
+                            }, 200);
+                        } else {
+                            // Snap Back
+                            this.swipeDistance = 0;
+                        }
+                    },
+
+                    // Close Padrão
+                    closeModal() {
+                        this.swipeDistance = 0;
+                        this.confirmDeletion = false;
+                    }
+                 }">
                 
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
@@ -220,20 +275,24 @@
                              x-transition:leave="transition ease-in duration-200"
                              x-transition:leave-start="opacity-100"
                              x-transition:leave-end="opacity-0"
-                             @click="confirmDeletion = false" 
+                             @click="closeModal()" 
                              class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm">
                         </div>
 
                         <div x-show="confirmDeletion"
-                             x-transition:enter="transition ease-out duration-300"
+                             @touchstart="handleTouchStart($event)"
+                             @touchmove="handleTouchMove($event)"
+                             @touchend="handleTouchEnd()"
+                             :style="swipeDistance !== 0 ? 'transform: translateY(' + swipeDistance + 'px); transition: ' + (isDragging ? 'none' : 'transform 0.3s ease-out') : ''"
+                             x-transition:enter="transition ease-out duration-300 transform"
                              x-transition:enter-start="translate-y-full md:opacity-0 md:scale-95 md:translate-y-0"
                              x-transition:enter-end="translate-y-0 md:opacity-100 md:scale-100"
-                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave="transition ease-in duration-200 transform"
                              x-transition:leave-start="translate-y-0 md:opacity-100 md:scale-100"
                              x-transition:leave-end="translate-y-full md:opacity-0 md:scale-95 md:translate-y-0"
-                             class="relative w-full md:max-w-lg bg-white dark:bg-gray-900 rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl border-t border-white/20 dark:border-gray-700 transform transition-all flex flex-col max-h-[85vh] overflow-y-auto">
+                             class="relative w-full md:max-w-lg bg-white dark:bg-gray-900 rounded-t-[2.5rem] md:rounded-[2.5rem] shadow-2xl border-t border-white/20 dark:border-gray-700 max-h-[85vh] overflow-y-auto">
                             
-                            <div class="sticky top-0 bg-white dark:bg-gray-900 pt-4 pb-2 z-10 flex justify-center md:hidden" @click="confirmDeletion = false">
+                            <div class="sticky top-0 bg-white dark:bg-gray-900 pt-4 pb-2 z-10 flex justify-center md:hidden" @click="closeModal()">
                                 <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
                             </div>
 
@@ -263,7 +322,7 @@
                                             <span>Sim, excluir permanentemente</span>
                                         </button>
 
-                                        <button type="button" @click="confirmDeletion = false" class="w-full py-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-700 transition active:scale-[0.98]">
+                                        <button type="button" @click="closeModal()" class="w-full py-4 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-700 transition active:scale-[0.98]">
                                             Cancelar
                                         </button>
                                     </div>
