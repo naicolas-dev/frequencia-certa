@@ -70,17 +70,19 @@ class DisciplinaController extends Controller
             'data_fim' => 'nullable|date|after_or_equal:data_inicio',
         ]);
 
-        // Se não veio cor do formulário, gera uma aleatória
-        if (empty($dados['cor'])) {
-            $dados['cor'] = $this->gerarCorAleatoria();
+        // FIX: A variável $dados não existia. Usamos uma variável local $cor.
+        $cor = $request->cor;
+        if (empty($cor)) {
+            $cor = $this->gerarCorAleatoria();
         }
 
         $inicio = $request->data_inicio ?? Auth::user()->ano_letivo_inicio;
         $fim    = $request->data_fim    ?? Auth::user()->ano_letivo_fim;
 
-        Auth::user()->disciplinas()->create([
+        // 1. CAPTURAMOS A DISCIPLINA EM UMA VARIÁVEL ($disciplina)
+        $disciplina = Auth::user()->disciplinas()->create([
             'nome' => $request->nome,
-            'cor' => $request->cor,
+            'cor' => $cor, // Usa a cor tratada (que pode ser a gerada aleatoriamente)
             'data_inicio' => $inicio,
             'data_fim' => $fim,
             'carga_horaria_total' => 0, 
@@ -91,9 +93,10 @@ class DisciplinaController extends Controller
             return response()->json(['message' => 'Disciplina cadastrada com sucesso!'], 201);
         }
 
-        return redirect()->route('dashboard')->with('toast',[
+        // 2. ALTERADO: Redireciona para a rota de editar grade passando o ID
+        return redirect()->route('grade.index', $disciplina->id)->with('toast',[
             'type' => 'success',
-            'message' => 'Disciplina cadastrada com sucesso!'
+            'message' => 'Disciplina criada! Agora adicione os horários.'
         ]);
     }
 
