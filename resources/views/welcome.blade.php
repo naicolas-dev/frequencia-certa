@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Frequência Certa - A Jornada</title>
+    <title>Frequência Certa - A Jornada do Estudante</title>
 
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/icons/icon-192x192.png') }}">
