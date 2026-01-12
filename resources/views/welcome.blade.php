@@ -13,10 +13,24 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <script>
+        // TRAVA PWA: Se estiver rodando como aplicativo, proíbe a Landing Page
+        (function () {
+            const isStandalone =
+            (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+            window.navigator.standalone === true; // iOS antigo
+
+            if (isStandalone && window.location.pathname === '/') {
+            window.location.replace(`${window.location.origin}/dashboard`);
+            }
+        })();
+    </script>
+
     <!-- GSAP (defer pra não bloquear) -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
+    <!-- Evita "flash" do modo escuro -->
     <script>
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
