@@ -173,9 +173,7 @@
 
                             <div class="pt-10 px-5 pb-3 flex justify-between items-center bg-white dark:bg-[#111827] border-b border-gray-100 dark:border-gray-800 transition-colors">
                                 <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-md">
-                                        FC
-                                    </div>
+                                    <x-application-logo />
                                     <span class="font-bold text-gray-900 dark:text-white tracking-tight text-sm">Frequência Certa</span>
                                 </div>
                                 <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700">
