@@ -224,7 +224,7 @@
                                                 </div>
                                             </div>
                                             <div class="text-right">
-                                                <div class="text-lg font-black text-emerald-500">5</div>
+                                                <div class="text-lg font-black text-emerald-500">10</div>
                                                 <div class="text-[9px] uppercase text-gray-400 font-bold">Faltas restantes</div>
                                             </div>
                                         </div>
@@ -232,17 +232,18 @@
                                 </div>
 
                                 <div id="scene-2" class="absolute inset-0 px-2 flex flex-col justify-center translate-y-full opacity-0">
-                                    <div class="bg-white dark:bg-[#111827] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl">
+                                    <div class="font-bold bg-white dark:bg-[#111827] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl">
+                                        História
                                         <div class="flex justify-between mb-2">
-                                            <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Aulas Totais</span>
-                                            <span class="text-blue-600 dark:text-blue-500 font-mono font-bold">80</span>
+                                            <span class="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase">Frequência</span>
+                                            <span class="text-emerald-600 dark:text-emerald-500 font-mono font-bold">100%</span>
                                         </div>
                                         <div class="h-2 bg-gray-100 dark:bg-gray-700 rounded-full mb-6 overflow-hidden">
-                                            <div id="calc-bar" class="h-full bg-blue-600 w-[0%]"></div>
+                                            <div id="calc-bar" class="h-full bg-emerald-500 w-[0%]"></div>
                                         </div>
                                         <div class="flex justify-between items-center border-t border-gray-100 dark:border-gray-700 pt-4">
-                                            <div class="text-[10px] font-bold text-gray-500 uppercase">Limite (25%)</div>
-                                            <div class="text-xl font-black text-gray-900 dark:text-white">20 <span class="text-xs font-normal text-gray-400">faltas</span></div>
+                                            <div class="text-[10px] font-bold text-gray-500 uppercase">Faltas restantes: 10</div>
+                                            <div class="text-xl font-black text-gray-900 dark:text-white">0/10 <span class="text-xs font-normal text-gray-400">faltas</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -250,7 +251,7 @@
                                 <div id="scene-3" class="absolute inset-0 px-2 flex flex-col justify-end pb-8 translate-y-full opacity-0">
                                     <div class="space-y-3">
                                         <div class="self-end bg-blue-600 text-white text-xs p-3 rounded-2xl rounded-tr-none ml-auto max-w-[80%] shadow-lg transform translate-x-10 opacity-0 chat-bubble-1">
-                                            Posso faltar hoje?
+                                            Posso faltar em História hoje?
                                         </div>
                                         <div class="self-start bg-white dark:bg-[#1f2937] border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-xs p-3 rounded-2xl rounded-tl-none max-w-[90%] shadow-lg transform -translate-x-10 opacity-0 chat-bubble-2">
                                             <div class="flex items-center gap-1 mb-1 text-purple-600 dark:text-purple-400 text-[9px] font-bold uppercase tracking-wider">
@@ -271,7 +272,7 @@
                                                     <span class="text-[9px] text-gray-500 dark:text-gray-400">1 min atrás</span>
                                                 </div>
                                                 <p class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight mt-0.5">
-                                                    Você usou 19 de 20 faltas em Física.
+                                                    Você usou 66 de 67 faltas em Matemática.
                                                 </p>
                                             </div>
                                         </div>
@@ -415,7 +416,7 @@
                   .to("#scene-1", { opacity: 0.3, duration: 1 }, "<")
                   .set("#scene-1", { filter: "blur(4px)" }, "<")     // <-- aplica blur sem animar
                   .to("#scene-2", { y: "0%", opacity: 1, duration: 1 })
-                  .to("#calc-bar", { width: "80%", duration: 1, ease: "power2.out" })
+                  .to("#calc-bar", { width: "100%", duration: 1, ease: "power2.out" })
                   .to("#text-2", { opacity: 1, y: 0, duration: 1 }, "<")
                   .addLabel("scene2");
 
