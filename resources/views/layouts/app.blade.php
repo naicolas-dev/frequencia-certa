@@ -35,6 +35,15 @@
 </head>
 
 <body class="font-sans antialiased">
+
+    <div id="page-loader"
+     class="fixed inset-0 z-[9999] bg-[#2D6AE6] flex items-center justify-center flex-col transition-colors duration-500 dark:bg-[#2D6AE6]">
+        <div class="loader-content text-white text-4xl md:text-5xl font-black tracking-tighter opacity-0 translate-y-4"
+            style="font-family: 'Instrument Sans', sans-serif;">
+            Frequência Certa
+        </div>
+    </div>
+
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         @include('layouts.navigation')
 
