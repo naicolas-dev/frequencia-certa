@@ -779,7 +779,7 @@
                                     </a>
                                     <div class="flex items-center gap-1">
                                         {{-- ✨ BOTÃO NOVO: CONSULTAR IA --}}
-                                        <button type="button" onclick="consultarIa({{ $disciplina->id }})" 
+                                        <button type="button" onclick="consultarIa({{ $disciplina->id }}, '{{ addslashes($disciplina->nome) }}')" 
                                                 class="p-2 text-yellow-600 hover:bg-yellow-100 dark:text-yellow-400 dark:hover:bg-yellow-900/30 rounded-lg transition group relative" 
                                                 title="Oráculo">
                                                 <svg class="w-5 h-5 animate-pulse group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -1143,86 +1143,172 @@
     {{-- BANNER DE NOTIFICAÇÕES --}}
     <x-notification-banner />
 
-    {{-- SCRIPT DA I.A. --}}
+    {{-- SCRIPT DA I.A. (NOVA VERSÃO CHAT) --}}
     <script>
-        window.consultarIa = async function(disciplinaId) {
+        window.consultarIa = async function(disciplinaId, disciplinaNome) {
             
-            // Verifica qual biblioteca do SweetAlert está ativa
-            const Swal = window.swalTailwind || window.Swal;
+            const chatContainer = document.getElementById('chat-container');
             
-            if (!Swal) {
-                if(!confirm('Deseja invocar O Oráculo?')) return;
-                // Se não tiver SweetAlert e o usuário aceitar o confirm nativo, prossegue...
-            } else {
-                // 1. POPUP DE CONFIRMAÇÃO (O "Goleiro" 🥅)
-                const confirmacao = await Swal.fire({
-                    title: 'Invocar O Oráculo? (I.A) ✨',
-                    text: 'Pergunte ao Oráculo se você pode faltar hoje nesta matéria.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Sim, invocar!',
-                    cancelButtonText: 'Cancelar',
-                    confirmButtonColor: '#eab308', // Amarelo (yellow-500)
-                    cancelButtonColor: '#9ca3af',  // Cinza
-                    reverseButtons: true, // Botão de confirmar na direita (padrão UX)
-                    focusCancel: true // Foca no cancelar por segurança
-                });
+            // 1. Abre o Modal
+            window.dispatchEvent(new CustomEvent('open-modal', { detail: 'oracle-chat' }));
+            
+            // 2. Limpa o chat anterior
+            chatContainer.innerHTML = '';
+            
+            // 3. Adiciona a mensagem do Usuário (Simulada, mas imediata)
+            // Trazendo aquela sensação de que "eu acabei de perguntar"
+            appendMessage('user', `Ó grande Oráculo, analise minha situação em <strong>${disciplinaNome}</strong>. Posso faltar hoje?`);
 
-                // Se o usuário clicar em "Cancelar" ou fora, a função para aqui.
-                if (!confirmacao.isConfirmed) return;
-            }
+            // 4. Mostra o indicador de "Digitando..." da IA
+            const typingId = showTyping();
 
-            // --- DAQUI PRA BAIXO É A LÓGICA QUE JÁ EXISTIA ---
-
-            // 2. Feedback de Carregamento
-            if (Swal) {
-                Swal.fire({
-                    title: 'Consultando os astros...',
-                    text: 'O Oráculo está calculando suas chances.',
-                    icon: 'info',
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            } else {
-                alert('Carregando...');
-            }
+            // Rola para baixo
+            scrollToBottom();
 
             try {
-                // 3. Chama a API
-                let response = await fetch(`/api/ai/analisar/${disciplinaId}`);
+                // 5. Chama a API (Backend)
+                const response = await fetch(`/api/ai/analisar/${disciplinaId}`);
                 
                 if (!response.ok) throw new Error('Erro na API');
                 
-                let data = await response.json();
+                const data = await response.json();
 
-                // 4. Define cores e ícones
-                let cor = data.risco === 'ALTO' ? '#ef4444' : (data.risco === 'MEDIO' ? '#f59e0b' : '#10b981');
-                let icone = data.risco === 'ALTO' ? 'error' : (data.risco === 'MEDIO' ? 'warning' : 'success');
-
-                // 5. Mostra o Resultado Final
-                if (Swal) {
-                    Swal.fire({
-                        title: data.emoji + ' Veredito:',
-                        text: data.analise,
-                        icon: icone, 
-                        confirmButtonText: 'Beleza, entendi!',
-                        confirmButtonColor: cor,
-                    });
-                } else {
-                    alert(data.analise);
-                }
+                // 6. Remove "Digitando..."
+                removeTyping(typingId);
+                
+                // 7. Adiciona a resposta da IA com um pequeno delay para parecer natural
+                // O Oráculo não responde instantaneamente como um robô chato, ele "pensa"
+                setTimeout(() => {
+                    appendMessage('ai', data.analise, data.risco, data.emoji);
+                    scrollToBottom();
+                }, 400);
 
             } catch (error) {
                 console.error(error);
-                if (Swal) {
-                    Swal.fire('Ops', 'O Oráculo tirou folga hoje. Tente de novo mais tarde.', 'error');
-                } else {
-                    alert('Erro ao consultar O Oráculo.');
-                }
+                removeTyping(typingId);
+                appendMessage('ai', 'Meus cristais estão embaçados por uma interferência no servidor. Tente novamente mais tarde.', 'ERRO', '😵');
             }
+        };
+
+        // Função auxiliar para criar as bolhas do chat
+        function appendMessage(role, text, risk = null, emoji = '') {
+            const container = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            
+            if (role === 'user') {
+                // Estilo da mensagem do USUÁRIO (Direita, Azul)
+                div.className = 'flex justify-end mb-4 pl-8 animate-fade-in-up';
+                div.innerHTML = `
+                    <div class="bg-blue-600 text-white rounded-2xl rounded-tr-sm py-3 px-5 shadow-md text-sm leading-relaxed">
+                        ${text}
+                    </div>
+                `;
+            } else {
+                // Cores baseadas no risco retornado pela API
+                let bgClass = 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100';
+                
+                if (risk === 'ALTO') {
+                    bgClass = 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800 text-red-800 dark:text-red-200';
+                } else if (risk === 'MEDIO') {
+                    bgClass = 'bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800 text-amber-800 dark:text-amber-200';
+                } else if (risk === 'BAIXO') {
+                    bgClass = 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200';
+                }
+
+                // Estilo da mensagem da IA (Esquerda)
+                div.className = 'flex justify-start mb-4 pr-8 animate-fade-in-up';
+                div.innerHTML = `
+                    <div class="flex items-end gap-3 max-w-full">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex-shrink-0 flex items-center justify-center text-sm shadow-sm ring-2 ring-white dark:ring-gray-800 z-10">
+                            ${emoji || '🔮'}
+                        </div>
+                        <div class="${bgClass} border rounded-2xl rounded-tl-sm py-3.5 px-5 shadow-sm text-sm leading-relaxed relative">
+                            <span class="absolute -left-1.5 bottom-2.5 w-3 h-3 ${bgClass.split(' ')[0]} border-l border-b ${bgClass.split(' ')[2]} transform rotate-45"></span>
+                            <p class="font-bold text-[10px] opacity-60 mb-1 uppercase tracking-wider flex items-center gap-1">
+                                Oráculo diz:
+                            </p>
+                            ${text}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.appendChild(div);
+        }
+
+        // Cria a animação de "3 pontinhos" pulando
+        function showTyping() {
+            const container = document.getElementById('chat-container');
+            const id = 'typing-' + Date.now();
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'flex justify-start mb-4 animate-pulse';
+            div.innerHTML = `
+                <div class="flex items-end gap-3">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex-shrink-0 flex items-center justify-center text-xs text-white shadow-sm ring-2 ring-white dark:ring-gray-800 opacity-50">
+                        🔮
+                    </div>
+                    <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-tl-sm py-4 px-4 shadow-sm flex items-center gap-1.5 h-12">
+                        <span class="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce"></span>
+                        <span class="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                        <span class="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            scrollToBottom();
+            return id;
+        }
+
+        function removeTyping(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('chat-container');
+            if(container) container.scrollTop = container.scrollHeight;
         }
     </script>
+
+    {{-- MODAL CHAT ORÁCULO --}}
+<x-modal name="oracle-chat" focusable>
+    <div class="bg-white dark:bg-gray-900 flex flex-col h-[500px] max-h-[85vh]">
+        <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white/95 dark:bg-gray-900/95 backdrop-blur z-10 sticky top-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/30">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 dark:text-white text-base">Oráculo Acadêmico</h3>
+                    <p class="text-xs text-emerald-500 font-bold flex items-center gap-1">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        Online
+                    </p>
+                </div>
+            </div>
+            <button x-on:click="$dispatch('close-modal', 'oracle-chat')" class="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition bg-gray-50 dark:bg-gray-800 rounded-full">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-[#0B1220] scroll-smooth">
+            {{-- As mensagens serão injetadas aqui pelo JS --}}
+        </div>
+
+        <div class="p-4 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
+            <div class="relative opacity-60">
+                <input type="text" disabled placeholder="INDISPONÍVEL..." class="w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-500 text-sm py-3 px-4 cursor-not-allowed select-none pl-4 pr-10">
+                <div class="absolute right-3 top-3 text-gray-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+            </div>
+            <p class="text-[10px] text-center text-gray-400 mt-2">O Oráculo analisa seu histórico para responder.</p>
+        </div>
+    </div>
+</x-modal>
+
 </x-app-layout>
