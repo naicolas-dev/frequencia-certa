@@ -272,6 +272,13 @@ function hideLoader() {
 // Evento 1: Carregamento normal da página
 window.addEventListener('load', hideLoader);
 
+setTimeout(() => {
+    const loader = document.querySelector('#page-loader');
+    if (loader && loader.style.display !== 'none') {
+        hideLoader();
+    }
+}, 3000);
+
 // Evento 2: Correção do botão "Voltar" (BFCache)
 // Impede que o loader fique travado na tela ao voltar no celular
 window.addEventListener('pageshow', (event) => {
