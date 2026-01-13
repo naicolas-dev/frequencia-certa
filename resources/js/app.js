@@ -1,4 +1,5 @@
 import './bootstrap';
+import gsap from 'gsap';
 import Alpine from 'alpinejs';
 import Swal from 'sweetalert2';
 
@@ -7,16 +8,17 @@ import { socialLogin, consumeRedirectResult } from './firebase-auth';
 window.Alpine = Alpine;
 window.Swal = Swal;
 
+// --- CONFIGURAÇÃO FIREBASE AUTH ---
 window.firebaseAuth = window.firebaseAuth || {};
 window.firebaseAuth.socialLogin = socialLogin;
 
-// compatibilidade com seus Blades atuais (@click="handleSocial('google')" -> window.socialLogin)
+// Compatibilidade com os Blades atuais
 window.socialLogin = socialLogin;
 
 if (typeof consumeRedirectResult === 'function') {
-  consumeRedirectResult().catch((err) => {
-    console.error('Erro ao finalizar login via redirect (Firebase):', err?.code || err);
-  });
+    consumeRedirectResult().catch((err) => {
+        console.error('Erro ao finalizar login via redirect (Firebase):', err?.code || err);
+    });
 }
 
 Alpine.start();
@@ -71,6 +73,10 @@ const toast = Swal.mixin({
     showConfirmButton: false,
     timer: 2500,
     timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.addEventListener('mouseenter', Swal.stopTimer);
+        toast.addEventListener('mouseleave', Swal.resumeTimer);
+    },
     customClass: {
         popup: `
             bg-white dark:bg-gray-900
@@ -195,7 +201,7 @@ window.pedirPermissaoNotificacao = async () => {
     
     if (permission === 'granted') {
         try {
-            // 2. Obtém o SW e a chave pública (definida no blade ou .env)
+            // 2. Obtém o SW e a chave pública
             const registration = await navigator.serviceWorker.ready;
             
             const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY; 
@@ -230,3 +236,103 @@ window.pedirPermissaoNotificacao = async () => {
     }
     return false;
 };
+
+/* =========================
+   LÓGICA DO LOADER (GSAP) 
+========================= */
+
+// Função separada para esconder o loader
+function hideLoader() {
+    const loader = document.querySelector('#page-loader');
+    if (!loader) return;
+
+    const tl = gsap.timeline();
+
+    // 1. Mostra o logo/texto
+    tl.to('.loader-content', {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: 'power2.out'
+    })
+    // 2. Sobe a cortina
+    .to('#page-loader', {
+        yPercent: -100,
+        duration: 1.2,
+        ease: 'power4.inOut',
+        delay: 0.2,
+        onComplete: () => {
+            if (document.querySelector('#page-loader')) {
+                document.querySelector('#page-loader').style.display = 'none'; 
+            }
+        }
+    });
+}
+
+// Evento 1: Carregamento normal da página
+window.addEventListener('load', hideLoader);
+
+// Evento 2: Correção do botão "Voltar" (BFCache)
+// Impede que o loader fique travado na tela ao voltar no celular
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) { 
+        const loader = document.querySelector('#page-loader');
+        if (loader) {
+            // Mata animações pendentes
+            gsap.killTweensOf(loader);
+            gsap.killTweensOf('.loader-content');
+            
+            // Força o desaparecimento
+            loader.style.display = 'none';
+            loader.style.transform = 'translateY(-100%)'; 
+        }
+    }
+});
+
+// Evento 3: Animação de Saída (Clique nos links)
+document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('a');
+
+    links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+
+            // Filtros de segurança
+            if (
+                !href || 
+                href.startsWith('#') || 
+                link.target === '_blank' || 
+                href.includes('mailto:') ||
+                href.includes('tel:') || // Adicionado tel:
+                window.location.href === href ||
+                e.ctrlKey || e.metaKey // Permite abrir em nova aba
+            ) {
+                return;
+            }
+
+            e.preventDefault();
+
+            const loader = document.querySelector('#page-loader');
+            
+            if (loader) {
+                loader.style.display = 'flex';
+
+                // Anima a cortina descendo
+                gsap.fromTo('#page-loader', 
+                    { yPercent: 100 }, 
+                    { 
+                        yPercent: 0, 
+                        duration: 0.8, 
+                        ease: 'power4.inOut',
+                        onComplete: () => {
+                            window.location.href = href;
+                        }
+                    }
+                );
+            } else {
+                // Fallback caso não tenha loader na página
+                window.location.href = href;
+            }
+        });
+    });
+});
