@@ -34,7 +34,7 @@ Route::post('/auth/social/login', [SocialAuthController::class, 'login'])
 
 
 // ======================================================
-// 🔓 ROTAS AUTENTICADAS (NÃO exigem email verificado)
+// 🔓 ROTAS AUTENTICADAS
 // ======================================================
 
 Route::middleware(['auth'])->group(function () {
@@ -86,12 +86,17 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/disciplinas/{id}', [DisciplinaController::class, 'destroy'])->name('disciplinas.destroy');
 
     // -------------------------
-    // 🗓️ GRADE HORÁRIA
+    // 🗓️ GRADE HORÁRIA (REFATORADO PARA AJAX)
     // -------------------------
     Route::get('/grade', [GradeHorariaController::class, 'geral'])->name('grade.geral');
+    
+    // Lista os horários de uma disciplina específica (Tela Principal com o Modal)
     Route::get('/disciplinas/{id}/horarios', [GradeHorariaController::class, 'index'])->name('grade.index');
-    Route::post('/disciplinas/{id}/horarios', [GradeHorariaController::class, 'store'])->name('grade.store');
-    Route::get('/grade/{id}/editar', [GradeHorariaController::class, 'edit'])->name('grade.edit');
+    
+    // Salvar novo horário (Agora rota genérica, pois o ID da disciplina vem no JSON)
+    Route::post('/grade', [GradeHorariaController::class, 'store'])->name('grade.store');
+    
+    // Atualizar e Deletar (AJAX)
     Route::put('/grade/{id}', [GradeHorariaController::class, 'update'])->name('grade.update');
     Route::delete('/grade/{id}', [GradeHorariaController::class, 'destroy'])->name('grade.destroy');
 
@@ -155,5 +160,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-// Rotas padrão de autenticação (Laravel Breeze / Jetstream)
 require __DIR__ . '/auth.php';
