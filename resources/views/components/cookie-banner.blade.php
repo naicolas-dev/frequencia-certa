@@ -8,7 +8,7 @@
                     // TRAVA A ROLAGEM DA TELA (Congela o fundo)
                     document.body.style.overflow = 'hidden'; 
                 }
-            }, 200);
+            }, 1301);
         },
         accept() {
             localStorage.setItem('cookie_seen', 'true'); 
