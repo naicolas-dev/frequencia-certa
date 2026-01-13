@@ -13,7 +13,6 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <!-- Evita "flash" do modo escuro -->
     <script>
       if (
         localStorage.theme === "dark" ||
@@ -26,7 +25,6 @@
       }
     </script>
 
-    <!-- Evita flash do x-show -->
     <style>
       [x-cloak] {
         display: none !important;
@@ -46,6 +44,7 @@
   >
 
     <div id="page-loader"
+     @if($errors->any()) style="display: none;" @endif
      class="fixed inset-0 z-[9999] bg-[#2D6AE6] flex items-center justify-center flex-col transition-colors duration-500 dark:bg-[#2D6AE6]">
         <div class="loader-content text-white text-4xl md:text-5xl font-black tracking-tighter opacity-0 translate-y-4"
             style="font-family: 'Instrument Sans', sans-serif;">
@@ -67,7 +66,6 @@
       ></div>
     </div>
 
-    <!-- Toast simples -->
     <div
       x-cloak
       x-show="toast.open"
