@@ -999,7 +999,7 @@
             // AVISA QUE O TOUR VAI COMEÇAR (Imediatamente)
             window.dispatchEvent(new CustomEvent('tour-starting'));
 
-            setTimeout(() => driverObj.drive(), 100);
+            setTimeout(() => driverObj.drive(), 1300);
         });
     </script>
     @endif
