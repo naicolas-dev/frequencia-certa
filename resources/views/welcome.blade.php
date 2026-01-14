@@ -14,30 +14,414 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <script>
-
+    
+    console.log(
+        "%c👀 Curioso? Clique em qualquer lugar da página para desbloquear o áudio.",
+        "color:#94a3b8;font-family:monospace;font-size:11px"
+        );
         console.log(
-        "%c" +
-        "███╗   ██╗██╗ ██████╗ ██████╗ ██╗      █████╗ ███████╗\n" +
-        "████╗  ██║██║██╔════╝██╔═══██╗██║     ██╔══██╗██╔════╝\n" +
-        "██╔██╗ ██║██║██║     ██║   ██║██║     ███████║███████╗\n" +
-        "██║╚██╗██║██║██║     ██║   ██║██║     ██╔══██║╚════██║\n" +
-        "██║ ╚████║██║╚██████╗╚██████╔╝███████╗██║  ██║███████║\n" +
-        "╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝\n" +
-        "                                                      \n" +
-        " █████╗ ██╗     ██╗   ██╗███████╗███████╗             \n" +
-        "██╔══██╗██║     ██║   ██║██╔════╝██╔════╝             \n" +
-        "███████║██║     ██║   ██║█████╗  ███████╗             \n" +
-        "██╔══██║██║     ╚██╗ ██╔╝██╔══╝  ╚════██║             \n" +
-        "██║  ██║███████╗ ╚████╔╝ ███████╗███████║             \n" +
-        "╚═╝  ╚═╝╚══════╝  ╚═══╝  ╚══════╝╚══════╝             ",
-        "color: #3b82f6; font-weight: bold; font-family: monospace;" // Azul da sua marca
+        "%c👀 Curious? Click anywhere on the page to unlock the audio.",
+        "color:#94a3b8;font-family:monospace;font-size:11px"
         );
 
-        console.log(
-                "%cDesenvolvido por Nicolas Alves %c🚀 \nConfira o código em: https://github.com/naicolas-dev/frequencia-certa",
-                "color: #9ca3af; font-family: sans-serif; font-size: 11px;", 
-                "font-size: 16px;"
-        );
+        (() => {
+        // =========================================================
+        // STATE
+        // =========================================================
+        let devtoolsOpen = false;
+        let userInteracted = false;
+        let easterEggFired = false;
+
+        const tryFire = () => {
+            if (devtoolsOpen && userInteracted && !easterEggFired) {
+            easterEggFired = true;
+            runEasterEgg();
+            }
+        };
+
+        // =========================================================
+        // DEVTOOLS DETECTOR
+        // =========================================================
+        (() => {
+            const threshold = 160;
+
+            const check = () => {
+            const w = window.outerWidth - window.innerWidth;
+            const h = window.outerHeight - window.innerHeight;
+
+            if (w > threshold || h > threshold) {
+                devtoolsOpen = true;
+                tryFire();
+                window.removeEventListener("resize", check);
+            }
+            };
+
+            window.addEventListener("resize", check);
+            setTimeout(check, 500);
+        })();
+
+        // =========================================================
+        // USER GESTURE DETECTOR
+        // =========================================================
+        (() => {
+            const onGesture = () => {
+            userInteracted = true;
+            tryFire();
+            ["click", "keydown", "pointerdown", "touchstart"].forEach(evt =>
+                window.removeEventListener(evt, onGesture)
+            );
+            };
+
+            ["click", "keydown", "pointerdown", "touchstart"].forEach(evt =>
+            window.addEventListener(evt, onGesture)
+            );
+        })();
+
+        // =========================================================
+        // EASTER EGG CORE
+        // =========================================================
+        function runEasterEgg() {
+            console.clear();
+
+            // =====================================================
+            // SFX ENGINE
+            // =====================================================
+            const sfx = (() => {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return {};
+
+            const ctx = new AudioCtx();
+
+            const beep = ({
+                freq = 700,
+                duration = 0.06,
+                type = "sine",
+                volume = 0.03,
+                delay = 0
+            } = {}) => {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                const t0 = ctx.currentTime + delay;
+
+                o.type = type;
+                o.frequency.value = freq;
+
+                g.gain.setValueAtTime(0.0001, t0);
+                g.gain.exponentialRampToValueAtTime(volume, t0 + 0.01);
+                g.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+
+                o.connect(g);
+                g.connect(ctx.destination);
+
+                o.start(t0);
+                o.stop(t0 + duration + 0.02);
+            };
+
+            const ambient = () => {
+        const now = ctx.currentTime;
+
+        // ===== Mix geral
+        const master = ctx.createGain();
+        master.gain.value = 0.18;
+        master.connect(ctx.destination);
+
+        const dry = ctx.createGain();
+        dry.gain.value = 1.0;
+
+        const wet = ctx.createGain();
+        wet.gain.value = 0.45;
+
+        // ===== Reverb curtinho (impulso gerado na hora)
+        const makeImpulse = (duration = 0.22, decay = 10) => {
+            const rate = ctx.sampleRate;
+            const length = Math.floor(rate * duration);
+            const buffer = ctx.createBuffer(2, length, rate);
+
+            for (let ch = 0; ch < 2; ch++) {
+            const data = buffer.getChannelData(ch);
+            for (let i = 0; i < length; i++) {
+                const t = i / length;
+                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - t, decay);
+            }
+            }
+            return buffer;
+        };
+
+        const convolver = ctx.createConvolver();
+        convolver.buffer = makeImpulse(0.22, 10);
+
+        // Reverb mais “limpo”
+        const reverbHP = ctx.createBiquadFilter();
+        reverbHP.type = "highpass";
+        reverbHP.frequency.value = 700;
+
+        const reverbLP = ctx.createBiquadFilter();
+        reverbLP.type = "lowpass";
+        reverbLP.frequency.value = 9000;
+
+        // ===== Delay curtinho (eco digital sutil)
+        const delay = ctx.createDelay(0.3);
+        delay.delayTime.value = 0.095;
+
+        const fb = ctx.createGain();
+        fb.gain.value = 0.22;
+
+        const fbLP = ctx.createBiquadFilter();
+        fbLP.type = "lowpass";
+        fbLP.frequency.value = 6500;
+
+        delay.connect(fbLP);
+        fbLP.connect(fb);
+        fb.connect(delay);
+
+        // ===== Roteamento wet
+        const wetBus = ctx.createGain();
+        wetBus.gain.value = 1.0;
+
+        wetBus.connect(delay);
+        wetBus.connect(convolver);
+
+        delay.connect(wet);
+        convolver.connect(reverbHP);
+        reverbHP.connect(reverbLP);
+        reverbLP.connect(wet);
+
+        // ===== Roteamento final
+        dry.connect(master);
+        wet.connect(master);
+
+        // ===== Helpers: voz “bell-metal” (FM + harmônicos)
+        const bell = (freq, t, dur = 0.55, amp = 1, pan = 0) => {
+            const out = ctx.createGain();
+
+            // Envelope de sino: ataque rápido e decay suave
+            out.gain.setValueAtTime(0.0001, t);
+            out.gain.exponentialRampToValueAtTime(0.22 * amp, t + 0.02);
+            out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+            const p = ctx.createStereoPanner();
+            p.pan.setValueAtTime(pan, t);
+
+            // Carrier (corpo)
+            const carrier = ctx.createOscillator();
+            carrier.type = "sine";
+            carrier.frequency.setValueAtTime(freq, t);
+
+            // Modulator (metal)
+            const mod = ctx.createOscillator();
+            mod.type = "sine";
+            mod.frequency.setValueAtTime(freq * 2.4, t);
+
+            const modGain = ctx.createGain();
+            modGain.gain.setValueAtTime(freq * 0.06, t); // profundidade FM (metal)
+
+            mod.connect(modGain);
+            modGain.connect(carrier.frequency);
+
+            // Harmônico pra “brilho”
+            const harm = ctx.createOscillator();
+            harm.type = "triangle";
+            harm.frequency.setValueAtTime(freq * 2, t);
+
+            carrier.connect(out);
+            harm.connect(out);
+
+            out.connect(p);
+            p.connect(dry);
+            p.connect(wetBus);
+
+            carrier.start(t);
+            harm.start(t);
+            mod.start(t);
+
+            carrier.stop(t + dur + 0.05);
+            harm.stop(t + dur + 0.05);
+            mod.stop(t + dur + 0.05);
+        };
+
+        // ===== Sparkle (ruído filtrado bem curto, dá o “tchiii” moderno)
+        const sparkle = (t, pan = 0) => {
+            const length = Math.floor(ctx.sampleRate * 0.09);
+            const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < length; i++) data[i] = (Math.random() * 2 - 1);
+
+            const src = ctx.createBufferSource();
+            src.buffer = buffer;
+
+            const bp = ctx.createBiquadFilter();
+            bp.type = "bandpass";
+            bp.frequency.value = 7200;
+            bp.Q.value = 10;
+
+            const g = ctx.createGain();
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(0.02, t + 0.01);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+
+            const p = ctx.createStereoPanner();
+            p.pan.setValueAtTime(pan, t);
+
+            src.connect(bp);
+            bp.connect(g);
+            g.connect(p);
+
+            p.connect(wetBus); // sparkle só no wet dá aquele “gloss”
+            src.start(t);
+            src.stop(t + 0.11);
+        };
+
+        // ===== Notas do acorde (Bm): B4, F#5, D6
+        // B4 ≈ 493.88Hz, F#5 ≈ 739.99Hz, D6 ≈ 1174.66Hz :contentReference[oaicite:2]{index=2}
+        const B4  = 493.88;
+        const Fs5 = 739.99;
+        const D6  = 1174.66;
+
+        // Pequeno “roll” (quase simultâneo) deixa mais próximo do trophy
+        bell(B4,  now + 0.00, 0.55, 1.0, -0.15);
+        bell(Fs5, now + 0.02, 0.55, 0.95,  0.10);
+        bell(D6,  now + 0.04, 0.52, 0.85,  0.18);
+
+        sparkle(now + 0.03,  0.25);
+        sparkle(now + 0.14, -0.15);
+
+        // Cleanup
+        setTimeout(() => {
+            [delay, fb, fbLP, convolver, reverbHP, reverbLP, wetBus, dry, wet, master].forEach(n => {
+            try { n.disconnect(); } catch {}
+            });
+        }, 1600);
+        };
+
+
+            return {
+                step: () => beep({ freq: 520, duration: 0.045, type: "triangle", volume: 0.02 }),
+                ok: () => beep({ freq: 880, duration: 0.11 }),
+                achievement: () => {
+                beep({ freq: 784, duration: 0.09, type: "square", volume: 0.02 });
+                beep({ freq: 1175, duration: 0.12, type: "square", volume: 0.02, delay: 0.12 });
+                },
+                ambient
+            };
+            })();
+
+            // =====================================================
+            // STYLES
+            // =====================================================
+            const cssTitle =
+            "font-family:monospace;font-weight:900;font-size:14px;" +
+            "color:#e2e8f0;background:#0b1220;padding:6px 10px;border-radius:10px;" +
+            "border:1px solid rgba(148,163,184,.25)";
+
+            const cssLine =
+            "font-family:monospace;font-weight:600;font-size:12px;color:#94a3b8";
+
+            const cssAccent =
+            "font-family:monospace;font-weight:800;font-size:12px;color:#60a5fa";
+
+            const cssOk =
+            "font-family:monospace;font-weight:800;font-size:12px;color:#22c55e";
+
+            const cssAchievement =
+            "font-family:monospace;font-weight:900;" +
+            "color:#0b1220;background:#e2e8f0;padding:10px 12px;border-radius:12px";
+
+            const cssSub =
+            "font-family:monospace;font-weight:700;color:#94a3b8";
+
+            // =====================================================
+            // BOOT SEQUENCE
+            // =====================================================
+            const steps = [
+            { t: "%c[ SYSTEM BOOT ]", s: cssTitle, d: 0 },
+            { t: "%c> Initializing modules...", s: cssLine, d: 180 },
+            { t: "%c> Loading UI...", s: cssLine, d: 180 },
+            { t: "%c> Injecting easter eggs...", s: cssLine, d: 180 },
+            { t: "%c> Author: %cNAICOLAS", s: cssLine, s2: cssAccent, d: 220 },
+            { t: "%c> Status: %cOK ✔", s: cssLine, s2: cssOk, d: 240, ok: true }
+            ];
+
+            let timeline = 0;
+
+            for (const step of steps) {
+            timeline += step.d;
+            setTimeout(() => {
+                sfx.step();
+                step.s2
+                ? console.log(step.t, step.s, step.s2)
+                : console.log(step.t, step.s);
+
+                if (step.ok) sfx.ok();
+            }, timeline);
+            }
+
+            // =====================================================
+            // ACHIEVEMENT + LOGO
+            // =====================================================
+            setTimeout(() => {
+            sfx.achievement();
+
+            console.log("%c🏆 ACHIEVEMENT UNLOCKED", cssAchievement);
+            console.log("%cSystem booted successfully  •  +50 curiosity", cssSub);
+            console.log(
+                "%cHint: try typing %cnaicolas()%c",
+                cssSub,
+                "color:#60a5fa;font-weight:900;font-family:monospace",
+                cssSub
+            );
+            console.log(
+                "%cDica: digite %cnaicolas()%c",
+                cssSub,
+                "color:#60a5fa;font-weight:900;font-family:monospace",
+                cssSub
+            );
+
+            window.naicolas = () => {
+                sfx.ambient(); // 🎧 SOM AMBIENTE AQUI
+
+                console.log(
+                "%cDeveloped by Nicolas Viana Alves %c🤓\n%cCheck the source at: https://github.com/naicolas-dev/frequencia-certa",
+                "color:#9ca3af;font-family:sans-serif;font-size:11px;",
+                "font-size:14px;",
+                "color:#60a5fa;font-family:sans-serif;font-size:11px;"
+                );
+                console.log(
+                "%cCheck my other projects at: https://github.com/naicolas-dev",
+                "color:#60a5fa;font-family:sans-serif;font-size:11px;"
+                );
+            };
+
+            const lines = [
+                " ",
+                "███╗   ██╗  █████╗ ██╗ ██████╗  ██████╗ ██╗      █████╗ ███████╗",
+                "████╗  ██║ ██╔══██╗██║██╔════╝ ██╔═══██╗██║     ██╔══██╗██╔════╝",
+                "██╔██╗ ██║ ███████║██║██║      ██║   ██║██║     ███████║███████╗",
+                "██║╚██╗██║ ██╔══██║██║██║      ██║   ██║██║     ██╔══██║╚════██║",
+                "██║ ╚████║ ██║  ██║██║╚██████╗ ╚██████╔╝███████╗██║  ██║███████║",
+                "╚═╝  ╚═══╝ ╚═╝  ╚═╝╚═╝ ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝"
+            ];
+
+            const gradient = [
+                "#3b82f6", "#4f7cf6", "#6376f6", "#776ff6",
+                "#8b69f6", "#9f63f6", "#b35df6", "#c757f6",
+                "#db51f6", "#ef4bf6"
+            ];
+
+            let fmt = "";
+            let styles = [];
+
+            lines.forEach((line, i) => {
+                const color =
+                gradient[Math.floor((i / (lines.length - 1)) * (gradient.length - 1))];
+                fmt += `%c${line}\n`;
+                styles.push(`color:${color};font-weight:bold;font-family:monospace;`);
+            });
+
+            console.log(fmt, ...styles);
+            }, timeline + 400);
+        }
+        })();
+
         // TRAVA PWA: Se estiver rodando como aplicativo, proíbe a Landing Page
         (function () {
             const isStandalone =
@@ -116,7 +500,7 @@
                 <span class="text-gradient">hoje?</span>
             </h1>
             <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 mx-auto leading-relaxed px-4">
-                Pare de fazer contas mentais. Deixe o <strong>Frequência Certa</strong> calcular suas <strong>Faltas</strong>, gerenciar seus riscos e te salvar.
+                Não confie na sorte. O <strong class="text-gray-900 dark:text-white">Frequência Certa</strong> calcula exatamente quantas vezes você pode <strong class="text-gray-900 dark:text-white">dormir até mais tarde</strong> sem ser reprovado.
             </p>
             <div class="pt-8 animate-bounce">
                 <svg class="w-6 h-6 mx-auto text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
@@ -131,22 +515,22 @@
 
                 <div id="text-1" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                     <div class="md:bg-transparent bg-white/90 dark:bg-black/80 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Organização <br>Instantânea.</h2>
-                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Esqueça as planilhas. Cadastre suas matérias de forma automatizada com a IA.</p>
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-gray-900 dark:text-white">Sua vida acadêmica,<br>Desbugada.</h2>
+                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Largue as planilhas do Excel. A gente monta sua grade, importa os feriados e a IA deixa tudo pronto em segundos.</p>
                     </div>
                 </div>
 
                 <div id="text-2" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                     <div class="md:bg-transparent bg-white/90 dark:bg-black/80 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-blue-600 dark:text-blue-500">Matemática <br>Automática.</h2>
-                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">O Frequência Certa projeta suas faltas com base no Calendário do seu Estado.</p>
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-blue-600 dark:text-blue-500">Matemática da<br>preguiça.</h2>
+                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Nós cruzamos o calendário do seu Estado com suas aulas. Você sabe exatamente quantas faltas tem no bolso.</p>
                     </div>
                 </div>
 
                 <div id="text-3" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                      <div class="md:bg-transparent bg-white/90 dark:bg-black/80 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-purple-600 dark:text-text-purple-600">IA que aconselha você.</h2>
-                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Na dúvida? O Oráculo analisa o calendário, suas faltas e o peso da matéria.</p>
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-purple-600 dark:text-purple-600">O Oráculo<br>sabe de tudo.</h2>
+                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Na dúvida? Pergunte ao Oráculo se vale a pena faltar. Ela analisa se é reta final, se tem feriado chegando e te dá o papo reto.</p>
                     </div>
                 </div>
 
@@ -159,7 +543,7 @@
 
                 <div id="text-5" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                      <div class="md:bg-transparent bg-white/90 dark:bg-black/80 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-orange-500">Vicie em não reprovar.</h2>
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-orange-500">Gamifique sua<br>Sobrevivência.</h2>
                         <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Transformamos registrar presença em jogo. Mantenha sua ofensiva, desbloqueie medalhas e suba de nível.</p>
                     </div>
                 </div>
@@ -322,15 +706,16 @@
             <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 dark:bg-purple-600/20 blur-[100px] rounded-full"></div>
 
             <div class="relative z-10">
-                <h2 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-gray-900 dark:text-white">Pare de arriscar.</h2>
+                <h2 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-gray-900 dark:text-white">Não seja o aluno que reprova por bobeira.</h2>
                 <p class="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
-                    Junte-se a outros estudantes que estão faltando com inteligência.
+                    Acesso gratuito. Instalação em segundos. Privacidade garantida.<br>
+                    <span class="text-sm text-gray-400 dark:text-gray-600 mt-2 block">(Sério, sua mãe vai agradecer).</span>
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     @guest
                     <a href="{{ route('register') }}" class="w-full sm:w-auto px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-black text-lg font-bold rounded-full hover:scale-105 transition shadow-lg">
-                        Criar Conta Grátis
+                        Garantir minha Aprovação
                     </a>
                     @endguest
                     @auth
