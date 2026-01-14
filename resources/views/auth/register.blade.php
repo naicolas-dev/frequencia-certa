@@ -34,7 +34,8 @@
     x-data="registerPage()"
     x-init="init()"
   >
-  <x-loading />
+
+ 
 
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
       <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob dark:bg-blue-900/20"></div>
@@ -264,7 +265,7 @@
         <div class="mt-8 text-center pt-6 border-t border-gray-200/60 dark:border-gray-800">
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Já possui uma conta?
-            <a href="{{ route('login') }}" class="font-bold text-blue-600 dark:text-blue-400 hover:underline p-2">
+            <a href="{{ route('login') }}" data-no-spa class="font-bold text-blue-600 dark:text-blue-400 hover:underline p-2">
               Fazer Login
             </a>
           </p>

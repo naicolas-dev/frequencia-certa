@@ -43,7 +43,7 @@
     x-init="init()"
   >
 
-    <x-loading />
+    
 
     <div
       class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none"
@@ -415,6 +415,7 @@
             Não tem uma conta?
             <a
               href="{{ route('register') }}"
+              data-no-spa
               class="font-bold text-blue-600 dark:text-blue-400 hover:underline p-2"
             >
               Cadastre-se

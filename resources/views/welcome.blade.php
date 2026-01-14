@@ -480,10 +480,10 @@
                 <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             </button>
             @auth
-                <a href="{{ url('/dashboard') }}" class="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full font-bold hover:scale-105 transition shadow-lg">Painel</a>
+                <a href="{{ url('/dashboard') }}" data-no-spa class="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-full font-bold hover:scale-105 transition shadow-lg">Painel</a>
             @else
-                <a href="{{ route('login') }}" class="font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition mr-2">Entrar</a>
-                <a href="{{ route('register') }}" class="px-5 py-2 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">Começar</a>
+                <a href="{{ route('login') }}" data-no-spa class="font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition mr-2">Entrar</a>
+                <a href="{{ route('register') }}" data-no-spa class="px-5 py-2 bg-blue-600 text-white rounded-full font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">Começar</a>
             @endauth
         </div>
     </nav>
