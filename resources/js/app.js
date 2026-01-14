@@ -2,71 +2,38 @@ import './bootstrap';
 import gsap from 'gsap';
 import Alpine from 'alpinejs';
 import Swal from 'sweetalert2';
-
 import { socialLogin, consumeRedirectResult } from './firebase-auth';
 
+// --- Global Config ---
 window.Alpine = Alpine;
 window.Swal = Swal;
 
-// --- CONFIGURAÇÃO FIREBASE AUTH ---
+// --- Firebase Auth ---
 window.firebaseAuth = window.firebaseAuth || {};
 window.firebaseAuth.socialLogin = socialLogin;
-
-// Compatibilidade com os Blades atuais
 window.socialLogin = socialLogin;
 
 if (typeof consumeRedirectResult === 'function') {
-    consumeRedirectResult().catch((err) => {
-        console.error('Erro ao finalizar login via redirect (Firebase):', err?.code || err);
-    });
+    consumeRedirectResult().catch((err) => console.error('Erro Firebase:', err));
 }
 
 Alpine.start();
 
-
-/* =========================
-   SWEETALERT CONFIRM GLOBAL
-========================= */
-
+// --- SweetAlert & Toasts ---
 const swalTailwind = Swal.mixin({
     customClass: {
-        popup: `
-            rounded-3xl 
-            bg-white dark:bg-gray-900 
-            text-gray-800 dark:text-gray-100 
-            shadow-2xl 
-            border border-gray-100 dark:border-gray-800
-        `,
+        popup: 'rounded-3xl bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 shadow-2xl border border-gray-100 dark:border-gray-800',
         title: 'text-lg font-bold',
         htmlContainer: 'text-sm text-gray-500 dark:text-gray-400',
         actions: 'gap-3',
-        confirmButton: `
-            bg-blue-600 hover:bg-blue-700 
-            text-white font-bold 
-            px-6 py-3 rounded-xl 
-            shadow-lg shadow-blue-500/30 
-            transition active:scale-95
-        `,
-        cancelButton: `
-            bg-gray-200 dark:bg-gray-800 
-            text-gray-700 dark:text-gray-300 
-            font-bold 
-            px-6 py-3 rounded-xl 
-            transition active:scale-95
-        `
+        confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-blue-500/30 transition active:scale-95',
+        cancelButton: 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold px-6 py-3 rounded-xl transition active:scale-95'
     },
     buttonsStyling: false,
-    backdrop: `
-        bg-black/50 
-        backdrop-blur-sm
-    `
+    backdrop: 'bg-black/50 backdrop-blur-sm'
 });
-
 window.swalTailwind = swalTailwind;
 
-/* =========================
-   TOAST GLOBAL
-========================= */
 const toast = Swal.mixin({
     toast: true,
     position: window.innerWidth > 768 ? 'bottom' : 'top',
@@ -78,79 +45,26 @@ const toast = Swal.mixin({
         toast.addEventListener('mouseleave', Swal.resumeTimer);
     },
     customClass: {
-        popup: `
-            bg-white dark:bg-gray-900
-            text-gray-800 dark:text-gray-100
-            rounded-2xl
-            shadow-xl
-            border border-gray-100 dark:border-gray-800
-            px-4 py-3
-            md:mb-6
-        `,
+        popup: 'bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 px-4 py-3 md:mb-6',
         title: 'text-sm font-semibold',
         icon: 'scale-90'
     },
     showClass: {
-        popup: `
-            animate__animated 
-            ${window.innerWidth > 768 ? 'animate__fadeInUp' : 'animate__fadeInDown'}
-            animate__faster
-        `
+        popup: `animate__animated ${window.innerWidth > 768 ? 'animate__fadeInUp' : 'animate__fadeInDown'} animate__faster`
     }
 });
 
-// SUCESSO (Verde / Emerald)
-window.toastSuccess = (msg) =>
-    toast.fire({
-        icon: 'success',
-        title: msg,
-        iconColor: '#10b981',
-        background: '#ecfdf5', 
-        color: '#064e3b',     
-    });
+window.toastSuccess = (msg) => toast.fire({ icon: 'success', title: msg, iconColor: '#10b981', background: '#ecfdf5', color: '#064e3b' });
+window.toastError = (msg) => toast.fire({ icon: 'error', title: msg, iconColor: '#ef4444', background: '#fef2f2', color: '#7f1d1d' });
+window.toastWarning = (msg) => toast.fire({ icon: 'warning', title: msg, iconColor: '#f59e0b', background: '#fffbeb', color: '#78350f' });
+window.toastInfo = (msg) => toast.fire({ icon: 'info', title: msg, iconColor: '#3b82f6', background: '#eff6ff', color: '#1e3a8a' });
 
-// ERRO (Vermelho / Red)
-window.toastError = (msg) =>
-    toast.fire({
-        icon: 'error',
-        title: msg,
-        iconColor: '#ef4444', 
-        background: '#fef2f2',
-        color: '#7f1d1d',      
-    });
-
-// AVISO (Amarelo / Amber)
-window.toastWarning = (msg) =>
-    toast.fire({
-        icon: 'warning',
-        title: msg,
-        iconColor: '#f59e0b', 
-        background: '#fffbeb',
-        color: '#78350f',      
-    });
-
-// INFO (Azul / Blue)
-window.toastInfo = (msg) =>
-    toast.fire({
-        icon: 'info',
-        title: msg,
-        iconColor: '#3b82f6',
-        background: '#eff6ff',
-        color: '#1e3a8a',     
-    });
-
-/* =========================
-   CONFIRM SUBMIT LISTENER
-========================= */
-
+// --- Global Listeners ---
 document.addEventListener('submit', function (e) {
     const form = e.target;
     const message = form.getAttribute('data-confirm');
-
     if (!message) return;
-
     e.preventDefault();
-
     swalTailwind.fire({
         title: 'Confirmação',
         text: message,
@@ -159,25 +73,14 @@ document.addEventListener('submit', function (e) {
         confirmButtonText: 'Sim',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
-        if (result.isConfirmed) {
-            form.submit();
-        }
+        if (result.isConfirmed) form.submit();
     });
 });
 
-/* =========================
-   SERVICE WORKER REGISTRATION
-========================= */
-
+// --- PWA & Push Notifications ---
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')           
-    });
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
 }
-
-/* =========================
-   NOTIFICAÇÕES PUSH
-========================= */
 
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -191,32 +94,20 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 window.pedirPermissaoNotificacao = async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        console.error('Push notifications não suportadas.');
-        return false;
-    }
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
 
-    // 1. Pede permissão ao navegador
     const permission = await Notification.requestPermission();
-    
     if (permission === 'granted') {
         try {
-            // 2. Obtém o SW e a chave pública
             const registration = await navigator.serviceWorker.ready;
-            
             const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY; 
-
-            if (!vapidPublicKey) {
-                console.error('Chave VAPID não configurada no .env');
-                return false;
-            }
+            if (!vapidPublicKey) return false;
 
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
             });
 
-            // 3. Envia para o Laravel
             await fetch('/push/subscribe', {
                 method: 'POST',
                 headers: {
@@ -229,7 +120,7 @@ window.pedirPermissaoNotificacao = async () => {
             window.toastSuccess('Notificações ativadas!');
             return true;
         } catch (error) {
-            console.error('Erro ao inscrever push:', error);
+            console.error('Erro push:', error);
             window.toastError('Erro ao ativar notificações.');
             return false;
         }
@@ -237,109 +128,117 @@ window.pedirPermissaoNotificacao = async () => {
     return false;
 };
 
-/* =========================
-   LÓGICA DO LOADER (GSAP) 
-========================= */
+// --- SPA Logic ---
+document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link || 
+        link.target === '_blank' || 
+        link.href.includes('#') || 
+        link.href.startsWith('mailto:') ||
+        link.href.startsWith('tel:') ||
+        !link.href.startsWith(window.location.origin) ||
+        link.getAttribute('download') !== null ||
+        e.ctrlKey || e.metaKey || 
+        link.hasAttribute('data-no-spa') || 
+        link.getAttribute('onclick')?.includes('submit()')
+    ) return;
 
-// Função separada para esconder o loader
-function hideLoader() {
-    const loader = document.querySelector('#page-loader');
-    if (!loader) return;
+    if (link.href === window.location.href) {
+        e.preventDefault();
+        return;
+    }
 
-    const tl = gsap.timeline();
+    e.preventDefault();
+    spaNavigate(link.href);
+});
 
-    // 1. Mostra o logo/texto
-    tl.to('.loader-content', {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: 'power2.out'
-    })
-    // 2. Sobe a cortina
-    .to('#page-loader', {
-        yPercent: -100,
-        duration: 1.2,
-        ease: 'power4.inOut',
-        delay: 0.2,
-        onComplete: () => {
-            if (document.querySelector('#page-loader')) {
-                document.querySelector('#page-loader').style.display = 'none'; 
-            }
-        }
+window.addEventListener('popstate', () => spaNavigate(window.location.href, false));
+
+async function spaNavigate(url, pushState = true) {
+    const curtainPromise = animateCurtainIn();
+    const dataPromise = fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+
+    try {
+        const [_, response] = await Promise.all([curtainPromise, dataPromise]);
+        
+        if (!response.ok) throw new Error('Erro na navegação');
+        
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        if (pushState) window.history.pushState({}, '', url);
+        document.title = doc.title;
+        document.body.innerHTML = doc.body.innerHTML;
+
+        if (window.Alpine) window.Alpine.initTree(document.body);
+        
+        const scripts = document.body.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+
+        window.scrollTo(0, 0);
+        hideLoader();
+
+    } catch (error) {
+        console.error('Fallback reload', error);
+        window.location.href = url;
+    }
+}
+
+// --- Loader Animations (GSAP) ---
+function animateCurtainIn() {
+    return new Promise(resolve => {
+        const loader = document.querySelector('#page-loader');
+        if (!loader) { resolve(); return; } 
+
+        loader.style.display = 'flex';
+        
+        // 1s minimum delay logic
+        const minTimePromise = new Promise(r => setTimeout(r, 1000));
+        const animationPromise = gsap.fromTo('#page-loader', 
+            { yPercent: -100, opacity: 1 }, 
+            { yPercent: 0, duration: 0.6, ease: 'power4.out' }
+        );
+
+        Promise.all([minTimePromise, animationPromise]).then(resolve);
     });
 }
 
-// Evento 1: Carregamento normal da página
+function hideLoader() {
+    const loader = document.querySelector('#page-loader');
+    if (!loader || (loader.style.display === 'none' && loader.style.transform !== '')) return;
+
+    const tl = gsap.timeline({
+        onComplete: () => { loader.style.display = 'none'; }
+    });
+
+    tl.to('#page-loader', {
+        yPercent: -100,
+        duration: 0.8,
+        ease: 'power4.inOut',
+        delay: 0.5 
+    }); 
+}
+
+// Initialization & Clean up
 window.addEventListener('load', hideLoader);
 
 setTimeout(() => {
     const loader = document.querySelector('#page-loader');
-    if (loader && loader.style.display !== 'none') {
-        hideLoader();
-    }
+    if (loader && loader.style.display !== 'none') hideLoader();
 }, 3000);
 
-// Evento 2: Correção do botão "Voltar" (BFCache)
-// Impede que o loader fique travado na tela ao voltar no celular
 window.addEventListener('pageshow', (event) => {
     if (event.persisted) { 
         const loader = document.querySelector('#page-loader');
         if (loader) {
-            // Mata animações pendentes
             gsap.killTweensOf(loader);
-            gsap.killTweensOf('.loader-content');
-            
-            // Força o desaparecimento
             loader.style.display = 'none';
-            loader.style.transform = 'translateY(-100%)'; 
         }
     }
-});
-
-// Evento 3: Animação de Saída (Clique nos links)
-document.addEventListener('DOMContentLoaded', () => {
-    const links = document.querySelectorAll('a');
-
-    links.forEach(link => {
-        link.addEventListener('click', (e) => {
-            const href = link.getAttribute('href');
-
-            // Filtros de segurança
-            if (
-                !href || 
-                href.startsWith('#') || 
-                link.target === '_blank' || 
-                href.includes('mailto:') ||
-                href.includes('tel:') || // Adicionado tel:
-                window.location.href === href ||
-                e.ctrlKey || e.metaKey // Permite abrir em nova aba
-            ) {
-                return;
-            }
-
-            e.preventDefault();
-
-            const loader = document.querySelector('#page-loader');
-            
-            if (loader) {
-                loader.style.display = 'flex';
-
-                // Anima a cortina descendo
-                gsap.fromTo('#page-loader', 
-                    { yPercent: 100 }, 
-                    { 
-                        yPercent: 0, 
-                        duration: 0.8, 
-                        ease: 'power4.inOut',
-                        onComplete: () => {
-                            window.location.href = href;
-                        }
-                    }
-                );
-            } else {
-                // Fallback caso não tenha loader na página
-                window.location.href = href;
-            }
-        });
-    });
 });
