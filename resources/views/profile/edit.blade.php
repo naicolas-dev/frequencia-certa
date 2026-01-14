@@ -41,7 +41,7 @@
                     </header>
 
                     <div class="flex items-center">
-                        <a href="{{ route('relatorio.baixar') }}" target="_blank" 
+                        <a href="{{ route('relatorio.baixar') }}" download="relatorio-frequencia.pdf"
                            class="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-xl shadow-indigo-500/30 transition transform active:scale-[0.98] text-sm flex items-center justify-center gap-3">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             Baixar
