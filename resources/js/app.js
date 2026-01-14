@@ -171,8 +171,7 @@ async function spaNavigate(url, pushState = true) {
         document.title = doc.title;
         document.body.innerHTML = doc.body.innerHTML;
 
-        if (window.Alpine) window.Alpine.initTree(document.body);
-        
+        // 1. PRIMEIRO: Re-executa os scripts para carregar as funções (gradeImporter, etc)
         const scripts = document.body.querySelectorAll('script');
         scripts.forEach(oldScript => {
             const newScript = document.createElement('script');
@@ -181,6 +180,14 @@ async function spaNavigate(url, pushState = true) {
             oldScript.parentNode.replaceChild(newScript, oldScript);
         });
 
+        // 2. DEPOIS: Inicia o Alpine (agora a função gradeImporter já existe na memória)
+        if (window.Alpine) {
+            // Pequeno delay para garantir que o navegador processou os scripts acima
+            requestAnimationFrame(() => {
+                window.Alpine.initTree(document.body);
+            });
+        }
+        
         window.scrollTo(0, 0);
         hideLoader();
 
