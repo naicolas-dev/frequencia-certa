@@ -5,103 +5,132 @@ FROM node:20-alpine AS node_builder
 
 WORKDIR /app
 
-# 📦 Instala dependências JS (cacheável)
+# 1. Copia apenas arquivos de dependência primeiro (Cache Layer)
 COPY package*.json ./
-RUN echo "📦 Instalando dependências frontend..." \
- && npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 
-# 🏗️ Copia somente o necessário pro build do Vite
-COPY vite.config.* postcss.config.* tailwind.config.* ./
-COPY resources ./resources
-COPY public ./public
-
-RUN echo "🏗️ Buildando assets frontend..." \
- && npm run build
+# 2. Copia o resto e builda
+COPY . .
+RUN npm run build
 
 
 # ============================================================
-# 🟩 STAGE 2 — PHP DEPENDENCIES (Composer + Vendor)
+# 🟩 STAGE 2 — BACKEND BUILD (Composer)
 # ============================================================
 FROM php:8.2-cli-alpine AS composer_builder
 
 WORKDIR /app
 
-# 🔧 Pacotes + build deps (pra compilar extensões) + extensões PHP
-RUN echo "🔧 Instalando dependências do sistema e extensões PHP (builder)..." \
- && apk add --no-cache \
-      bash git unzip curl \
-      icu-libs libzip postgresql-libs oniguruma \
- && apk add --no-cache --virtual .build-deps \
-      $PHPIZE_DEPS icu-dev libzip-dev postgresql-dev oniguruma-dev \
- && docker-php-ext-install \
-      intl zip pdo_pgsql mbstring \
- && apk del .build-deps
+# 1. Instala dependências do sistema para compilar PHP
+RUN apk add --no-cache \
+    git \
+    unzip \
+    libpq-dev \
+    libzip-dev \
+    libpng-dev \
+    libonig-dev \
+    icu-dev
 
-# 🎼 Composer
-COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
-ENV COMPOSER_ALLOW_SUPERUSER=1
+# 2. Instala extensões necessárias para o build
+RUN docker-php-ext-install \
+    pdo_pgsql \
+    bcmath \
+    gd \
+    intl \
+    zip \
+    mbstring \
+    pcntl
 
-# ✅ IMPORTANTE:
-# Copie o código (incluindo artisan) ANTES do composer install,
-# senão o post-autoload-dump tenta rodar "php artisan ..." e falha.
+# 3. Instala Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# 4. Copia APENAS composer.json/lock para aproveitar cache do Docker
+COPY composer.json composer.lock ./
+
+# 5. Instala dependências (sem scripts para não quebrar por falta de código)
+RUN composer install \
+    --no-dev \
+    --no-scripts \
+    --no-autoloader \
+    --prefer-dist \
+    --no-interaction
+
+# 6. Copia o código fonte
 COPY . .
 
-# 📦 Instala dependências PHP (gera vendor/)
-RUN echo "📦 Instalando dependências PHP (composer)..." \
- && composer install \
-      --no-dev \
-      --optimize-autoloader \
-      --no-interaction \
-      --prefer-dist \
-      --no-progress
-
-# (Opcional, mas ajuda em algumas imagens) garante cache dirs existirem
-RUN mkdir -p storage bootstrap/cache \
- && chmod -R 775 storage bootstrap/cache || true
+# 7. Gera o autoloader final otimizado
+RUN composer dump-autoload --optimize
 
 
 # ============================================================
-# 🟨 STAGE 3 — RUNTIME (PHP 8.2)
+# 🟨 STAGE 3 — RUNTIME (Imagem Final Leve)
 # ============================================================
 FROM php:8.2-cli-alpine
 
 WORKDIR /var/www/html
 
-# 🔧 Runtime libs + build deps temporários pra compilar extensões (e remover depois)
-RUN echo "🔧 Instalando extensões PHP em runtime..." \
- && apk add --no-cache \
-      bash unzip \
-      icu-libs libzip postgresql-libs oniguruma \
- && apk add --no-cache --virtual .build-deps \
-      $PHPIZE_DEPS icu-dev libzip-dev postgresql-dev oniguruma-dev \
- && docker-php-ext-install \
-      intl zip pdo_pgsql mbstring \
- && apk del .build-deps
+# 1. Instala libs de runtime (Postgres, Zip, etc)
+# libpq é essencial para conectar no Neon
+RUN apk add --no-cache \
+    bash \
+    libpq \
+    libzip \
+    libpng \
+    libonig \
+    icu-libs
 
-# 📁 Copia app já com vendor pronto do builder
+# 2. Instala as extensões PHP na imagem final
+# pdo_pgsql: Conexão com Neon
+# opcache: Performance
+# bcmath: Cálculos precisos
+RUN apk add --no-cache --virtual .build-deps \
+    libpq-dev libzip-dev libpng-dev libonig-dev icu-dev \
+    && docker-php-ext-install pdo_pgsql bcmath gd intl zip mbstring opcache \
+    && apk del .build-deps
+
+# 3. Copia o código pronto dos estágios anteriores
 COPY --from=composer_builder /app /var/www/html
-
-# ✅ Copia assets compilados do Vite
 COPY --from=node_builder /app/public/build ./public/build
 
-# 🔐 Permissões (sem quebrar build se não existir algo)
-RUN echo "🔐 Ajustando permississões..." \
- && chmod -R 775 storage bootstrap/cache || true
+# 4. Ajusta permissões e cria pastas de cache
+RUN mkdir -p storage/framework/{sessions,views,cache} bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 
+# 5. Configuração do PHP (Opcional, aumenta limite de upload/memória)
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
+RUN echo "upload_max_filesize=50M" > /usr/local/etc/php/conf.d/uploads.ini
 
 # ============================================================
-# 🚀 STARTUP — MIGRATIONS + OPTIMIZE + SERVER
+# 🚀 STARTUP SCRIPT (NEON DB LOGIC)
 # ============================================================
+# O script abaixo faz a mágica:
+# 1. Usa a URL "Direct" para rodar migrations (port 5432)
+# 2. Otimiza o Laravel
+# 3. Usa a URL "Pooler" para rodar o servidor (port 6543)
 CMD sh -c '\
-  set -e; \
-  echo "🚀 Inicializando aplicação Laravel"; \
-  echo "➡️ Usando Neon DIRECT para migrations"; \
-  export DATABASE_URL="${DATABASE_URL_DIRECT:-$DATABASE_URL}"; \
-  php artisan migrate --force --no-interaction; \
-  echo "⚡ Otimizando Laravel"; \
-  php artisan optimize; \
-  echo "➡️ Subindo aplicação com Neon POOLER"; \
-  export DATABASE_URL="${DATABASE_URL_POOLER:-$DATABASE_URL}"; \
-  echo "🌍 Servidor disponível na porta ${PORT:-10000}"; \
-  php -S 0.0.0.0:${PORT:-10000} -t public \
-'
+    set -e; \
+    echo "🚀 Inicializando container..."; \
+    \
+    if [ -n "$DATABASE_URL_DIRECT" ]; then \
+        echo "🔄 Trocando para conexão DIRECT para rodar Migrations..."; \
+        export DATABASE_URL="$DATABASE_URL_DIRECT"; \
+    fi; \
+    \
+    echo "📂 Executando Migrations..."; \
+    php artisan migrate --force --no-interaction; \
+    \
+    echo "⚡ Otimizando caches..."; \
+    php artisan optimize; \
+    php artisan config:cache; \
+    php artisan route:cache; \
+    php artisan view:cache; \
+    \
+    if [ -n "$DATABASE_URL_POOLER" ]; then \
+        echo "✅ Voltando para conexão POOLER para o Servidor..."; \
+        export DATABASE_URL="$DATABASE_URL_POOLER"; \
+    fi; \
+    \
+    echo "🌍 Servidor iniciando na porta ${PORT:-10000}"; \
+    php -S 0.0.0.0:${PORT:-10000} -t public \
+'    
