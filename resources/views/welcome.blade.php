@@ -145,15 +145,15 @@
 
                 <div id="text-3" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                      <div class="md:bg-transparent bg-white/90 dark:bg-black/80 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-purple-600 dark:text-white">IA que aconselha você.</h2>
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-purple-600 dark:text-text-purple-600">IA que aconselha você.</h2>
                         <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Na dúvida? O Oráculo analisa o calendário, suas faltas e o peso da matéria.</p>
                     </div>
                 </div>
 
                 <div id="text-4" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                     <div class="md:bg-transparent bg-white/90 dark:bg-black/80 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                       <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-red-600 dark:text-red-500">Alertas Anti<br>Reprovação.</h2>
-                       <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Esqueceu de registrar a frequência? Está em perigo de estourar as faltas? O app te manda um puxão de orelha na hora certa se você estiver em perigo.</p>
+                       <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-teal-600 dark:text-teal-500">Alertas Anti<br>Esquecimento.</h2>
+                       <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Esqueceu de registrar a frequência? O app te manda um puxão de orelha na hora certa se você estiver em perigo.</p>
                    </div>
                </div>
 
@@ -261,14 +261,20 @@
                                 <div id="scene-4" class="absolute inset-0 px-2 flex flex-col items-center pt-8 opacity-0">
                                     <div id="push-notification" class="w-full bg-white/95 dark:bg-[#1f2937]/95 backdrop-blur-md p-3 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl transform -translate-y-20">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-500 flex items-center justify-center text-xs font-bold">⚠️</div>
+                                            <div class="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-500 flex items-center justify-center">
+                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"aria-hidden="true"  >
+                                                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" stroke="currentColor" stroke-width="2"/>
+                                                    <path d="M12 10.5v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                                    <path d="M12 7.5h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                                </svg>
+                                            </div>
                                             <div class="flex-1">
                                                 <div class="flex justify-between">
-                                                    <span class="text-xs font-bold text-gray-900 dark:text-white">Alerta Crítico</span>
+                                                    <span class="text-xs font-bold text-gray-900 dark:text-white">Chamada! 📢</span>
                                                     <span class="text-[9px] text-gray-500 dark:text-gray-400">1 min atrás</span>
                                                 </div>
                                                 <p class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight mt-0.5">
-                                                    Você usou 66 de 67 faltas em Matemática.
+                                                    Você tem aulas hoje! Não se esqueça de registrar sua frequência para manter a média.
                                                 </p>
                                             </div>
                                         </div>
