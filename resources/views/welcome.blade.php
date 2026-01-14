@@ -467,8 +467,6 @@
 </head>
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-white antialiased selection:bg-blue-500 selection:text-white transition-colors duration-300">
 
-    <x-loading style="display: none;" />
-
     <nav class="fixed top-0 w-full z-50 p-6 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-black/90 border-b border-gray-200/50 dark:border-white/10 transition-colors duration-300">
         <div class="flex items-center gap-2 font-bold text-xl tracking-tighter text-gray-900 dark:text-white">
             <x-application-logo class="block h-8 w-auto fill-current text-blue-600 dark:text-blue-500" />
