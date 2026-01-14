@@ -200,7 +200,7 @@
     </div>
 
     <script>
-        function gradeImporter() {
+        window.gradeImporter = function() {
             return {
                 step: 1, mode: 'texto', textoInput: '', previewUrl: null, file: null, isLoading: false, dadosExtraidos: [],
                 config: { inicio: '07:00', duracao: 50, intervaloTempo: 15, intervaloApos: 3 },
