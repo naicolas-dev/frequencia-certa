@@ -909,99 +909,106 @@
                         </div>
 
     @if(Auth::user()->has_seen_intro && !Auth::user()->has_completed_tour)
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const driver = window.driver.js.driver;
-            const isMobile = window.innerWidth < 1024;
+        <script>
+            { // <--- 1. ABRE ESCOPO: Isso impede o erro de "variável já declarada" ao voltar na página
+                
+                // 2. Função encapsulada para iniciar o tour
+                const initDashboardTour = () => {
+                    
+                    // Verifica se a biblioteca driver.js carregou
+                    if (!window.driver || !window.driver.js || !window.driver.js.driver) {
+                        console.warn('Driver.js não encontrado');
+                        return;
+                    }
 
-            let tourSteps = [{
-                    element: '#tour-chamada',
-                    popover: {
-                        title: 'Diário de Classe',
-                        description: 'Registre sua presença do dia com um clique. Ou, marque um dia livre.'
-                    }
-                },
-                {
-                    element: '#tour-status',
-                    popover: {
-                        title: 'Seu Painel',
-                        description: 'Acompanhe sua frequência global e veja alertas de matérias em risco.'
-                    }
-                },
-                {
-                    element: '#tour-theme-toggle',
-                    popover: {
-                        title: 'Modo Noturno',
-                        description: 'Prefere estudar à noite? Troque o tema aqui.'
-                    }
-                }
-            ];
+                    const driver = window.driver.js.driver;
+                    const isMobile = window.innerWidth < 1024;
 
-            if (isMobile) {
-                tourSteps.push({
-                    element: '#tour-grade-mobile',
-                    popover: {
-                        title: 'Sua Grade',
-                        description: 'Acesse a visão completa da sua semana.'
-                    }
-                }, {
-                    element: '#tour-profile-mobile',
-                    popover: {
-                        title: 'Seu Perfil',
-                        description: 'Gerencie sua conta e outras configurações aqui.'
-                    }
-                }, {
-                    element: '#tour-add-mobile',
-                    popover: {
-                        title: 'Adicione uma Matéria',
-                        description: 'Toque no botão central para adicionar suas matérias.'
-                    }
-                });
-            } else {
-                tourSteps.push({
-                    element: '#tour-grade-desktop',
-                    popover: {
-                        title: 'Grade Horária',
-                        description: 'Acesse a visão completa da sua semana.'
-                    }
-                }, {
-                    element: '#tour-nova-materia',
-                    popover: {
-                        title: 'Adicione uma Matéria',
-                        description: 'Comece clicando aqui para cadastrar suas matérias.'
-                    }
-                });
-            }
+                    let tourSteps = [
+                        {
+                            element: '#tour-chamada',
+                            popover: {
+                                title: 'Diário de Classe',
+                                description: 'Registre sua presença do dia com um clique. Ou, marque um dia livre.'
+                            }
+                        },
+                        {
+                            element: '#tour-status',
+                            popover: {
+                                title: 'Seu Painel',
+                                description: 'Acompanhe sua frequência global e veja alertas de matérias em risco.'
+                            }
+                        },
+                        {
+                            element: '#tour-theme-toggle',
+                            popover: {
+                                title: 'Modo Noturno',
+                                description: 'Prefere estudar à noite? Troque o tema aqui.'
+                            }
+                        }
+                    ];
 
-            const driverObj = driver({
-                showProgress: true,
-                allowClose: true,
-                animate: true,
-                nextBtnText: 'Próximo',
-                prevBtnText: 'Voltar',
-                doneBtnText: 'Concluir',
-                steps: tourSteps,
-                onDestroyStarted: () => {
-                    fetch('{{ route("tour.finish") }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Content-Type': 'application/json'
+                    if (isMobile) {
+                        tourSteps.push(
+                            {
+                                element: '#tour-grade-mobile',
+                                popover: { title: 'Sua Grade', description: 'Acesse a visão completa da sua semana.' }
+                            }, 
+                            {
+                                element: '#tour-profile-mobile',
+                                popover: { title: 'Seu Perfil', description: 'Gerencie sua conta e outras configurações aqui.' }
+                            }, 
+                            {
+                                element: '#tour-add-mobile',
+                                popover: { title: 'Adicione uma Matéria', description: 'Toque no botão central para adicionar suas matérias.' }
+                            }
+                        );
+                    } else {
+                        tourSteps.push(
+                            {
+                                element: '#tour-grade-desktop',
+                                popover: { title: 'Grade Horária', description: 'Acesse a visão completa da sua semana.' }
+                            }, 
+                            {
+                                element: '#tour-nova-materia',
+                                popover: { title: 'Adicione uma Matéria', description: 'Comece clicando aqui para cadastrar suas matérias.' }
+                            }
+                        );
+                    }
+
+                    const driverObj = driver({
+                        showProgress: true,
+                        allowClose: true,
+                        animate: true,
+                        nextBtnText: 'Próximo',
+                        prevBtnText: 'Voltar',
+                        doneBtnText: 'Concluir',
+                        steps: tourSteps,
+                        onDestroyStarted: () => {
+                            fetch('{{ route("tour.finish") }}', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'application/json'
+                                }
+                            }).catch(err => console.error(err));
+                            
+                            window.dispatchEvent(new CustomEvent('tour-finished'));
+                            driverObj.destroy();
                         }
                     });
-                    // AVISA O BANNER QUE O TOUR ACABOU
-                    window.dispatchEvent(new CustomEvent('tour-finished'));
 
-                    driverObj.destroy();
-                }
-            });
+                    window.dispatchEvent(new CustomEvent('tour-starting'));
 
-            // AVISA QUE O TOUR VAI COMEÇAR (Imediatamente)
-            window.dispatchEvent(new CustomEvent('tour-starting'));
+                    // Pequeno delay para garantir que a animação da página terminou antes de focar
+                    setTimeout(() => driverObj.drive(), 1300);
+                };
 
-            setTimeout(() => driverObj.drive(), 1300);
-        });
-    </script>
+                // 3. EXECUTA IMEDIATAMENTE (Sem esperar DOMContentLoaded, pois o HTML já está lá)
+                initDashboardTour();
+
+            } // <--- FECHA ESCOPO
+        </script>
     @endif
 
         {{-- SCRIPT PARA FUNCIONALIDADES AJAX (FILTROS E DELETE) --}}

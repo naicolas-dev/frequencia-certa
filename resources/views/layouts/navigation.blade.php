@@ -69,7 +69,7 @@
                             <x-dropdown-link :href="route('profile.edit')">{{ __('Perfil') }}</x-dropdown-link>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                                <x-dropdown-link :href="route('logout')" data-no-spa onclick="event.preventDefault(); this.closest('form').submit();">
                                     {{ __('Sair') }}
                                 </x-dropdown-link>
                             </form>
