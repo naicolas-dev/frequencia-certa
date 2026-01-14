@@ -34,14 +34,7 @@
     x-data="registerPage()"
     x-init="init()"
   >
-  <div id="page-loader"
-      @if($errors->any()) style="display: none;" @endif
-      class="fixed inset-0 z-[9999] bg-[#2D6AE6] flex items-center justify-center flex-col transition-colors duration-500 dark:bg-[#2D6AE6]">
-      <div class="loader-content text-white text-4xl md:text-5xl font-black tracking-tighter opacity-0 translate-y-4"
-          style="font-family: 'Instrument Sans', sans-serif;">
-          Frequência Certa
-      </div>
-  </div>
+  <x-loading />
 
     <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
       <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob dark:bg-blue-900/20"></div>

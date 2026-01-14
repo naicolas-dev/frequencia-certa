@@ -83,11 +83,7 @@
 </head>
 <body class="bg-gray-50 dark:bg-black text-gray-900 dark:text-white antialiased selection:bg-blue-500 selection:text-white transition-colors duration-300">
 
-    <div id="page-loader" style="display: none;" class="fixed inset-0 z-[9999] bg-[#2D6AE6] flex items-center justify-center flex-col transition-colors duration-500 dark:bg-[#2D6AE6]">
-        <div class="loader-content text-white text-4xl md:text-5xl font-black tracking-tighter opacity-0 translate-y-4" style="font-family: 'Instrument Sans', sans-serif;">
-            Frequência Certa
-        </div>
-    </div>
+    <x-loading style="display: none;" />
 
     <nav class="fixed top-0 w-full z-50 p-6 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-black/90 border-b border-gray-200/50 dark:border-white/10 transition-colors duration-300">
         <div class="flex items-center gap-2 font-bold text-xl tracking-tighter text-gray-900 dark:text-white">
