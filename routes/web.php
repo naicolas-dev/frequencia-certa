@@ -37,7 +37,7 @@ Route::post('/auth/social/login', [SocialAuthController::class, 'login'])
 // 🔓 ROTAS AUTENTICADAS
 // ======================================================
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     // -------------------------
     // 🔔 PUSH NOTIFICATIONS
