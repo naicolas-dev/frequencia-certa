@@ -4,9 +4,10 @@
 ![Laravel](https://img.shields.io/badge/Laravel-12+-FF2D20?style=flat&logo=laravel&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat&logo=pwa&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat&logo=php&logoColor=white)
+![SPA](https://img.shields.io/badge/SPA-Turbo-blue?style=flat&logo=fastapi&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-> **Sistema de Gestão e Controle de Frequência Escolar.**
+> **Sistema Inteligente de Gestão e Controle de Frequência Escolar.**
 
 ---
 
@@ -14,16 +15,22 @@
 
 O **Frequência Certa** é uma solução híbrida (Web e PWA) desenvolvida para empoderar estudantes do ensino médio e técnico no gerenciamento de sua assiduidade escolar.
 
-O objetivo central é mitigar a evasão e a reprovação por faltas, além de auxiliar no monitoramento de requisitos para benefícios governamentais (como o **Pé-de-Meia**), que exigem frequência mínima de 80%. Através de uma interface intuitiva, o aluno consegue projetar seu desempenho e receber alertas visuais antes de atingir limites críticos.
+Além de mitigar a evasão e auxiliar no cumprimento de requisitos para benefícios como o **Pé-de-Meia**, o sistema evoluiu para oferecer uma experiência de usuário moderna e engajadora. Agora operando como uma **Single Page Application (SPA)** simulada, o sistema oferece navegação instantânea, gamificação para incentivar a constância e um assistente de IA para análise de riscos.
 
-### 🚀 Principais Funcionalidades
+### 🚀 Novas Funcionalidades (v2.0)
 
-- **📱 Mobile First & PWA:** Aplicação instalável no celular (Android/iOS).
-- **📅 Grade Dinâmica:** Montagem flexível de horários semanais adaptada à realidade do ensino técnico.
-- **📊 Inteligência de Dados:** Projeção automática de dias letivos e cálculo percentual de presença em tempo real.
-- **🚦 Alertas Semafóricos:** Indicadores visuais (Verde/Amarelo/Vermelho) que sinalizam o risco de reprovação por disciplina.
-- **🗓️ Gestão de Eventos:** Cadastro de feriados e dias sem aula para garantir a precisão dos cálculos.
-- **📄 Relatórios:** Geração de histórico de presença (Web).
+- **⚡ Navegação SPA Fluida:** Transições de página instantâneas sem recarregamento (Reload), com animações de carregamento (Loading) elegantes e minimalistas via GSAP.
+- **🔮 Oráculo Acadêmico (IA):** Um assistente virtual integrado (Google Gemini) que analisa o histórico do aluno via chat e oferece conselhos personalizados sobre faltar ou não.
+- **🏆 Gamificação & Conquistas:** Sistema de medalhas e "ofensivas" (streaks) para recompensar alunos que mantêm a frequência e o registro em dia.
+- **🔔 Notificações Push:** Lembretes automáticos enviados diretamente ao dispositivo para registrar a chamada ou alertar sobre limites de faltas.
+
+### 🌟 Funcionalidades Essenciais
+
+- **📱 Mobile First & PWA:** Instalável no celular (Android/iOS) com suporte offline.
+- **📅 Grade Dinâmica:** Montagem flexível de horários semanais.
+- **📊 Inteligência de Dados:** Projeção automática de dias letivos e cálculo percentual em tempo real.
+- **🚦 Alertas Semafóricos:** Indicadores visuais (Verde/Amarelo/Vermelho) de risco.
+- **🗓️ Gestão de Eventos:** Cadastro de feriados e dias sem aula.
 
 ---
 
@@ -39,14 +46,14 @@ O objetivo central é mitigar a evasão e a reprovação por faltas, além de au
 
 ## 🛠️ Stack Tecnológica
 
-O projeto utiliza uma arquitetura moderna focada em performance e experiência do usuário:
+Arquitetura moderna foca em performance, interatividade e experiência do usuário (UX):
 
-| Front-end & Interface | Back-end & Infraestrutura | Ferramentas de Dev |
+| Front-end & Interface | Back-end & Infraestrutura | Bibliotecas & Serviços |
 | :--- | :--- | :--- |
-| ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) **HTML5** | ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white) **Laravel 12+** | ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) **Git** |
-| ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) **Tailwind CSS** | ![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white) **PHP 8.2** | ![VS Code](https://img.shields.io/badge/VS_Code-007ACC?style=flat-square&logo=visual-studio-code&logoColor=white) **VS Code** |
-| ![AlpineJS](https://img.shields.io/badge/Alpine.js-8BC0D0?style=flat-square&logo=alpine.js&logoColor=black) **Alpine.js** | ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) **MySQL** | ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white) **GitHub** |
-| ![PWA](https://img.shields.io/badge/PWA-Workbox-5A0FC8?style=flat-square&logo=pwa&logoColor=white) **Service Workers** | | |
+| ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) **HTML5** | ![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=flat-square&logo=laravel&logoColor=white) **Laravel 12** | ![GSAP](https://img.shields.io/badge/GSAP-88CE02?style=flat-square&logo=greensock&logoColor=white) **GSAP (Animações)** |
+| ![Tailwind](https://img.shields.io/badge/Tailwind-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) **Tailwind CSS** | ![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat-square&logo=php&logoColor=white) **PHP 8.2** | ![Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=flat-square&logo=google-bard&logoColor=white) **Google Gemini AI** |
+| ![AlpineJS](https://img.shields.io/badge/Alpine.js-8BC0D0?style=flat-square&logo=alpine.js&logoColor=black) **Alpine.js** | ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) **MySQL** | ![SweetAlert2](https://img.shields.io/badge/SweetAlert2-EF2D5E?style=flat-square&logo=alert&logoColor=white) **SweetAlert2** |
+| ![PWA](https://img.shields.io/badge/PWA-Workbox-5A0FC8?style=flat-square&logo=pwa&logoColor=white) **Service Workers** | ![Filament](https://img.shields.io/badge/Filament-F28D15?style=flat-square&logo=laravel&logoColor=white) **Filament Admin** | ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black) **Firebase Auth** |
 
 ---
 
@@ -56,7 +63,9 @@ O projeto utiliza uma arquitetura moderna focada em performance e experiência d
 - Composer
 - Node.js + npm
 - MySQL (ou MariaDB)
+
 ---
+
 ## 👥 Equipe de Desenvolvimento
 
 | Integrante | Funções Principais | GitHub |
@@ -74,53 +83,51 @@ O projeto utiliza uma arquitetura moderna focada em performance e experiência d
 git clone <URL_DO_REPOSITORIO>
 cd <NOME_DO_PROJETO>
 ```
-2. Instale as dependências do PHP:
+2. Instale as dependências:
 ```bash
 composer install
-```
-3. Instale as dependências do Front-end:
-```bash
 npm install
 ```
-4. Configure o arquivo .env:
+3. Configure o ambiente:
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
-
-5. Crie sua chave em: https://api.invertexto.com
-
-Adicione no .env:
+4. Configuração de APIs (Essencial): Adicione as chaves necessárias no seu arquivo .env:
 ```env
-INVERTEXTO_API_KEY=SUACHAVE_AQUI
-```
-6. Configure o banco de dados no .env e rode as migrations:
-```bash
-php artisan migrate
-```
-7. Inicie o servidor em dois terminais
+# API de Feriados (Para feriados estaduais)
+INVERTEXTO_API_KEY=sua_chave_invertexto
 
-**Terminal 1**
+# IA do Oráculo (Obrigatório para o chat)
+GEMINI_API_KEY=sua_chave_google_gemini
+
+# Notificações Push (WebPush)
+VAPID_PUBLIC_KEY=sua_chave_publica_vapid
+VAPID_PRIVATE_KEY=sua_chave_privada_vapid
+```
+5. Configure o banco de dados e migre:
+```bash
+php artisan migrate --seed
+```
+6. Inicie o servidor:
+
+Terminal 1 (Backend):
 ```bash
 php artisan serve
 ```
-**Terminal 2**
+Terminal 2 (Frontend & Watcher):
 ```bash
 npm run dev
 ```
 Acesse o projeto em: http://localhost:8000
 
----
 ## ⚠️ Disclaimer
 
 Este sistema foi desenvolvido **exclusivamente para fins acadêmicos**, como parte de um Trabalho de Conclusão de Curso (TCC).
 
 As informações de frequência apresentadas pelo sistema representam **estimativas baseadas na grade horária definida pelo estudante, nos registros de presença realizados e nos dias não letivos informados**, não devendo ser interpretadas como registros oficiais ou documentos válidos para comprovação institucional.
 
-O projeto **não substitui** sistemas oficiais de controle escolar, diários de classe ou registros administrativos das instituições de ensino.
-
-
-
+O projeto **não substitui sistemas oficiais de controle escolar**, diários de classe ou registros administrativos das instituições de ensino.
 ## 📄 Licença
 Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais detalhes.
 
