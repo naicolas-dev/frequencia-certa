@@ -42,7 +42,7 @@
         "price": "0",
         "priceCurrency": "BRL"
       },
-      "description": "Aplicativo para controle de faltas escolares, cálculo de frequência e alertas de reprovação cruzados com o calendário letivo.",
+      "description": "Aplicativo para controle de faltas escolares, cálculo de frequência e alertas de reprovação cruzados com o calendário letivo."
     }
     </script>
 
