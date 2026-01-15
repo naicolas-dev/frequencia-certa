@@ -23,3 +23,24 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# --- MELHORIAS LIGHTHOUSE (SEGURANÇA) ---
+<IfModule mod_headers.c>
+    # HSTS (Força HTTPS por 1 ano) - Resolve o item "Usar uma política HSTS forte"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # Proteção contra XSS
+    Header set X-XSS-Protection "1; mode=block"
+
+    # Impede que o site seja aberto em iframes de outros sites (evita Clickjacking)
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Impede o navegador de "adivinhar" o tipo de arquivo (Sniffing)
+    Header set X-Content-Type-Options "nosniff"
+
+    # Política de Referência (Privacidade)
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Permissions Policy (Desativa recursos não usados para segurança extra)
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
