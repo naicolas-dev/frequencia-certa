@@ -3,7 +3,24 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Frequência Certa - Garanta seu Pé-de-Meia</title>
+    
+    <title>Controle de Faltas Escolares | Saiba Quantas Faltas Pode Ter - Frequência Certa</title>
+    <meta name="description" content="Descubra exatamente quantas faltas você pode ter sem reprovar ou perder o Pé-de-Meia. O Frequência Certa calcula sua frequência escolar, cruza com o calendário letivo e te avisa antes de rodar. Grátis.">
+    <meta name="author" content="Frequência Certa">
+    <link rel="canonical" href="https://frequenciacerta.app.br/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://frequenciacerta.app.br/">
+    <meta property="og:title" content="Controle de Faltas Escolares – Frequência Certa">
+    <meta property="og:description" content="A ferramenta que calcula quantas vezes você pode faltar na escola sem reprovar. Simples, rápido e grátis.">
+    <meta property="og:image" content="{{ asset('img/og-image.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:title" content="Controle de Faltas Escolares – Frequência Certa">
+    <meta name="twitter:description" content="Evite a reprovação e garanta seu benefício. Calcule suas faltas agora.">
+    <meta name="twitter:image" content="{{ asset('img/og-image.png') }}">
 
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/icons/icon-192x192.png') }}">
@@ -13,6 +30,30 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "SoftwareApplication",
+      "name": "Frequência Certa",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": {
+        "@@type": "Offer",
+        "price": "0",
+        "priceCurrency": "BRL"
+      },
+      "description": "Aplicativo para controle de faltas escolares, cálculo de frequência e alertas de reprovação cruzados com o calendário letivo.",
+    }
+    </script>
+
+    <script>
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    
     <script>
     // EASTER EGG MANTIDO - NÃO ALTERAR
     console.log(
@@ -288,51 +329,44 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
-    <script>
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
-
     <style>
         body { font-family: 'Instrument Sans', sans-serif; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
 
         .phone-mockup {
-            /* Sombra azulada bem sutil no escuro para dar profundidade */
             box-shadow: 0 0 0 10px #1f2937, 0 20px 50px -10px rgba(0, 0, 0, 0.5);
         }
-        .notch {
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
-        /* Gradiente ajustado para Tech Cyan + Brand Blue */
+        .notch { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
         .text-gradient {
             background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-image: linear-gradient(to right, #06B6D4, #1D4ED8, #06B6D4);
         }
         .h-screen-ios { height: 100vh; height: 100dvh; }
+        
+        @keyframes pulse-soft {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(29, 78, 216, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(29, 78, 216, 0); }
+        }
+        .cta-pulse { animation: pulse-soft 2s infinite; }
     </style>
 </head>
 <body class="bg-[#F8FAFC] dark:bg-[#0F172A] text-gray-900 dark:text-white antialiased selection:bg-[#06B6D4] selection:text-white transition-colors duration-300">
 
     <nav class="fixed top-0 w-full z-50 p-6 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-[#0F172A]/90 border-b border-gray-200/50 dark:border-white/10 transition-colors duration-300">
         <div class="flex items-center gap-2 font-bold text-xl tracking-tighter text-[#1E3A8A] dark:text-white">
-            <x-application-logo class="block h-8 w-auto fill-current text-[#1D4ED8] dark:text-[#06B6D4]" />
+            <x-application-logo class="block h-8 w-auto fill-current text-[#1D4ED8] dark:text-[#06B6D4]" width="32" height="32" />
             <span class="hidden sm:inline">Frequência Certa</span>
         </div>
         <div class="flex items-center gap-4">
-            <button id="theme-toggle" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition-colors">
+            <button id="theme-toggle" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition-colors" aria-label="Alternar tema">
                 <svg id="theme-toggle-light-icon" class="hidden w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                 <svg id="theme-toggle-dark-icon" class="hidden w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             </button>
             @auth
-                <a href="{{ url('/dashboard') }}" data-no-spa class="px-5 py-2 bg-[#1E3A8A] dark:bg-white text-white dark:text-[#0F172A] rounded-full font-bold hover:scale-105 transition shadow-lg">Painel</a>
+                <a href="{{ url('/dashboard') }}" data-no-spa class="px-5 py-2 bg-[#1E3A8A] dark:bg-white text-white dark:text-[#0F172A] rounded-full font-bold hover:scale-105 transition shadow-lg">Voltar ao App</a>
             @else
-                <a href="{{ route('login') }}" data-no-spa class="font-medium text-gray-700 dark:text-gray-300 hover:text-[#1D4ED8] dark:hover:text-[#06B6D4] transition mr-2">Entrar</a>
-                <a href="{{ route('register') }}" data-no-spa class="px-5 py-2 bg-[#1D4ED8] text-white rounded-full font-bold hover:bg-[#1E40AF] transition shadow-lg shadow-blue-600/20">Começar</a>
+                <a href="{{ route('login') }}" data-no-spa class="hidden sm:inline font-medium text-gray-600 dark:text-gray-400 hover:text-[#1D4ED8] dark:hover:text-[#06B6D4] transition mr-2 text-sm">Já tenho conta</a>
+                <a href="{{ route('register') }}" data-no-spa class="px-5 py-2 bg-[#1D4ED8] text-white rounded-full font-bold hover:bg-[#1E40AF] transition shadow-lg shadow-blue-600/20 text-sm">Criar Grátis</a>
             @endauth
         </div>
     </nav>
@@ -340,20 +374,41 @@
     <section class="h-screen-ios w-full flex flex-col items-center justify-center relative overflow-hidden bg-[#F8FAFC] dark:bg-[#0F172A] transition-colors duration-300">
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1D4ED8]/10 dark:bg-[#1D4ED8]/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-        <div class="z-10 text-center px-4 space-y-6 max-w-2xl mt-16 sm:mt-0">
-            <div class="inline-block px-3 py-1 rounded-full border border-gray-200 dark:border-white/20 bg-white/50 dark:bg-white/5 text-xs font-medium tracking-wide mb-2 text-[#1E3A8A] dark:text-[#06B6D4]">
-                <strong>INTEGRAÇÃO COM IA</strong> ✨
+        <div class="z-10 text-center px-4 space-y-8 max-w-3xl mt-16 sm:mt-0">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-100 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-900/20 text-xs font-semibold tracking-wide mb-2 text-[#1D4ED8] dark:text-[#60A5FA] animate-fade-in-up">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                IA DE CONTROLE DE FREQUÊNCIA 🤖
             </div>
             
-            <h1 class="text-5xl md:text-8xl font-black tracking-tight leading-tight text-[#1E3A8A] dark:text-white">
-                Perder o <br />
-                <span class="text-gradient">Pé-de-Meia?</span>
+            <h1 class="text-5xl md:text-8xl font-black tracking-tight leading-[0.9] text-[#1E3A8A] dark:text-white">
+                Evite reprovar por <br />
+                <span class="text-gradient">Faltas Escolares</span>
             </h1>
             
-            <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 mx-auto leading-relaxed px-4">
-                Nem a pau. O <strong class="text-[#1E3A8A] dark:text-white">Frequência Certa</strong> calcula quantas vezes você pode <strong class="text-[#1E3A8A] dark:text-white">dormir até mais tarde</strong> sem reprovar ou perder seu benefício.
+            <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 mx-auto leading-relaxed px-4 max-w-xl">
+                O <strong class="text-[#1E3A8A] dark:text-white">controle de faltas</strong> definitivo. Calcule se você ainda pode faltar sem perder o <strong>Pé-de-Meia</strong> ou rodar de ano.
             </p>
-            <div class="pt-8 animate-bounce">
+
+            <div class="flex flex-col items-center gap-3 pt-2">
+                @auth
+                    <a href="{{ url('/dashboard') }}" class="cta-pulse px-8 py-4 bg-[#1E3A8A] dark:bg-white text-white dark:text-[#0F172A] text-lg font-bold rounded-full hover:scale-105 transition shadow-xl">
+                        Acessar Painel de Frequência
+                    </a>
+                @else
+                    <a href="{{ route('register') }}" class="cta-pulse group relative inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white transition-all duration-200 bg-[#1D4ED8] font-pj rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1D4ED8] hover:bg-[#1E40AF] hover:scale-105">
+                        Calcular minhas Faltas
+                        <svg class="w-5 h-5 ml-2 -mr-1 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </a>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 font-medium">
+                        ✨ 100% Grátis • Leva menos de 1 minuto
+                    </p>
+                @endauth
+            </div>
+
+            <div class="pt-8 animate-bounce opacity-50">
                 <svg class="w-6 h-6 mx-auto text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
             </div>
         </div>
@@ -366,62 +421,60 @@
 
                 <div id="text-1" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                     <div class="md:bg-transparent bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#1E3A8A] dark:text-white">Sua vida escolar,<br>no piloto automático.</h2>
-                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Esquece planilha do Excel. A gente monta sua grade, pega os feriados e deixa tudo pronto. Você só marca "Fui" ou "Faltei".</p>
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#1E3A8A] dark:text-white">Frequência Escolar<br>no piloto automático.</h2>
+                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Esqueça a planilha. Nossa IA monta sua grade, identifica feriados e automatiza seu controle. Só marque "Fui" ou "Faltei".</p>
                     </div>
                 </div>
 
                 <div id="text-2" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                     <div class="md:bg-transparent bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#1D4ED8] dark:text-[#60A5FA]">Matemática da<br>preguiça.</h2>
-                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Cruzamos o calendário do Estado com suas aulas. O app te fala <strong class="text-[#1D4ED8] dark:text-white">exatamente</strong> quantas faltas você tem no bolso antes de rodar.</p>
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#1D4ED8] dark:text-[#60A5FA]">Cálculo de Faltas<br>inteligente.</h2>
+                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Cruzamos o <strong>calendário letivo</strong> com suas aulas. Saiba exatamente quantas faltas você tem "no bolso" antes de arriscar o ano.</p>
+                        <div class="mt-4 md:hidden">
+                            <span class="text-xs font-bold text-[#1D4ED8] dark:text-[#60A5FA]">Ver como funciona ↓</span>
+                        </div>
                     </div>
                 </div>
 
                 <div id="text-3" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
-                     <div class="md:bg-transparent bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#7C3AED] dark:text-[#A78BFA]">O Oráculo<br>sabe de tudo.</h2>
-                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Na dúvida? Manda pro Oráculo: <i>"Posso faltar amanhã?"</i>. Ele analisa se é prova, se tem feriado chegando e te manda a real.</p>
+                      <div class="md:bg-transparent bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#7C3AED] dark:text-[#A78BFA]">O Oráculo da<br>Aprovação.</h2>
+                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Na dúvida? Pergunte: <i>"Posso faltar amanhã?"</i>. Ele analisa provas, feriados e seu limite de faltas para te dar o veredito.</p>
                     </div>
                 </div>
 
                 <div id="text-4" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
                     <div class="md:bg-transparent bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                       <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#06B6D4] dark:text-[#22D3EE]">Alerta Anti<br>Rodação.</h2>
-                       <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Esqueceu de marcar presença? O app te manda um puxão de orelha antes que seja tarde demais pro seu boletim.</p>
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#06B6D4] dark:text-[#22D3EE]">Alerta Anti<br>Reprovação.</h2>
+                       <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Esqueceu de registrar presença? O app manda um alerta antes que a situação fique crítica e você corra risco de reprovar por falta.</p>
                    </div>
                </div>
 
                 <div id="text-5" class="absolute max-w-md opacity-0 translate-y-20 w-full px-6 text-center md:text-left">
-                     <div class="md:bg-transparent bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
-                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#F59E0B]">Gamifique sua<br>Aprovação.</h2>
-                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Ir pra escola virou jogo. Mantenha sua ofensiva (tipo Duolingo), ganhe medalhas e mostre que você não é NPC.</p>
+                      <div class="md:bg-transparent bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-xl md:backdrop-blur-none p-6 rounded-3xl md:p-0 border border-gray-200 dark:border-white/10 md:border-none shadow-xl md:shadow-none">
+                        <h2 class="text-2xl md:text-5xl font-bold mb-3 md:mb-4 text-[#F59E0B]">Gamifique sua<br>Escola.</h2>
+                        <p class="text-base md:text-xl text-gray-600 dark:text-gray-400">Transformamos o "ir para a aula" num jogo. Mantenha sua ofensiva de presença, ganhe medalhas e mostre que você domina o sistema.</p>
                     </div>
                 </div>
             </div>
 
             <div class="order-1 md:order-2 w-full md:w-1/2 h-[60vh] md:h-full flex items-end pb-4 md:items-center justify-center relative z-20">
                 <div id="phone-container" class="relative md:static w-full h-full flex items-end md:items-center justify-center">
-
                     <div id="phone" class="phone-mockup relative w-[300px] h-[600px] bg-gray-800 rounded-[40px] z-20 overflow-hidden transform-gpu scale-[0.55] sm:scale-[0.6] md:scale-100 opacity-0 md:opacity-100 shadow-2xl">
                         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-[#1f2937] notch z-30"></div>
-
                         <div class="relative w-full h-full bg-[#F8FAFC] dark:bg-[#030712] flex flex-col transition-colors duration-300">
-
-                            <div class="pt-10 px-5 pb-3 flex justify-between items-center bg-white dark:bg-[#111827] border-b border-gray-100 dark:border-gray-800 transition-colors">
+                             <div class="pt-10 px-5 pb-3 flex justify-between items-center bg-white dark:bg-[#111827] border-b border-gray-100 dark:border-gray-800 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <x-application-logo class="w-6 h-6 text-[#1D4ED8] dark:text-[#06B6D4]" />
                                     <span class="font-bold text-[#1E3A8A] dark:text-white tracking-tight text-sm">Frequência Certa</span>
                                 </div>
                                 <div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden border border-gray-200 dark:border-gray-700">
-                                    <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar" class="w-full h-full opacity-80">
+                                    <img src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar Usuário" class="w-full h-full opacity-80" width="32" height="32">
                                 </div>
                             </div>
-
+                            
                             <div class="relative flex-1 px-4 overflow-hidden bg-[#F8FAFC] dark:bg-[#030712] transition-colors">
-
                                 <div id="scene-1" class="absolute inset-0 px-1 pt-6 transition-opacity duration-300">
-
                                     <div class="mb-5 p-4 rounded-xl bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 shadow-sm">
                                         <p class="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">Presença Global</p>
                                         <div class="flex items-end justify-between">
@@ -429,7 +482,6 @@
                                             <span class="text-xs text-[#22C55E] font-bold bg-emerald-50 dark:bg-emerald-900/20 px-2 py-1 rounded-md">Pé-de-Meia Garantido</span>
                                         </div>
                                     </div>
-
                                     <h2 class="text-sm font-bold text-[#1E3A8A] dark:text-white mb-3 px-1">Minhas Matérias</h2>
                                     <div class="space-y-3">
                                         <div class="p-4 rounded-xl bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 flex justify-between items-center shadow-sm">
@@ -445,7 +497,6 @@
                                                 <div class="text-[9px] uppercase text-gray-400 font-bold">Falta restante</div>
                                             </div>
                                         </div>
-
                                         <div class="p-4 rounded-xl bg-white dark:bg-[#111827] border border-gray-200 dark:border-gray-800 flex justify-between items-center shadow-sm opacity-80">
                                             <div>
                                                 <div class="font-bold text-[#1E3A8A] dark:text-white text-sm">História</div>
@@ -461,7 +512,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div id="scene-2" class="absolute inset-0 px-2 flex flex-col justify-center translate-y-full opacity-0">
                                     <div class="font-bold bg-white dark:bg-[#111827] p-5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-xl">
                                         História
@@ -478,7 +528,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div id="scene-3" class="absolute inset-0 px-2 flex flex-col justify-end pb-8 translate-y-full opacity-0">
                                     <div class="space-y-3">
                                         <div class="self-end bg-[#1D4ED8] text-white text-xs p-3 rounded-2xl rounded-tr-none ml-auto max-w-[80%] shadow-lg transform translate-x-10 opacity-0 chat-bubble-1">
@@ -492,30 +541,22 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div id="scene-4" class="absolute inset-0 px-2 flex flex-col items-center pt-8 opacity-0">
                                     <div id="push-notification" class="w-full bg-white/95 dark:bg-[#1f2937]/95 backdrop-blur-md p-3 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-2xl transform -translate-y-20">
                                         <div class="flex items-center gap-3">
                                             <div class="w-8 h-8 rounded-lg bg-[#06B6D4]/10 text-[#06B6D4] flex items-center justify-center">
-                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                                                    <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" stroke="currentColor" stroke-width="2"/>
-                                                    <path d="M12 10.5v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                                    <path d="M12 7.5h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                                                </svg>
+                                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" stroke="currentColor" stroke-width="2"/><path d="M12 10.5v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 7.5h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
                                             </div>
                                             <div class="flex-1">
                                                 <div class="flex justify-between">
-                                                    <span class="text-xs font-bold text-[#1E3A8A] dark:text-white">Alerta de Falta! 🚨</span>
-                                                    <span class="text-[9px] text-gray-500 dark:text-gray-400">Agora</span>
+                                                    <span class="text-xs font-bold text-[#1E3A8A] dark:text-white">Chamada! 📢</span>
+                                                    <span class="text-[9px] text-gray-500 dark:text-gray-400">há 1 min</span>
                                                 </div>
-                                                <p class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight mt-0.5">
-                                                    Você não registrou presença em Matemática. Cuidado pra não rodar!
-                                                </p>
+                                                <p class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight mt-0.5">Você tem aulas hoje! Não se esqueça de registrar sua frequência para manter a média.</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div id="scene-5" class="absolute inset-0 flex items-center justify-center scale-50 opacity-0">
                                     <div class="text-center relative">
                                         <div class="absolute inset-0 bg-[#EAB308] blur-3xl opacity-20 animate-pulse"></div>
@@ -525,10 +566,10 @@
                                     </div>
                                 </div>
                             </div>
-
+                            
                             <div class="h-14 bg-white dark:bg-[#111827] border-t border-gray-200 dark:border-gray-800 flex justify-around items-center px-4 transition-colors">
                                 <div class="flex flex-col items-center gap-0.5 text-[#1D4ED8] dark:text-[#06B6D4]">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                                     <span class="text-[9px] font-bold">Início</span>
                                 </div>
                                 <div class="flex flex-col items-center gap-0.5 text-gray-400 dark:text-gray-500">
@@ -540,7 +581,6 @@
                                     <span class="text-[9px] font-medium">Perfil</span>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -560,18 +600,18 @@
                 <h2 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-[#1E3A8A] dark:text-white">Não deixe para a recuperação.</h2>
                 <p class="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
                     Grátis. Leve. Instala em segundos.<br>
-                    <span class="text-sm text-gray-400 dark:text-gray-600 mt-2 block">(Sua mãe vai agradecer quando você passar direto).</span>
+                    <span class="text-sm text-gray-400 dark:text-gray-600 mt-2 block">(O teu "eu" do futuro vai agradecer).</span>
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    @guest
-                    <a href="{{ route('register') }}" class="w-full sm:w-auto px-8 py-4 bg-[#1E3A8A] dark:bg-white text-white dark:text-[#0F172A] text-lg font-bold rounded-full hover:scale-105 transition shadow-lg">
-                        Calcular minhas Faltas
-                    </a>
-                    @endguest
                     @auth
                     <a href="{{ url('/dashboard') }}" class="w-full sm:w-auto px-8 py-4 bg-[#1D4ED8] text-white text-lg font-bold rounded-full hover:bg-[#1E40AF] transition shadow-lg">
                         Abrir App
+                    </a>
+                    @else
+                    <a href="{{ route('register') }}" class="w-full sm:w-auto px-8 py-4 bg-[#1E3A8A] dark:bg-white text-white dark:text-[#0F172A] text-lg font-bold rounded-full hover:scale-105 transition shadow-lg flex items-center justify-center gap-2">
+                        Entrar no ritmo agora
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </a>
                     @endauth
                 </div>
@@ -579,27 +619,23 @@
                 <div class="mt-8 flex flex-col items-center justify-center">
                     <button id="pwaInstallBtn" class="hidden px-6 py-3 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-full font-semibold transition flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                        Instalar App
+                        Instalar na tela inicial
                     </button>
                     <p id="iosHint" class="hidden text-sm text-gray-500 mt-4 flex items-center justify-center gap-1 flex-wrap">
-                        <span>Para instalar no iPhone: Toque em</span>
-                        <svg class="w-5 h-5 text-[#1D4ED8] inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                        <span class="font-bold text-[#1D4ED8]">Compartilhar</span>
+                        <span>iPhone? Toque em</span>
+                        <svg class="w-5 h-5 text-[#1D4ED8] inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                        <span class="font-bold text-[#1D4ED8]">Partilhar</span>
                         <span>e</span>
-                        <svg class="w-5 h-5 text-gray-900 dark:text-white inline-block bg-gray-200 dark:bg-gray-700 rounded-md p-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                        <span class="font-bold text-gray-900 dark:text-white">Tela de Início</span>
+                        <span class="font-bold text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 rounded px-1">Tela de Início</span>
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer class="py-10 text-center text-gray-500 text-sm bg-white dark:bg-black transition-colors">
-        <p>&copy; {{ date('Y') }} Frequência Certa. Feito por <a href="https://github.com/naicolas-dev" class="underline hover:text-[#1D4ED8]">Nicolas Alves</a>.</p>
+    <footer class="py-10 text-center text-gray-500 text-sm bg-white dark:bg-black transition-colors border-t border-gray-100 dark:border-gray-800">
+        <p class="mb-2">Feito para estudantes, por estudantes 🎓</p>
+        <p>&copy; {{ date('Y') }} Frequência Certa. Desenvolvido por <a href="https://github.com/naicolas-dev" class="underline hover:text-[#1D4ED8]">Nicolas Alves</a>.</p>
     </footer>
 
     <script>
@@ -610,149 +646,34 @@
             const themeBtn = document.getElementById('theme-toggle');
             const darkIcon = document.getElementById('theme-toggle-dark-icon');
             const lightIcon = document.getElementById('theme-toggle-light-icon');
-
-            function updateIcons() {
-                if (document.documentElement.classList.contains('dark')) {
-                    darkIcon.classList.remove('hidden');
-                    lightIcon.classList.add('hidden');
-                } else {
-                    lightIcon.classList.remove('hidden');
-                    darkIcon.classList.add('hidden');
-                }
-            }
-
-            themeBtn.addEventListener('click', () => {
-                document.documentElement.classList.toggle('dark');
-                if (document.documentElement.classList.contains('dark')) {
-                    localStorage.theme = 'dark';
-                } else {
-                    localStorage.theme = 'light';
-                }
-                updateIcons();
-            });
+            function updateIcons() { if (document.documentElement.classList.contains('dark')) { darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); } else { lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden'); } }
+            themeBtn.addEventListener('click', () => { document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'; updateIcons(); });
             updateIcons();
 
             function createTimeline() {
                 let tl = gsap.timeline();
-                tl.to("#phone", { opacity: 1, duration: 1 })
-                  .to("#text-1", { opacity: 1, y: 0, duration: 1 }, "<")
-                  .addLabel("scene1");
-
-                tl.to("#text-1", { opacity: 0, y: -50, duration: 1 })
-                  .to("#scene-1", { opacity: 0.3, duration: 1 }, "<")
-                  .set("#scene-1", { filter: "blur(4px)" }, "<")
-                  .to("#scene-2", { y: "0%", opacity: 1, duration: 1 })
-                  .to("#calc-bar", { width: "100%", duration: 1, ease: "power2.out" })
-                  .to("#text-2", { opacity: 1, y: 0, duration: 1 }, "<")
-                  .addLabel("scene2");
-
-                tl.to("#text-2", { opacity: 0, y: -50, duration: 1 })
-                  .to("#scene-2", { opacity: 0, y: "20%", duration: 1 }, "<")
-                  .to("#scene-3", { y: "0%", opacity: 1, duration: 1 })
-                  .to(".chat-bubble-1", { x: 0, opacity: 1, duration: 0.5 })
-                  .to(".chat-bubble-2", { x: 0, opacity: 1, duration: 0.5 })
-                  .to("#text-3", { opacity: 1, y: 0, duration: 1 }, "<")
-                  .addLabel("scene3");
-
-                tl.to("#text-3", { opacity: 0, y: -50, duration: 1 })
-                  .to("#scene-3", { opacity: 0, duration: 1 }, "<")
-                  .to("#scene-4", { opacity: 1, duration: 0.5 })
-                  .to("#push-notification", { y: 0, duration: 0.8, ease: "back.out(1.7)" })
-                  .to("#text-4", { opacity: 1, y: 0, duration: 1 }, "<")
-                  .addLabel("scene4");
-
-                tl.to("#text-4", { opacity: 0, y: -50, duration: 1 })
-                  .to("#scene-4", { opacity: 0, duration: 1 }, "<")
-                  .to("#scene-5", { scale: 1, opacity: 1, duration: 1.5, ease: "elastic.out(1, 0.5)" })
-                  .to("#text-5", { opacity: 1, y: 0, duration: 1 }, "<")
-                  .addLabel("scene5");
-
-                tl.set("#phone", { filter: "blur(10px)" })
-                  .to("#phone", { scale: 0.8, opacity: 0, duration: 1 })
-                  .to("#text-5", { opacity: 0, scale: 0.8, duration: 1 }, "<")
-                  .set("#phone", { filter: "none" });
-
+                tl.to("#phone", { opacity: 1, duration: 1 }).to("#text-1", { opacity: 1, y: 0, duration: 1 }, "<").addLabel("scene1");
+                tl.to("#text-1", { opacity: 0, y: -50, duration: 1 }).to("#scene-1", { opacity: 0.3, duration: 1 }, "<").set("#scene-1", { filter: "blur(4px)" }, "<").to("#scene-2", { y: "0%", opacity: 1, duration: 1 }).to("#calc-bar", { width: "100%", duration: 1, ease: "power2.out" }).to("#text-2", { opacity: 1, y: 0, duration: 1 }, "<").addLabel("scene2");
+                tl.to("#text-2", { opacity: 0, y: -50, duration: 1 }).to("#scene-2", { opacity: 0, y: "20%", duration: 1 }, "<").to("#scene-3", { y: "0%", opacity: 1, duration: 1 }).to(".chat-bubble-1", { x: 0, opacity: 1, duration: 0.5 }).to(".chat-bubble-2", { x: 0, opacity: 1, duration: 0.5 }).to("#text-3", { opacity: 1, y: 0, duration: 1 }, "<").addLabel("scene3");
+                tl.to("#text-3", { opacity: 0, y: -50, duration: 1 }).to("#scene-3", { opacity: 0, duration: 1 }, "<").to("#scene-4", { opacity: 1, duration: 0.5 }).to("#push-notification", { y: 0, duration: 0.8, ease: "back.out(1.7)" }).to("#text-4", { opacity: 1, y: 0, duration: 1 }, "<").addLabel("scene4");
+                tl.to("#text-4", { opacity: 0, y: -50, duration: 1 }).to("#scene-4", { opacity: 0, duration: 1 }, "<").to("#scene-5", { scale: 1, opacity: 1, duration: 1.5, ease: "elastic.out(1, 0.5)" }).to("#text-5", { opacity: 1, y: 0, duration: 1 }, "<").addLabel("scene5");
+                tl.set("#phone", { filter: "blur(10px)" }).to("#phone", { scale: 0.8, opacity: 0, duration: 1 }).to("#text-5", { opacity: 0, scale: 0.8, duration: 1 }, "<").set("#phone", { filter: "none" });
                 return tl;
             }
 
             const mm = gsap.matchMedia();
-            mm.add(
-                {
-                    desktop: "(min-width: 768px)",
-                    mobile: "(max-width: 767px)",
-                    reduce: "(prefers-reduced-motion: reduce)"
-                },
-                (ctx) => {
-                    const { desktop, mobile, reduce } = ctx.conditions;
-
-                    if (reduce) {
-                        gsap.set("#phone", { opacity: 1, clearProps: "transform,filter" });
-                        gsap.set("#text-1", { opacity: 1, y: 0 });
-                        gsap.set(["#text-2", "#text-3", "#text-4", "#text-5"], { opacity: 0, clearProps: "transform" });
-                        gsap.set("#scene-1", { opacity: 1, clearProps: "filter" });
-                        gsap.set("#scene-2", { opacity: 0, y: "100%" });
-                        gsap.set("#scene-3", { opacity: 0, y: "100%" });
-                        gsap.set("#scene-4", { opacity: 0 });
-                        gsap.set("#scene-5", { opacity: 0, scale: 0.5 });
-                        gsap.set(".chat-bubble-1", { opacity: 0, x: 40 });
-                        gsap.set(".chat-bubble-2", { opacity: 0, x: -40 });
-                        gsap.set("#push-notification", { y: -80 });
-                        return;
-                    }
-
-                    if (mobile) {
-                        gsap.set("#phone", { scale: 0.55, transformOrigin: "center bottom" });
-                    } else {
-                        gsap.set("#phone", { scale: 1, transformOrigin: "center center" });
-                    }
-
-                    const tl = createTimeline();
-                    const st = ScrollTrigger.create({
-                        animation: tl,
-                        trigger: "#scrolly-wrapper",
-                        start: "top top",
-                        end: () => "+=" + (window.innerHeight * 5),
-                        scrub: 1,
-                        pin: ".scrolly-stage",
-                        invalidateOnRefresh: true,
-                        snap: desktop ? { snapTo: "labels", duration: { min: 0.2, max: 0.8 }, delay: 0.1, ease: "power1.inOut" } : false
-                    });
-
-                    const onLoadRefresh = () => ScrollTrigger.refresh();
-                    window.addEventListener("load", onLoadRefresh, { once: true });
-
-                    return () => {
-                        window.removeEventListener("load", onLoadRefresh);
-                        st.kill();
-                        tl.kill();
-                    };
-                }
-            );
-
-            let deferredPrompt;
-            const installBtn = document.getElementById('pwaInstallBtn');
-            const iosHint = document.getElementById('iosHint');
-            const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                installBtn.classList.remove('hidden');
+            mm.add({ desktop: "(min-width: 768px)", mobile: "(max-width: 767px)", reduce: "(prefers-reduced-motion: reduce)" }, (ctx) => {
+                const { desktop, mobile, reduce } = ctx.conditions;
+                if (reduce) { gsap.set("#phone", { opacity: 1, clearProps: "transform,filter" }); gsap.set("#text-1", { opacity: 1, y: 0 }); return; }
+                if (mobile) { gsap.set("#phone", { scale: 0.55, transformOrigin: "center bottom" }); } else { gsap.set("#phone", { scale: 1, transformOrigin: "center center" }); }
+                const tl = createTimeline();
+                ScrollTrigger.create({ animation: tl, trigger: "#scrolly-wrapper", start: "top top", end: () => "+=" + (window.innerHeight * 5), scrub: 1, pin: ".scrolly-stage", invalidateOnRefresh: true, snap: desktop ? { snapTo: "labels", duration: { min: 0.2, max: 0.8 }, delay: 0.1, ease: "power1.inOut" } : false });
             });
 
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') installBtn.classList.add('hidden');
-                    deferredPrompt = null;
-                }
-            });
-
-            if (isIos && !isStandalone) {
-                iosHint.classList.remove('hidden');
-            }
+            let deferredPrompt; const installBtn = document.getElementById('pwaInstallBtn'); const iosHint = document.getElementById('iosHint'); const isIos = /iPhone|iPad|iPod/i.test(navigator.userAgent); const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.classList.remove('hidden'); });
+            installBtn.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === 'accepted') installBtn.classList.add('hidden'); deferredPrompt = null; } });
+            if (isIos && !isStandalone) { iosHint.classList.remove('hidden'); }
         });
     </script>
 </body>
