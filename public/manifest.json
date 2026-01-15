@@ -1,45 +1,180 @@
 {
-  "name": "Frequência Certa",
-  "short_name": "Frequência Certa",
-  "start_url": "/dashboard",
-  "display": "standalone",
-  "background_color": "#f3f4f6",
-  "theme_color": "#2563eb",
-  "orientation": "portrait",
-  "scope": "/",
-  "lang": "pt-BR",
-  "screenshots": [
-    { "src": "/img/screenshots/bright-mode-1.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/bright-mode-2.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/bright-mode-3.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/bright-mode-4.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/bright-mode-5.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/bright-mode-6.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/bright-mode-7.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-
-    { "src": "/img/screenshots/dark-mode-1.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/dark-mode-2.png", "sizes": "1919x1078", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/dark-mode-3.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/dark-mode-4.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/dark-mode-5.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/dark-mode-6.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/dark-mode-7.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-    { "src": "/img/screenshots/dark-mode-8.png", "sizes": "1919x1079", "type": "image/png", "form_factor": "wide" },
-
-    { "src": "/img/screenshots/mobile-bright-1.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" },
-    { "src": "/img/screenshots/mobile-bright-2.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" },
-    { "src": "/img/screenshots/mobile-bright-3.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" },
-    { "src": "/img/screenshots/mobile-bright-4.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" },
-
-    { "src": "/img/screenshots/mobile-dark-1.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" },
-    { "src": "/img/screenshots/mobile-dark-2.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" },
-    { "src": "/img/screenshots/mobile-dark-3.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" },
-    { "src": "/img/screenshots/mobile-dark-4.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" },
-    { "src": "/img/screenshots/mobile-dark-5.jpeg", "sizes": "720x1600", "type": "image/jpeg", "form_factor": "narrow" }
-  ],
-  "icons": [
-    { "src": "/img/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/img/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/img/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ]
+    "name": "Frequência Certa",
+    "short_name": "Frequência Certa",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#f3f4f6",
+    "theme_color": "#2563eb",
+    "orientation": "portrait",
+    "scope": "/",
+    "lang": "pt-BR",
+    "description": "Controle suas faltas escolares e evite a reprovação com o Frequência Certa.",
+    "categories": [
+        "education",
+        "productivity"
+    ],
+    "screenshots": [
+        {
+            "src": "/img/screenshots/bright-mode-1.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/bright-mode-2.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/bright-mode-3.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/bright-mode-4.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/bright-mode-5.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/bright-mode-6.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/bright-mode-7.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/dark-mode-1.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/dark-mode-2.png",
+            "sizes": "1919x1078",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/dark-mode-3.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/dark-mode-4.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/dark-mode-5.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/dark-mode-6.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/dark-mode-7.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/dark-mode-8.png",
+            "sizes": "1919x1079",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/img/screenshots/mobile-bright-1.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/img/screenshots/mobile-bright-2.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/img/screenshots/mobile-bright-3.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/img/screenshots/mobile-bright-4.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/img/screenshots/mobile-dark-1.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/img/screenshots/mobile-dark-2.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/img/screenshots/mobile-dark-3.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/img/screenshots/mobile-dark-4.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "/img/screenshots/mobile-dark-5.jpeg",
+            "sizes": "720x1600",
+            "type": "image/jpeg",
+            "form_factor": "narrow"
+        }
+    ],
+    "icons": [
+        {
+            "src": "/img/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
 }
