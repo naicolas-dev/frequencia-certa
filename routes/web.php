@@ -28,6 +28,10 @@ Route::get('/', fn () => view('welcome'));
 
 Route::get('/offline', fn () => view('offline'));
 
+Route::get('/sitemap.xml', function () {
+    return response()->view('sitemap')->header('Content-Type', 'text/xml');
+});
+
 // Social Login (Firebase)
 Route::post('/auth/social/login', [SocialAuthController::class, 'login'])
     ->name('social.login');

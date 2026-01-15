@@ -1,2 +1,6 @@
 User-agent: *
-Disallow:
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api
+
+Sitemap: https://frequenciacerta.app.br/sitemap.xml
