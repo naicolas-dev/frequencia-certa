@@ -32,13 +32,13 @@
 
     <script type="application/ld+json">
     {
-      "@@context": "https://schema.org",
-      "@@type": "SoftwareApplication",
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
       "name": "Frequência Certa",
       "applicationCategory": "EducationalApplication",
       "operatingSystem": "Web, iOS, Android",
       "offers": {
-        "@@type": "Offer",
+        "@type": "Offer",
         "price": "0",
         "priceCurrency": "BRL"
       },
