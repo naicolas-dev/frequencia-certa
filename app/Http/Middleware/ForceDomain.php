@@ -10,15 +10,18 @@ class ForceDomain
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Defina o domínio EXATO que o Render quer (com WWW)
+        if (
+            $request->is('sitemap.xml*') ||
+            $request->is('robots.txt*')
+        ) {
+            return $next($request);
+        }
         $dominioOficial = 'www.frequenciacerta.app.br';
 
-        // 2. Verifica se o host atual é diferente do oficial
         if (
-            app()->environment('production') 
-            && $request->getHost() !== $dominioOficial
+            app()->environment('production') &&
+            $request->getHost() !== $dominioOficial
         ) {
-            // 3. Se for diferente, redireciona para o oficial (HTTPS + WWW)
             return redirect()->to(
                 'https://' . $dominioOficial . $request->getRequestUri(),
                 301
