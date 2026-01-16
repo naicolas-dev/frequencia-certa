@@ -370,7 +370,7 @@
             </h1>
             
             <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 mx-auto leading-relaxed px-4 max-w-xl">
-                O <strong class="text-[#1E3A8A] dark:text-white">controle de faltas</strong> definitivo. Calcule se você ainda pode faltar sem perder o <strong>Pé-de-Meia</strong> ou rodar de ano.
+                O <strong class="text-[#1E3A8A] dark:text-white">controle de faltas</strong> definitivo. Calcule se você ainda pode faltar sem perder o <strong class="text-[#1E3A8A] dark:text-white">Pé-de-Meia</strong> ou reprovar.
             </p>
 
             <div class="flex flex-col items-center gap-3 pt-2">
