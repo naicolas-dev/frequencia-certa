@@ -1,6 +1,7 @@
 {
     "name": "Frequência Certa",
     "short_name": "Frequência Certa",
+    "id": "/dashboard",
     "start_url": "/dashboard",
     "display": "standalone",
     "background_color": "#0F172A",
