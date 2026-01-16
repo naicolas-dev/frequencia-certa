@@ -112,6 +112,7 @@ CMD sh -c '\
     \
     echo "📂 Executando Migrations..."; \
     php artisan migrate --force --no-interaction; \
+    php artisan seo:generate-sitemap; \
     \
     echo "⚡ Otimizando caches..."; \
     php artisan optimize; \

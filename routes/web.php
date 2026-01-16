@@ -26,19 +26,6 @@ use Spatie\Sitemap\Tags\Url;
 // 🌍 ROTAS PÚBLICAS
 // ======================================================
 
-Route::get('/sitemap.xml', function () {
-    $sitemap = Sitemap::create()
-        ->add(
-            Url::create('/')
-                ->setLastModificationDate(now())
-                ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
-                ->setPriority(1.0)
-        );
-
-    return $sitemap->toResponse(request());
-});
-
-
 Route::get('/', fn () => view('welcome'));
 
 Route::get('/offline', fn () => view('offline'));
