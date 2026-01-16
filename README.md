@@ -36,11 +36,23 @@ Além de mitigar a evasão e auxiliar no cumprimento de requisitos para benefíc
 
 ## 📸 Demonstração
 
-<div align="center">
-  <img src="public/img/screenshots/desktop.png" alt="Dashboard Desktop" width="600">
-  <br><br>
-  <img src="public/img/screenshots/mobile.png" alt="Versão Mobile" width="250">
-</div>
+<details>
+  <summary align="center"><strong>Clique para ver o Modo Claro (Light Mode)</strong></summary>
+  <br>
+  <div align="center">
+     <img src="public/img/screenshots/clean-browser-mockup-light.png" alt="Desktop Light" width="600">
+     <img src="public/img/screenshots/iphone-11-mockup-light.png" alt="Mobile Light" width="200">
+  </div>
+</details>
+
+<details>
+  <summary align="center"><strong>Clique para ver o Modo Escuro (Dark Mode)</strong></summary>
+  <br>
+  <div align="center">
+     <img src="public/img/screenshots/clean-browser-mockup-dark.png" alt="Desktop Dark" width="600">
+     <img src="public/img/screenshots/iphone-11-mockup-dark.png" alt="Mobile Dark" width="200">
+  </div>
+</details>
 
 ---
 
