@@ -30,6 +30,7 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    @verbatim
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -45,7 +46,7 @@
       "description": "Aplicativo para controle de faltas escolares, cálculo de frequência e alertas de reprovação cruzados com o calendário letivo."
     }
     </script>
-
+    @endverbatim
     <script>
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
@@ -329,28 +330,8 @@
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
-    <style>
-        body { font-family: 'Instrument Sans', sans-serif; overflow-x: hidden; }
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-
-        .phone-mockup {
-            box-shadow: 0 0 0 10px #1f2937, 0 20px 50px -10px rgba(0, 0, 0, 0.5);
-        }
-        .notch { border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
-        .text-gradient {
-            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(to right, #06B6D4, #1D4ED8, #06B6D4);
-        }
-        .h-screen-ios { height: 100vh; height: 100dvh; }
-        
-        @keyframes pulse-soft {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(29, 78, 216, 0.4); }
-            50% { box-shadow: 0 0 0 15px rgba(29, 78, 216, 0); }
-        }
-        .cta-pulse { animation: pulse-soft 2s infinite; }
-    </style>
 </head>
-<body class="bg-[#F8FAFC] dark:bg-[#0F172A] text-gray-900 dark:text-white antialiased selection:bg-[#06B6D4] selection:text-white transition-colors duration-300">
+<body class="landing-page bg-[#F8FAFC] dark:bg-[#0F172A] text-gray-900 dark:text-white antialiased selection:bg-[#06B6D4] selection:text-white transition-colors duration-300">
 
     <nav class="fixed top-0 w-full z-50 p-6 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-[#0F172A]/90 border-b border-gray-200/50 dark:border-white/10 transition-colors duration-300">
         <div class="flex items-center gap-2 font-bold text-xl tracking-tighter text-[#1E3A8A] dark:text-white">

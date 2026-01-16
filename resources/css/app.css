@@ -2,9 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-/* =========================================
-   DRIVER.JS THEME OVERRIDE (Design System)
-   ========================================= */
+.landing-page {
+    font-family: 'Instrument Sans', sans-serif;
+    overflow-x: hidden;
+}
+
+.landing-page::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+.phone-mockup {
+    box-shadow: 0 0 0 10px #1f2937,
+                0 20px 50px -10px rgba(0, 0, 0, 0.5);
+}
+
+.notch {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(
+        to right,
+        #06B6D4,
+        #1D4ED8,
+        #06B6D4
+    );
+}
+
+.h-screen-ios {
+    height: 100vh;
+    height: 100dvh;
+}
+
+@keyframes pulse-soft {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(29, 78, 216, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 15px rgba(29, 78, 216, 0);
+    }
+}
+
+.cta-pulse {
+    animation: pulse-soft 2s infinite;
+}
+
 
 /* 1. O Container do Popover (Card) */
 .driver-popover {
