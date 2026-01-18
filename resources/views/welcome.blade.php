@@ -332,6 +332,21 @@
     <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 
     <style>
+
+        html, body {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+
+        /* Esconde no Chrome, Safari e Opera */
+        html::-webkit-scrollbar,
+        body::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+            background: transparent !important;
+        }
+        
         /* CSS Obrigatório para o Lenis funcionar */
         html.lenis, html.lenis body {
             height: auto;

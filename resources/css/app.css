@@ -7,11 +7,6 @@
     overflow-x: hidden;
 }
 
-.landing-page::-webkit-scrollbar {
-    width: 0px;
-    background: transparent;
-}
-
 .phone-mockup {
     box-shadow: 0 0 0 10px #1f2937,
                 0 20px 50px -10px rgba(0, 0, 0, 0.5);
@@ -140,5 +135,47 @@
 .overflow-hidden-mobile {
     @media (max-width: 640px) {
         overflow: hidden;
+    }
+}
+
+@layer base {
+    /* === PERSONALIZAÇÃO DA BARRA DE ROLAGEM === */
+
+    /* Webkit (Chrome, Edge, Safari, Opera) */
+    ::-webkit-scrollbar {
+        width: 6px;              /* Largura vertical */
+        height: 6px;             /* Altura horizontal */
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent; /* Fundo transparente para parecer flutuante */
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1; /* Cor da barra (Slate-300) - Modo Claro */
+        border-radius: 9999px;     /* Totalmente redonda (Pill shape) */
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #94a3b8; /* Cor ao passar o mouse (Slate-400) */
+    }
+
+    /* Firefox (Suporte limitado) */
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    /* === MODO ESCURO (DARK MODE) === */
+    .dark ::-webkit-scrollbar-thumb {
+        background-color: #334155; /* Slate-700 para fundo escuro */
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+        background-color: #475569; /* Slate-600 ao passar o mouse */
+    }
+
+    .dark * {
+        scrollbar-color: #334155 transparent;
     }
 }
