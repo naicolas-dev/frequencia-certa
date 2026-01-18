@@ -329,6 +329,35 @@
 
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+
+    <style>
+        /* CSS Obrigatório para o Lenis funcionar */
+        html.lenis, html.lenis body {
+            height: auto;
+        }
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+        .lenis.lenis-scrolling iframe {
+            pointer-events: none;
+        }
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+        }
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 
 </head>
 <body class="landing-page bg-[#F8FAFC] dark:bg-[#0F172A] text-gray-900 dark:text-white antialiased selection:bg-[#06B6D4] selection:text-white transition-colors duration-300">
@@ -440,7 +469,7 @@
             </div>
 
             <div class="order-1 md:order-2 w-full md:w-1/2 h-[60vh] md:h-full flex items-end pb-4 md:items-center justify-center relative z-20">
-                <div id="phone-container" class="relative md:static w-full h-full flex items-end md:items-center justify-center">
+                <div id="phone-container" class="reveal-on-scroll relative md:static w-full h-full flex items-end md:items-center justify-center">
                     <div id="phone" class="phone-mockup relative w-[300px] h-[600px] bg-gray-800 rounded-[40px] z-20 overflow-hidden transform-gpu scale-[0.55] sm:scale-[0.6] md:scale-100 opacity-0 md:opacity-100 shadow-2xl">
                         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-[#1f2937] notch z-30"></div>
                         <div class="relative w-full h-full bg-[#F8FAFC] dark:bg-[#030712] flex flex-col transition-colors duration-300">
@@ -583,18 +612,18 @@
     <section class="min-h-screen bg-white dark:bg-zinc-900 flex items-center justify-center py-24 px-4 relative transition-colors duration-300">
         <div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#1D4ED8] to-transparent opacity-50"></div>
 
-        <div class="max-w-4xl w-full bg-[#F8FAFC] dark:bg-black border border-gray-200 dark:border-white/10 rounded-[3rem] p-8 md:p-16 text-center relative overflow-hidden transition-colors shadow-xl">
+        <div class=" reveal-on-scroll max-w-4xl w-full bg-[#F8FAFC] dark:bg-black border border-gray-200 dark:border-white/10 rounded-[3rem] p-8 md:p-16 text-center relative overflow-hidden transition-colors shadow-xl">
             <div class="absolute top-0 right-0 w-64 h-64 bg-[#1D4ED8]/10 dark:bg-[#1D4ED8]/20 blur-[100px] rounded-full"></div>
             <div class="absolute bottom-0 left-0 w-64 h-64 bg-[#06B6D4]/10 dark:bg-[#06B6D4]/20 blur-[100px] rounded-full"></div>
 
-            <div class="relative z-10">
+            <div class="relative z-10 reveal-on-scroll">
                 <h2 class="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-[#1E3A8A] dark:text-white">Não deixe para a recuperação.</h2>
                 <p class="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
                     Grátis. Leve. Instala em segundos.<br>
                     <span class="text-sm text-gray-400 dark:text-gray-600 mt-2 block">(O teu "eu" do futuro vai agradecer).</span>
                 </p>
 
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <div class=" reveal-on-scroll flex flex-col sm:flex-row gap-4 justify-center items-center">
                     @auth
                     <a href="{{ url('/dashboard') }}" class="w-full sm:w-auto px-8 py-4 bg-[#1D4ED8] text-white text-lg font-bold rounded-full hover:bg-[#1E40AF] transition shadow-lg">
                         Abrir App
@@ -667,5 +696,33 @@
             if (isIos && !isStandalone) { iosHint.classList.remove('hidden'); }
         });
     </script>
+
+    <script>
+        // Inicialização Simples
+        const lenis = new Lenis({
+            duration: 1.2, // Duração da inércia (padrão é 1.2)
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Curva suave
+            smoothWheel: true,
+            wheelMultiplier: 1, // Velocidade (aumente para ir mais rápido)
+        });
+
+        // Loop de animação (obrigatório)
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
+    </script>
+
 </body>
 </html>
