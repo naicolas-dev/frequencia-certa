@@ -64,55 +64,138 @@
             </div>
 
         <div id="gamification-area" class="contents">
-           @if(Auth::user()->current_streak == 0 && Auth::user()->badges->count() == 0)
-    
-                <div class="mb-6 relative overflow-hidden rounded-2xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-lg group transition-colors duration-300">
-                    
-                    <div class="absolute top-0 right-0 -mt-2 -mr-2 w-24 h-24 bg-blue-500/10 dark:bg-blue-500/20 rounded-full blur-2xl group-hover:bg-blue-500/20 dark:group-hover:bg-blue-500/30 transition-colors"></div>
-                    
-                    <div class="relative z-10 flex items-center justify-between p-4 sm:p-5">
-                        <div class="flex items-center gap-4">
-                            <div class="shrink-0 w-12 h-12 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 flex items-center justify-center text-2xl shadow-sm text-gray-400 dark:text-gray-500">
-                                🔒
-                            </div>
-                            
-                            <div>
-                                <h3 class="text-base font-bold text-gray-800 dark:text-white leading-tight">
-                                    Painel de Conquistas
-                                </h3>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 max-w-[220px] sm:max-w-none leading-relaxed">
-                                    Registre presença para liberar a <span class="text-orange-500 dark:text-orange-400 font-bold">Ofensiva</span> e ganhar <span class="text-yellow-600 dark:text-yellow-400 font-bold">Medalhas</span>.
-                                </p>
-                            </div>
-                        </div>
+            @php
+                // DADOS DA OFENSIVA
+                $streak = Auth::user()->current_streak;
+                $badgesCount = Auth::user()->badges->count();
+                $hoje = \Carbon\Carbon::now()->startOfDay();
+                $ultimoRegistro = Auth::user()->last_streak_date ? \Carbon\Carbon::parse(Auth::user()->last_streak_date)->startOfDay() : null;
+                $marcouHoje = $ultimoRegistro && $ultimoRegistro->equalTo($hoje);
+                $dateString = $hoje->toDateString(); 
 
-                        <div class="hidden sm:flex text-gray-300 dark:text-gray-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">
-                            <svg class="w-5 h-5 animate-bounce-x" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                        </div>
-                    </div>
+                // FILTRA APENAS MEDALHAS GANHAS HOJE PARA A ANIMAÇÃO
+                $medalhasHoje = Auth::user()->badges->filter(function($badge) use ($hoje) {
+                    return \Carbon\Carbon::parse($badge->pivot->earned_at)->startOfDay()->equalTo($hoje);
+                })->values(); // Resetar chaves para o loop funcionar com 0, 1, 2...
+            @endphp
 
-                    <div class="h-1 w-full bg-gray-100 dark:bg-gray-800">
-                        <div class="h-full bg-blue-500 w-[5%] shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+            {{-- 1. POP-UP DA OFENSIVA (FOGO) --}}
+            @if($streak == 1 && $marcouHoje)
+                <div x-data="{ 
+                        show: false,
+                        init() {
+                            const key = 'fire_shown_{{ $dateString }}';
+                            if (!localStorage.getItem(key)) {
+                                // Pequeno delay inicial para não brigar com outros elementos
+                                setTimeout(() => {
+                                    this.show = true;
+                                    setTimeout(() => {
+                                        this.show = false;
+                                        localStorage.setItem(key, 'true');
+                                    }, 1500);
+                                }, 500);
+                            }
+                        }
+                     }"
+                     x-show="show"
+                     x-transition:enter="transition ease-out duration-500"
+                     x-transition:enter-start="opacity-0 scale-50"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-500"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-110"
+                     class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
+                     style="display: none;">
+                    
+                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+
+                    <div class="relative z-10 flex flex-col items-center justify-center scale-150">
+                        <div class="absolute w-full h-full bg-orange-500/40 rounded-full blur-[80px] animate-pulse"></div>
+                        <div class="relative drop-shadow-[0_0_50px_rgba(255,100,0,1)]">
+                             <svg class="w-40 h-40 text-orange-500 animate-bounce" style="animation-duration: 0.8s;" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" />
+                             </svg>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <h2 class="text-3xl font-black text-white italic tracking-tighter drop-shadow-xl uppercase animate-pulse">Chama Acesa!</h2>
+                        </div>
                     </div>
                 </div>
+            @endif
 
-            @else
+            {{-- 2. POP-UP DE MEDALHAS (LOOP COM DELAY) --}}
+            @foreach($medalhasHoje as $index => $badge)
+                <div x-data="{ 
+                        show: false,
+                        init() {
+                            const key = 'badge_shown_{{ $badge->id }}_{{ $dateString }}';
+                            
+                            // Se ainda não mostrou hoje
+                            if (!localStorage.getItem(key)) {
+                                // Calcula o delay baseado na ordem (index).
+                                // Se tiver a animação do FOGO (streak == 1), soma +2000ms para não encavalar.
+                                let baseDelay = {{ ($streak == 1 && $marcouHoje) ? 2500 : 500 }};
+                                let myDelay = baseDelay + ({{ $index }} * 2000); 
 
+                                setTimeout(() => {
+                                    this.show = true;
+                                    setTimeout(() => {
+                                        this.show = false;
+                                        localStorage.setItem(key, 'true');
+                                    }, 1500); // Duração de 1.5s
+                                }, myDelay);
+                            }
+                        }
+                     }"
+                     x-show="show"
+                     x-transition:enter="transition ease-out duration-500"
+                     x-transition:enter-start="opacity-0 scale-50 rotate-180"
+                     x-transition:enter-end="opacity-100 scale-100 rotate-0"
+                     x-transition:leave="transition ease-in duration-500"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-110"
+                     class="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none"
+                     style="display: none;">
+                    
+                    {{-- Fundo blur (acumulativo, mas ok pois elas aparecem em sequência) --}}
+                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+
+                    <div class="relative z-10 flex flex-col items-center justify-center scale-150 p-6 rounded-3xl">
+                        {{-- Luz de fundo com a cor amarela/dourada --}}
+                        <div class="absolute w-full h-full bg-yellow-500/30 rounded-full blur-[60px] animate-pulse"></div>
+
+                        {{-- Ícone da Medalha --}}
+                        <div class="relative text-6xl mb-4 drop-shadow-[0_0_30px_rgba(234,179,8,0.8)] animate-bounce" style="animation-duration: 1s;">
+                            {{ $badge->icon }}
+                        </div>
+
+                        <div class="relative z-10 text-center">
+                            <p class="text-[10px] font-bold text-yellow-400 uppercase tracking-widest mb-1">Nova Conquista!</p>
+                            <h2 class="text-2xl font-black text-white tracking-tight drop-shadow-lg leading-none">
+                                {{ $badge->name }}
+                            </h2>
+                        </div>
+                        
+                        {{-- Confetes simples CSS --}}
+                        <div class="absolute -top-10 -left-10 w-3 h-3 bg-blue-400 rotate-12 animate-ping"></div>
+                        <div class="absolute top-10 -right-12 w-2 h-2 bg-red-400 -rotate-12 animate-ping" style="animation-delay: 0.2s"></div>
+                        <div class="absolute -bottom-5 left-10 w-2 h-2 bg-green-400 rotate-45 animate-ping" style="animation-delay: 0.4s"></div>
+                    </div>
+                </div>
+            @endforeach
+
+            {{-- 3. CARDS DO PAINEL (Lógica Padrão) --}}
+            @if($streak > 0 || $badgesCount > 0)
                 <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                     
+                    {{-- Card Ofensiva --}}
                     @php
-                        // Lógica da Ofensiva
-                        $streak = Auth::user()->current_streak;
-                        $hoje = \Carbon\Carbon::now()->startOfDay();
-                        $ultimoRegistro = Auth::user()->last_streak_date ? \Carbon\Carbon::parse(Auth::user()->last_streak_date)->startOfDay() : null;
-                        $marcouHoje = $ultimoRegistro && $ultimoRegistro->equalTo($hoje);
-
                         if ($streak == 0) {
-                            $cardClasses = "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm";
+                            $cardClasses = "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm opacity-75";
                             $textClasses = "text-gray-500 dark:text-gray-400";
                             $numClasses = "text-gray-400 dark:text-gray-500";
                             $iconColor = "text-gray-300 dark:text-gray-600";
-                            $msg = "Comece hoje!";
+                            $msg = "Reinicie a chama!";
                             $fireOpacity = "opacity-0";
                         } elseif (!$marcouHoje) {
                             $cardClasses = "bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-transparent shadow-inner";
@@ -156,6 +239,7 @@
                         </div>
                     </div>
 
+                    {{-- Card Medalhas --}}
                     <div x-data 
                             @click="$dispatch('open-modal', 'badges-gallery')"
                             class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 p-4 shadow-sm flex flex-col justify-center h-24 sm:h-28 transition-transform hover:scale-[1.01] cursor-pointer group hover:bg-white/80 dark:hover:bg-gray-800/80 overflow-hidden relative">
@@ -163,7 +247,7 @@
                         <div class="flex items-center justify-between mb-2">
                             <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Conquistas</p>
                             <span class="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-1.5 py-0.5 rounded text-gray-500 group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">
-                                {{ Auth::user()->badges->count() }}
+                                {{ $badgesCount }}
                             </span>
                         </div>
 
@@ -179,20 +263,21 @@
                                 </div>
                             @endforelse
 
-                            @if(Auth::user()->badges->count() > 3)
+                            @if($badgesCount > 3)
                                 <div class="shrink-0 w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                    +{{ Auth::user()->badges->count() - 3 }}
+                                    +{{ $badgesCount - 3 }}
                                 </div>
                             @endif
                         </div>
                     </div>
 
+                    {{-- Modal Galeria --}}
                     <x-modal name="badges-gallery" focusable>
                         <div class="bg-white dark:bg-gray-900 flex flex-col max-h-[85vh]">
                             <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-10 flex justify-between items-center">
                                 <div>
                                     <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">🏆 Sala de Troféus</h2>
-                                    <p class="text-xs text-gray-500">{{ Auth::user()->badges->count() }} desbloqueadas</p>
+                                    <p class="text-xs text-gray-500">{{ $badgesCount }} desbloqueadas</p>
                                 </div>
                                 <button x-on:click.stop="$dispatch('close-modal', 'badges-gallery')" class="p-2 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
                                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
