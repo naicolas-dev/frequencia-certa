@@ -123,13 +123,18 @@
 
             {{-- Ações Direita --}}
             <div class="flex items-center gap-3">
+
+            
                 
                 {{-- AI CREDITS PILL (DESKTOP) --}}
-                <div class="relative group flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-full border border-purple-200 dark:border-purple-800/50 shadow-sm hover:shadow-md transition-all cursor-help"
-                     title="Créditos de Inteligência Artificial">
+                <button type="button" 
+                        @click="$dispatch('open-modal', 'ai-credits-info')"
+                        class="cursor-help relative group flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-full border border-purple-200 dark:border-purple-800/50 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer"
+                        title="Ver detalhes dos créditos">
                     
                     {{-- Floating Delta --}}
                     <div x-show="aiCredits.showDelta" 
+                         {{-- (Mantenha o conteúdo interno do Delta igual) --}}
                          x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0 translate-y-4"
                          x-transition:enter-end="opacity-100 -translate-y-6"
@@ -141,11 +146,11 @@
                          x-text="aiCredits.delta">
                     </div>
 
-                    <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
                     </svg>
                     
-                    <div class="flex flex-col leading-none">
+                    <div class="flex flex-col leading-none items-start">
                         <span class="text-[8px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider hidden lg:block">Créditos</span>
                         <div class="flex items-baseline gap-0.5">
                             <span class="text-sm font-black text-purple-700 dark:text-purple-300 tabular-nums" x-text="aiCredits.current"></span>
@@ -153,7 +158,7 @@
                             <span class="text-[10px] font-medium text-purple-500 dark:text-purple-400 tabular-nums" x-text="aiCredits.max"></span>
                         </div>
                     </div>
-                </div>
+                </button>
 
                 {{-- Theme Toggle (Desktop) --}}
                 <button 
@@ -230,10 +235,13 @@
 
          {{-- AI CREDITS (MOBILE) --}}
          <div class="absolute left-4 top-1/2 -translate-y-1/2">
-             <div class="relative flex items-center gap-1.5 px-2 py-1 bg-purple-50/80 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30">
+             <button type="button" 
+                     @click="$dispatch('open-modal', 'ai-credits-info')"
+                     class="relative flex items-center gap-1.5 px-2 py-1 bg-purple-50/80 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30 active:scale-95 transition-transform">
                  
                  {{-- Floating Delta Mobile --}}
                  <div x-show="aiCredits.showDelta" 
+                      {{-- (Mantenha o conteúdo interno do Delta igual) --}}
                       x-transition:enter="transition ease-out duration-300"
                       x-transition:enter-start="opacity-0 translate-y-2"
                       x-transition:enter-end="opacity-100 -translate-y-4"
@@ -245,11 +253,11 @@
                       x-text="aiCredits.delta">
                  </div>
 
-                 <svg class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                 </svg>
+                 <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                </svg>
                  <span class="text-xs font-black text-purple-700 dark:text-purple-300 tabular-nums" x-text="aiCredits.current"></span>
-             </div>
+             </button>
          </div>
 
          {{-- Toggle de Tema (Posicionado na direita) --}}
@@ -305,3 +313,67 @@
         </a>
     </div>
 </div>
+
+{{-- MODAL DE INFORMAÇÕES DOS CRÉDITOS (GLOBAL) --}}
+<x-modal name="ai-credits-info" focusable>
+    <div class="p-6 bg-white dark:bg-gray-800">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                ✨
+            </div>
+            <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">
+                {{ __('Sobre os Créditos IA') }}
+            </h2>
+        </div>
+
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            {{ __('Os créditos são utilizados para realizar ações inteligentes no sistema. Eles são renovados mensalmente. Veja abaixo quanto custa cada ação:') }}
+        </p>
+
+        <div class="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300">
+                    <tr>
+                        <th class="px-4 py-3 font-medium">{{ __('Ação') }}</th>
+                        <th class="px-4 py-3 font-medium text-right">{{ __('Custo') }}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <tr class="bg-white dark:bg-gray-800">
+                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Posso faltar hoje?</td>
+                        <td class="px-4 py-3 text-right font-bold text-purple-600 dark:text-purple-400">
+                            {{ \App\Helpers\AiCredits::COST_DAY_CHECK }} créditos
+                        </td>
+                    </tr>
+                    <tr class="bg-white dark:bg-gray-800">
+                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Análise de Disciplina</td>
+                        <td class="px-4 py-3 text-right font-bold text-purple-600 dark:text-purple-400">
+                            {{ \App\Helpers\AiCredits::COST_SUBJECT_ANALYSIS }} créditos
+                        </td>
+                    </tr>
+                    <tr class="bg-white dark:bg-gray-800">
+                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Importação de Grade</td>
+                        <td class="px-4 py-3 text-right font-bold text-purple-600 dark:text-purple-400">
+                            {{ \App\Helpers\AiCredits::COST_IMPORT_SCHEDULE }} créditos
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/30">
+            <span class="text-sm font-medium text-purple-800 dark:text-purple-200">
+                {{ __('Limite Mensal') }}
+            </span>
+            <span class="text-lg font-black text-purple-700 dark:text-purple-300">
+                {{ \App\Helpers\AiCredits::MONTHLY_MAX }}
+            </span>
+        </div>
+
+        <div class="mt-6 flex justify-end">
+            <x-secondary-button x-on:click="$dispatch('close')">
+                {{ __('Entendi') }}
+            </x-secondary-button>
+        </div>
+    </div>
+</x-modal>
