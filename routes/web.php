@@ -142,6 +142,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('throttle:5,1')
         ->get('/api/ai/analisar/{disciplina}', [AiAdvisorController::class, 'analisarRisco'])
         ->name('ai.analisar');
+
+    Route::middleware('throttle:10,1')
+        ->get('/ai-advisor/day-check', [AiAdvisorController::class, 'dayCheck'])
+        ->name('ai.daycheck');
 });
 
 

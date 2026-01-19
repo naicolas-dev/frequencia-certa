@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AiCacheHelper;
 use App\Services\GamificationService;
 use App\Models\GradeHoraria;
 use App\Models\Frequencia;
@@ -122,7 +123,19 @@ class FrequenciaController extends Controller
 
         app(GamificationService::class)->verificarOfensiva(Auth::user());
 
+        // 🗑️ CACHE INVALIDATION: Bust today's AI day-check cache
+        AiCacheHelper::bustDayCheck(Auth::id(), $dados['data']);
+
         return response()->json(['sucesso' => true]);
+    }
+
+    /**
+     * 🗑️ DEPRECATED: Use AiCacheHelper::bustDayCheck() instead.
+     * Kept for reference but delegating to helper.
+     */
+    private function bustAiDayCheckCache(int $userId, string $date): void
+    {
+        AiCacheHelper::bustDayCheck($userId, $date);
     }
 
     public function historico(Request $request)

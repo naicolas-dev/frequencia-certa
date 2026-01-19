@@ -356,52 +356,82 @@
                     <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl"></div>
 
                     <div class="relative z-10 flex flex-col h-full justify-between">
-                        <div class="flex justify-between items-start">
+                        {{-- Header do Card --}}
+                        <div class="flex justify-between items-start mb-6">
                             <div>
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/20 backdrop-blur-md text-xs font-semibold mb-3 border border-white/10">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold mb-2 border border-white/10 shadow-sm">
+                                    <svg class="w-3.5 h-3.5 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
-                                    {{ date('d/m/Y -') }} {{ \Carbon\Carbon::now()->locale('pt_BR')->dayName }}
+                                    {{ date('d/m') }} <span class="opacity-60">|</span> {{ \Carbon\Carbon::now()->locale('pt_BR')->dayName }}
                                 </div>
-                                <h2 class="text-2xl sm:text-3xl font-bold leading-tight">Diário de Classe</h2>
+                                <h2 class="text-2xl sm:text-3xl font-bold leading-tight tracking-tight">Diário de Classe</h2>
                             </div>
-                            <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">
-                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="bg-white/20 p-2.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg hidden sm:block">
+                                <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                         </div>
 
-                        <button @click="abrirModal()" 
-                            class="mt-8 w-full sm:w-auto bg-white text-blue-600 hover:bg-blue-50 font-bold py-4 px-8 rounded-xl shadow-xl transition-transform active:scale-95 flex items-center justify-center gap-2 group">
-                            @if($temAulaHoje)
-                                {{-- CENÁRIO 1: TEM AULA HOJE (Urgência / Ação) --}}
-                                <span>Registrar Presença</span>
-                                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                                </svg>
-                            @else
-                                {{-- CENÁRIO 2: NÃO TEM AULA (Consulta / Gestão) --}}
-                                <span>Gerenciar Frequência</span>
-                                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                                </svg>
-                            @endif
-                        </button>
-                        <button @click="modalEvento = true" class="mt-3 w-full sm:w-auto bg-white/20 text-white hover:bg-white/30 font-semibold py-3 px-6 rounded-xl transition flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Marcar Dia Livre
-                        </button>
+                        {{-- Actions Grid --}}
+                        <div class="space-y-3">
+                            
+                            {{-- PRIMARY ACTION: Main Driver --}}
+                            <button @click="abrirModal()" 
+                                class="group relative w-full bg-white text-indigo-700 hover:bg-blue-50 font-bold py-4 px-6 rounded-2xl shadow-xl shadow-indigo-900/10 transition-all active:scale-[0.98] flex items-center justify-between border-b-4 border-black/5 hover:border-black/10">
+                                <div class="flex flex-col items-start">
+                                    @if($temAulaHoje)
+                                        <span class="text-lg leading-none">Registrar Presença</span>
+                                        <span class="text-xs font-medium text-indigo-500/80 mt-1 uppercase tracking-wide">Aulas de Hoje</span>
+                                    @else
+                                        <span class="text-lg leading-none">Gerenciar Frequência</span>
+                                        <span class="text-xs font-medium text-indigo-500/80 mt-1 uppercase tracking-wide">Histórico & Ajustes</span>
+                                    @endif
+                                </div>
+                                <div class="bg-indigo-100/50 p-2 rounded-xl group-hover:bg-indigo-100 transition-colors">
+                                    <svg class="w-6 h-6 transform group-hover:rotate-6 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                </div>
+                            </button>
 
-                        <a href="{{ route('eventos.index') }}" class="mt-2 inline-flex items-center justify-center gap-2 text-sm font-semibold text-white/90 hover:text-white underline underline-offset-4">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            Gerenciar dias livres
-                        </a>
+                            {{-- SECONDARY ACTIONS: Grid --}}
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                
+                                {{-- AI ADVISOR --}}
+                                <button @click="consultarIaDia(dataSelecionada)" 
+                                        class="relative overflow-hidden w-full bg-purple-600/30 hover:bg-purple-600/40 border border-white/20 text-white font-semibold py-3.5 px-4 rounded-xl transition active:scale-[0.98] flex items-center justify-center gap-2 group backdrop-blur-sm">
+                                    
+                                    {{-- Glow Effect --}}
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    
+                                    <svg class="w-5 h-5 text-purple-200 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                    </svg>
+                                    <div class="flex flex-col items-start leading-none relative z-10">
+                                        <span class="text-sm">Devo ir hoje?</span>
+                                        <span class="text-[10px] text-purple-200/80 font-medium">Consultar IA</span>
+                                    </div>
+                                </button>
+
+                                {{-- MARCAR FOLGA --}}
+                                <button @click="modalEvento = true" class="w-full bg-white/10 hover:bg-white/20 border border-white/10 text-white font-medium py-3.5 px-4 rounded-xl transition active:scale-[0.98] flex items-center justify-center gap-2 backdrop-blur-sm">
+                                    <svg class="w-5 h-5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-sm">Marcar Folga</span>
+                                </button>
+                            </div>
+
+                            {{-- TERTIARY LINK --}}
+                            <div class="pt-1 text-center">
+                                <a href="{{ route('eventos.index') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-white/70 hover:text-white transition-colors py-1">
+                                    <span>Gerenciar dias sem aula</span>
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </a>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- MODAL DE CHAMADA --}}
@@ -806,14 +836,6 @@
                                         Grade
                                     </a>
                                     <div class="flex items-center gap-1">
-                                        {{-- ✨ BOTÃO NOVO: CONSULTAR IA --}}
-                                        <button type="button" onclick="consultarIa({{ $disciplina->id }}, '{{ addslashes($disciplina->nome) }}')" 
-                                                class="p-2 text-yellow-600 hover:bg-yellow-100 dark:text-yellow-400 dark:hover:bg-yellow-900/30 rounded-lg transition group relative" 
-                                                title="Oráculo">
-                                                <svg class="w-5 h-5 animate-pulse group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-                                                </svg>
-                                        </button>
 
                                         <a href="{{ route('disciplinas.edit', $disciplina->id) }}" class="p-2 text-gray-400 hover:text-blue-500 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition" title="Editar Matéria">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1224,6 +1246,64 @@
                 appendMessage('ai', 'Meus cristais estão embaçados por uma interferência no servidor. Tente novamente mais tarde.', 'ERRO', '😵');
             }
         };
+
+        window.consultarIaDia = async function(date) {
+        
+        // 1. Confirmação para economizar Tokens 💰
+        if (window.swalTailwind) {
+            const result = await window.swalTailwind.fire({
+                title: 'Invocar o Oráculo?',
+                text: `O Oráculo analisará todas as aulas do dia ${date.split('-').reverse().join('/')}. Isso consome seus tokens.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, invocar!',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#8b5cf6', // Roxo
+            });
+            if (!result.isConfirmed) return;
+        } else if (!confirm('Deseja gastar tokens para analisar o dia?')) {
+            return;
+        }
+
+        const chatContainer = document.getElementById('chat-container');
+        
+        // 2. Abre o Modal
+        window.dispatchEvent(new CustomEvent('open-modal', { detail: 'oracle-chat' }));
+        
+        // 3. Limpa o chat e adiciona pergunta do usuário
+        chatContainer.innerHTML = '';
+        
+        // Formata a data para o chat ficar bonitinho (YYYY-MM-DD -> DD/MM)
+        const dataFormatada = date.split('-').reverse().slice(0, 2).join('/');
+        appendMessage('user', `Ó grande Oráculo, analise meu dia (${dataFormatada}). Posso faltar hoje?`);
+
+        // 4. Mostra "Digitando..."
+        const typingId = showTyping();
+        scrollToBottom();
+
+        try {
+            // 5. Chama a API nova (Day Check)
+            const response = await fetch(`/ai-advisor/day-check?date=${date}`);
+            
+            if (!response.ok) throw new Error('Erro na API');
+            
+            const data = await response.json();
+
+            // 6. Remove "Digitando..." e exibe resposta
+            removeTyping(typingId);
+            
+            setTimeout(() => {
+                // O backend retorna: { message: "...", risk: "HIGH|MEDIUM|LOW" }
+                appendMessage('ai', data.message, data.risk, '📅');
+                scrollToBottom();
+            }, 500);
+
+        } catch (error) {
+            console.error(error);
+            removeTyping(typingId);
+            appendMessage('ai', 'As nuvens cobriram minha visão. Tente novamente mais tarde.', 'ERRO', '☁️');
+        }
+    };
 
         // Função auxiliar para criar as bolhas do chat
         function appendMessage(role, text, risk = null, emoji = '') {
