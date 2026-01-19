@@ -107,6 +107,68 @@ class DashboardController extends Controller
             default => $todasDisciplinas
         };
 
+        // 5. LÓGICA DE APRESENTAÇÃO (Greeting & Tips)
+        $hora = now()->hour;
+        if ($hora < 12) { $saudacao = 'Bom dia'; }
+        elseif ($hora < 18) { $saudacao = 'Boa tarde'; }
+        else { $saudacao = 'Boa noite'; }
+
+        $mensagensPorHora = [
+            0 => 'Já deu por hoje 🙂 — descansar também é produtividade.',
+            1 => 'Hora de desligar um pouco. Um bom sono melhora seu rendimento.',
+            2 => 'Sono é parte do progresso. Seu eu de amanhã agradece.',
+            3 => 'Tá bem tarde… cuida de você. Amanhã é um novo dia.',
+            4 => 'Quase amanhecendo. Que tal se preparar pra não correr depois?',
+            5 => 'Um novo começo chegando 🌅 Ajuste o ritmo e vai com calma.',
+            6 => 'Bom começo de dia! Presença hoje faz diferença no final do semestre.',
+            7 => 'Organiza o dia rapidinho e evita correria mais tarde.',
+            8 => 'Primeiras aulas, primeira chance de mandar bem. Bora marcar presença?',
+            9 => 'Mantém o ritmo: consistência é o que dá resultado.',
+            10 => 'Cada aula conta. Confere sua presença e segue firme.',
+            11 => 'Último gás da manhã 💪 Foco no que importa.',
+            12 => 'Pausa merecida! Já aproveita e confirma sua presença.',
+            13 => 'De volta aos estudos: calma, atenção e presença.',
+            14 => 'Ainda dá tempo de virar o jogo hoje. Bora manter a frequência?',
+            15 => 'Vai no constante: consistência vence a pressa.',
+            16 => 'Olho na frequência 👀 O que você garante hoje evita dor de cabeça depois.',
+            17 => 'Final da tarde chegando. Fecha o dia com presença em dia.',
+            18 => 'Encerrando? Dá uma olhada na chamada antes de sair.',
+            19 => 'Se organizar agora poupa estresse amanhã.',
+            20 => 'Revisar hoje é se agradecer amanhã. 😉',
+            21 => 'Última checagem do dia: tudo certo na frequência?',
+            22 => 'Fechando o dia com responsabilidade. Boa!',
+            23 => 'Hora de descansar 🌙 Amanhã continua — com mais uma presença.'
+        ];
+
+        $diaHoje = now()->dayOfWeekIso;
+        $temAulaHoje = $todasDisciplinas->contains(function($d) use ($diaHoje) {
+            return $d->horarios->contains('dia_semana', $diaHoje);
+        });
+
+        if ($todasDisciplinas->isEmpty()) {
+            $fraseMotivacional = 'Comece adicionando suas matérias para montar a grade 🚀';
+        } elseif (!$temAulaHoje) {
+            $fraseMotivacional = 'Hoje não há aulas programadas. Aproveite o descanso 😌';
+        } elseif ($materiasEmRisco > 0) {
+            $fraseMotivacional = '⚠️ Atenção: você tem matérias com frequência baixa. Foco total!';
+        } else {
+            $fraseMotivacional = $mensagensPorHora[$hora] ?? 'Bons estudos!';
+        }
+
+        // 6. GAMIFICATION DATA
+        $user->load('badges'); // Eager load para evitar N+1 na view
+        
+        $streak = $user->current_streak;
+        $badgesCount = $user->badges->count();
+        $hoje = Carbon::now()->startOfDay();
+        $ultimoRegistro = $user->last_streak_date ? Carbon::parse($user->last_streak_date)->startOfDay() : null;
+        $marcouHoje = $ultimoRegistro && $ultimoRegistro->equalTo($hoje);
+        $dateString = $hoje->toDateString();
+
+        $medalhasHoje = $user->badges->filter(function($badge) use ($hoje) {
+            return Carbon::parse($badge->pivot->earned_at)->startOfDay()->equalTo($hoje);
+        })->values();
+
         return view('dashboard', compact(
             'todasDisciplinas',
             'disciplinasFiltradas',
@@ -114,7 +176,15 @@ class DashboardController extends Controller
             'corGlobal', 
             'materiasEmRisco', 
             'totalPresencasGeral', 
-            'estadoVazio'
+            'estadoVazio',
+            'saudacao',
+            'fraseMotivacional',
+            'temAulaHoje',
+            'streak',
+            'badgesCount',
+            'marcouHoje',
+            'dateString',
+            'medalhasHoje'
         ));
     }
 
