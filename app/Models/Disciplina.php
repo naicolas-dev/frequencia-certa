@@ -57,91 +57,89 @@ class Disciplina extends Model
         return $this->hasMany(Frequencia::class);
     }
 
-public function getTotalAulasPrevistasAttribute()
+/**
+     * 🚫 QUERY-FREE ACCESSOR
+     * 
+     * Returns the cached/precomputed value of total projected classes.
+     * This accessor NEVER queries the database.
+     * 
+     * Use DisciplinaStatsService::enrichWithStats() to precompute this value.
+     * 
+     * @return int
+     */
+    public function getTotalAulasPrevistasAttribute()
     {
-        // 1. Se não houver datas definidas, não podemos projectar
-        if (!$this->data_inicio || !$this->data_fim) {
-            return 0;
+        // Return precomputed value if available
+        if ($this->getAttribute('total_aulas_previstas_cache') !== null) {
+            return (int) $this->getAttribute('total_aulas_previstas_cache');
         }
 
-        $inicio = Carbon::parse($this->data_inicio);
-        $fim = Carbon::parse($this->data_fim);
-
-        // 2. Recupera os dias da semana que têm aula (ex: [1, 3] = Seg, Qua)
-        // O unique() evita duplicados se tiveres 2 aulas no mesmo dia
-        $diasAula = $this->horarios->pluck('dia_semana')->unique()->toArray();
-
-        if (empty($diasAula)) {
-            return 0;
+        // Safe fallback: return 0 and log warning in non-production
+        if (app()->environment('local')) {
+            \Log::warning('total_aulas_previstas accessed without precomputation', [
+                'disciplina_id' => $this->id,
+                'trace' => collect(debug_backtrace())->take(3)->pluck('file', 'function')
+            ]);
         }
-
-        // 3. OTIMIZAÇÃO DE PERFORMANCE 🚀
-        // Buscamos todas as folgas manuais (Eventos) do período de uma só vez
-        // para evitar fazer centenas de queries ao banco dentro do loop.
-        $folgasManuais = Evento::where('user_id', $this->user_id)
-            ->whereBetween('data', [$this->data_inicio, $this->data_fim])
-            ->whereIn('tipo', ['feriado', 'sem_aula'])
-            ->pluck('data')
-            ->map(fn($d) => substr($d, 0, 10)) // Garante formato Y-m-d
-            ->toArray();
-
-        // 4. Prepara os feriados (Cache do CalendarioService)
-        $calendarioService = app(CalendarioService::class);
-        $estado = Auth::user()->estado ?? 'BR';
         
-        // Carregamos feriados dos anos envolvidos (caso o semestre vire o ano)
-        $anos = range($inicio->year, $fim->year);
-        $feriados = [];
-        
-        foreach ($anos as $ano) {
-            // O Service já usa cache, então isso é rápido
-            $lista = $calendarioService->obterFeriados($estado, $ano);
-            foreach ($lista as $f) {
-                $feriados[] = $f['data'];
-            }
-        }
-
-        // 5. O Grande Loop: Contagem dia a dia
-        $totalAulas = 0;
-        $atual = $inicio->copy();
-
-        while ($atual->lte($fim)) {
-            // Verifica se hoje é um dia de aula desta matéria (ex: Segunda)
-            if (in_array($atual->dayOfWeekIso, $diasAula)) {
-                $dataStr = $atual->format('Y-m-d');
-
-                // Verifica se NÃO é folga manual E NÃO é feriado
-                if (!in_array($dataStr, $folgasManuais) && !in_array($dataStr, $feriados)) {
-                    $totalAulas++;
-                }
-            }
-            $atual->addDay();
-        }
-
-        return $totalAulas;
+        return 0;
     }
 
+    /**
+     * 🚫 QUERY-FREE ACCESSOR
+     * 
+     * Computes attendance rate from preloaded counts or loaded relations.
+     * This accessor NEVER triggers database queries.
+     * 
+     * Preload using: withCount(['frequencias as total_aulas_realizadas', ...])
+     * 
+     * @param mixed $value
+     * @return float
+     */
     public function getTaxaPresencaAttribute($value): float
     {
+        // 1. If explicitly set via setAttribute (e.g., from controller), use it
         if ($value !== null) {
             return (float) $value;
         }
 
-        if ($this->getAttribute('total_aulas_realizadas') !== null && $this->getAttribute('total_faltas') !== null) {
+        // 2. If preloaded via withCount, compute from attributes
+        if ($this->getAttribute('total_aulas_realizadas') !== null 
+            && $this->getAttribute('total_faltas') !== null) {
             $total = (int) $this->getAttribute('total_aulas_realizadas');
             $faltas = (int) $this->getAttribute('total_faltas');
 
-            if ($total === 0) return 100.0;
+            if ($total === 0) return 0.0; // Changed: return 0.0 instead of 100.0
 
             $presencas = $total - $faltas;
             return round(($presencas / $total) * 100, 1);
         }
 
-        $total = $this->frequencias()->count();
-        if ($total === 0) return 100.0;
+        // 3. Safe in-memory path: if frequencias relation is already loaded, use it
+        if ($this->relationLoaded('frequencias')) {
+            $total = $this->frequencias->count();
+            
+            if ($total === 0) return 0.0;
 
-        $presencas = $this->frequencias()->where('presente', true)->count();
-        return round(($presencas / $total) * 100, 1);
+            $presencas = $this->frequencias->where('presente', true)->count();
+            return round(($presencas / $total) * 100, 1);
+        }
+
+        // 4. 🚨 Data not preloaded - safe fallback
+        if (app()->environment('local')) {
+            throw new \RuntimeException(
+                "taxa_presenca accessed without preloaded data on Disciplina #{$this->id}. " .
+                "Use withCount(['frequencias as total_aulas_realizadas', ...]) or eager load 'frequencias'."
+            );
+        }
+
+        // Production fallback: log warning and return safe default
+        \Log::warning('taxa_presenca accessed without preloaded data', [
+            'disciplina_id' => $this->id,
+            'trace' => collect(debug_backtrace())->take(3)->pluck('file', 'function')
+        ]);
+        
+        return 0.0;
     }
 
 }

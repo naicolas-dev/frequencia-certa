@@ -58,24 +58,25 @@ class DashboardController extends Controller
             ->orderBy('nome', 'asc')
             ->get();
 
-        // 3. CÁLCULOS EM MEMÓRIA (O "Hydrator")
-        // Aqui preenchemos os atributos que a View vai usar, para ela não chamar o banco.
-        $todasDisciplinas->each(function ($d) use ($datasSemAulaSet) {
-            
-            // A. Taxa de Presença (Evita chamar frequencias->count())
+
+        // 3. USE SERVICE FOR BATCH COMPUTATION (Prevents N+1)
+        $statsService = app(\App\Services\DisciplinaStatsService::class);
+        $statsService->enrichWithStats($todasDisciplinas, $user);
+
+        // Additional computation for taxa_presenca (using already-loaded counts)
+        $todasDisciplinas->each(function ($d) {
+            // Taxa de Presença from preloaded counts
             if ($d->total_aulas_realizadas > 0) {
                 $presencas = $d->total_aulas_realizadas - $d->total_faltas;
                 $taxa = round(($presencas / $d->total_aulas_realizadas) * 100);
             } else {
-                $taxa = 100;
+                $taxa = 0; // Changed: return 0 instead of 100 when no classes
             }
-            // Força o atributo para a View não acionar o Accessor
+            // Force attribute so View doesn't trigger accessor
             $d->setAttribute('taxa_presenca', $taxa);
-
-            // B. Previsão de Aulas (Lógica movida do Model para cá para usar cache de Eventos)
-            $previsao = $this->calcularAulasPrevistas($d, $datasSemAulaSet);
-            $d->setAttribute('total_aulas_previstas_cache', $previsao);
         });
+
+
 
 
         // 4. ESTATÍSTICAS GERAIS (Query Única)
@@ -188,35 +189,4 @@ class DashboardController extends Controller
         ));
     }
 
-    /**
-     * Função auxiliar otimizada que não faz queries
-     */
-    private function calcularAulasPrevistas($disciplina, array $datasSemAulaSet)
-    {
-        if (!$disciplina->data_inicio || !$disciplina->data_fim) {
-            return 0;
-        }
-
-        $inicio = Carbon::parse($disciplina->data_inicio);
-        $fim = Carbon::parse($disciplina->data_fim);
-        $diasAula = $disciplina->horarios->pluck('dia_semana')->unique()->toArray();
-
-        if (empty($diasAula)) {
-            return 0;
-        }
-
-        $count = 0;
-        // Loop simples, mas agora com lookup O(1)
-        while ($inicio->lte($fim)) {
-            if (in_array($inicio->dayOfWeekIso, $diasAula, true)) {
-                $data = $inicio->toDateString(); // 'YYYY-MM-DD'
-                if (!isset($datasSemAulaSet[$data])) {
-                    $count++;
-                }
-            }
-            $inicio->addDay();
-        }
-
-        return $count;
-    }
 }
