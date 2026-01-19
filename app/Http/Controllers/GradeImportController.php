@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Disciplina;
 use App\Models\GradeHoraria;
+use App\Helpers\AiCredits;
 
 class GradeImportController extends Controller
 {
@@ -26,6 +27,21 @@ class GradeImportController extends Controller
         ]);
 
         try {
+            $user = Auth::user();
+            
+            // 💰 CREDIT CHECK before calling Gemini
+            $user->ensureMonthlyCreditsFresh();
+            
+            if (!$user->hasEnoughCredits(AiCredits::COST_IMPORT_SCHEDULE)) {
+                return response()->json([
+                    'message' => 'Your wisdom credits are exhausted for this month.',
+                    'error' => 'insufficient_credits',
+                    'user_credits' => $user->ai_credits,
+                    'monthly_max' => $user->getMonthlyMaxCredits(),
+                    'reset_at' => $user->credits_reset_at?->toIso8601String(),
+                ], 402);
+            }
+            
             $apiKey = config('gemini.key');
             $modelName = config('gemini.model'); 
             $base = config('gemini.url');
@@ -136,10 +152,18 @@ class GradeImportController extends Controller
             unset($dia);
             unset($aula);
 
-            return response()->json(['data' => $dados]);
+            // ✅ SUCCESS: Deduct credits
+            $user->deductCredits(AiCredits::COST_IMPORT_SCHEDULE);
+
+            return response()->json([
+                'data' => $dados,
+                'cost_applied' => AiCredits::COST_IMPORT_SCHEDULE,
+                'user_credits' => $user->ai_credits,
+            ]);
 
         } catch (\Exception $e) {
             Log::error($e->getMessage());
+            // ❌ FAILURE: Do NOT deduct credits
             return response()->json(['error' => 'Erro técnico no servidor.'], 500);
         }
     }

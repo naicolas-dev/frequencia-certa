@@ -22,6 +22,12 @@ class AiCacheHelper
     const DAY_CHECK_VERSION = 'v1';
 
     /**
+     * Current cache version for subject analysis endpoint.
+     * Bump this when you change the prompt or response structure.
+     */
+    const SUBJECT_ANALYSIS_VERSION = 'v1';
+
+    /**
      * Generate cache key for daily AI advice.
      * 
      * @param int $userId
@@ -31,6 +37,19 @@ class AiCacheHelper
     public static function dayCheckKey(int $userId, string $date): string
     {
         return "ai:day_check:{$userId}:{$date}:" . self::DAY_CHECK_VERSION;
+    }
+
+    /**
+     * Generate cache key for subject analysis.
+     * 
+     * @param int $userId
+     * @param int $disciplinaId
+     * @param string $date Format: Y-m-d
+     * @return string
+     */
+    public static function subjectAnalysisKey(int $userId, int $disciplinaId, string $date): string
+    {
+        return "ai:subject_analysis:{$userId}:{$disciplinaId}:{$date}:" . self::SUBJECT_ANALYSIS_VERSION;
     }
 
     /**
@@ -49,6 +68,20 @@ class AiCacheHelper
     public static function bustDayCheck(int $userId, string $date): bool
     {
         $key = self::dayCheckKey($userId, $date);
+        return \Cache::forget($key);
+    }
+
+    /**
+     * Invalidate (forget) the subject analysis cache for a specific user, discipline, and date.
+     * 
+     * @param int $userId
+     * @param int $disciplinaId
+     * @param string $date Format: Y-m-d
+     * @return bool
+     */
+    public static function bustSubjectAnalysis(int $userId, int $disciplinaId, string $date): bool
+    {
+        $key = self::subjectAnalysisKey($userId, $disciplinaId, $date);
         return \Cache::forget($key);
     }
 }

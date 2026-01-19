@@ -18,6 +18,9 @@ class DashboardController extends Controller
             return redirect()->route('intro');
         }
 
+        // Ensure credits are fresh for this month
+        $user->ensureMonthlyCreditsFresh();
+
         // 1. CARREGAR DADOS GLOBAIS (Eventos e Feriados) UMA ÚNICA VEZ
         // Isso evita que o Model Disciplina faça queries repetidas.
         $inicioAno = Carbon::parse($user->ano_letivo_inicio ?? now()->startOfYear());
@@ -185,7 +188,8 @@ class DashboardController extends Controller
             'badgesCount',
             'marcouHoje',
             'dateString',
-            'medalhasHoje'
+            'medalhasHoje',
+            'user' // Pass user with credits
         ));
     }
 

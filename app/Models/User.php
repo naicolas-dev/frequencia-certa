@@ -12,11 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Builder;
 use NotificationChannels\WebPush\HasPushSubscriptions;
+use App\Models\Concerns\HasAiCredits;
 
 class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, Prunable, HasPushSubscriptions;
+    use HasFactory, Notifiable, Prunable, HasPushSubscriptions, HasAiCredits;
 
     /**
      * The attributes that are mass assignable.
@@ -37,6 +38,8 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
         'max_streak',
         'last_streak_date',
         'badges',
+        'ai_credits',
+        'credits_reset_at',
     ];
 
     public function prunable(): Builder
@@ -71,6 +74,7 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
             'ano_letivo_inicio' => 'date',
             'ano_letivo_fim' => 'date',
             'last_streak_date' => 'date',
+            'credits_reset_at' => 'datetime',
         ];
     }
 

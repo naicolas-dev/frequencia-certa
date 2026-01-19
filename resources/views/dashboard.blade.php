@@ -7,14 +7,12 @@
 
             {{-- CABEÇALHO --}}
             <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
-                <div>
+                <div class="flex-1">
                     <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
-
                         {{ $saudacao }}, {{ explode(' ', Auth::user()->name)[0] }} 👋
                     </h1>
                     <p class="text-gray-500 dark:text-gray-400 mt-1 text-sm sm:text-base">
                         {{ $fraseMotivacional }}
-
                     </p>
                 </div>
             </div>
@@ -410,8 +408,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                                     </svg>
                                     <div class="flex flex-col items-start leading-none relative z-10">
-                                        <span class="text-sm">Devo ir hoje?</span>
-                                        <span class="text-[10px] text-purple-200/80 font-medium">Consultar IA</span>
+                                        <span class="text-sm">Consultar Oráculo</span>
+                                        <span class="text-[10px] text-purple-200/80 font-medium">5 créditos</span>
                                     </div>
                                 </button>
 
@@ -1226,6 +1224,41 @@
                 // 5. Chama a API (Backend)
                 const response = await fetch(`/api/ai/analisar/${disciplinaId}`);
                 
+                // Handle HTTP 402 Insufficient Credits
+                if (response.status === 402) {
+                    const errorData = await response.json();
+                    removeTyping(typingId);
+                    window.dispatchEvent(new CustomEvent('close-modal', { detail: 'oracle-chat' }));
+                    
+                    const resetDate = errorData.reset_at ? new Date(errorData.reset_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : 'próximo mês';
+                    
+                    const exhaustedResult = await window.swalTailwind.fire({
+                        title: 'O Oráculo está Exausto!',
+                        html: `
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">Você zerou seus créditos de sabedoria este mês.</p>
+                            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 mb-4">
+                                <div class="text-2xl font-black text-purple-700 dark:text-purple-300">${errorData.user_credits}/${errorData.monthly_max}</div>
+                                <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">Renova em ${resetDate}</div>
+                            </div>
+                        `,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Comprar Mais (conceitual)',
+                        cancelButtonText: 'Ok',
+                        confirmButtonColor: '#8b5cf6',
+                    });
+                    
+                    if (exhaustedResult.isConfirmed) {
+                        await window.swalTailwind.fire({
+                            title: 'Recurso Conceitual',
+                            text: 'Em uma versão comercial, aqui você poderia adquirir mais créditos. Esta é uma demonstração para fins acadêmicos (TCC).',
+                            icon: 'info',
+                            confirmButtonText: 'Entendi',
+                        });
+                    }
+                    return;
+                }
+                
                 if (!response.ok) throw new Error('Erro na API');
                 
                 const data = await response.json();
@@ -1233,10 +1266,23 @@
                 // 6. Remove "Digitando..."
                 removeTyping(typingId);
                 
+                // Update credits display via Global Event
+                if (data.user_credits !== undefined) {
+                    window.dispatchEvent(new CustomEvent('ai-credits:update', { 
+                        detail: { 
+                            credits: data.user_credits, 
+                            max: {{ $user->getMonthlyMaxCredits() }} 
+                        } 
+                    }));
+                }
+                
                 // 7. Adiciona a resposta da IA com um pequeno delay para parecer natural
-                // O Oráculo não responde instantaneamente como um robô chato, ele "pensa"
                 setTimeout(() => {
-                    appendMessage('ai', data.analise, data.risco, data.emoji);
+                    let message = data.analise;
+                    if (data.cached) {
+                        message += '<div class="mt-2 text-xs opacity-70 flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg> Grátis (Cache)</div>';
+                    }
+                    appendMessage('ai', message, data.risco, data.emoji);
                     scrollToBottom();
                 }, 400);
 
@@ -1247,21 +1293,21 @@
             }
         };
 
-        window.consultarIaDia = async function(date) {
+     window.consultarIaDia = async function(date) {
         
-        // 1. Confirmação para economizar Tokens 💰
+        // 1. Confirmação para economizar Créditos
         if (window.swalTailwind) {
             const result = await window.swalTailwind.fire({
                 title: 'Invocar o Oráculo?',
-                text: `O Oráculo analisará todas as aulas do dia ${date.split('-').reverse().join('/')}. Isso consome seus tokens.`,
+                html: `O Oráculo analisará todas as aulas do dia ${date.split('-').reverse().join('/')}.<br><span class="text-sm text-purple-600 dark:text-purple-400 font-bold">Custo: 5 créditos</span>`,
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Sim, invocar!',
                 cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#8b5cf6', // Roxo
+                confirmButtonColor: '#8b5cf6',
             });
             if (!result.isConfirmed) return;
-        } else if (!confirm('Deseja gastar tokens para analisar o dia?')) {
+        } else if (!confirm('Deseja gastar 5 créditos para analisar o dia?')) {
             return;
         }
 
@@ -1285,6 +1331,45 @@
             // 5. Chama a API nova (Day Check)
             const response = await fetch(`/ai-advisor/day-check?date=${date}`);
             
+            // Handle HTTP 402 Insufficient Credits
+            if (response.status === 402) {
+                const errorData = await response.json();
+                removeTyping(typingId);
+                
+                // Close oracle modal
+                window.dispatchEvent(new CustomEvent('close-modal', { detail: 'oracle-chat' }));
+                
+                // Show exhausted credits modal
+                const resetDate = errorData.reset_at ? new Date(errorData.reset_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : 'próximo mês';
+                
+                const exhaustedResult = await window.swalTailwind.fire({
+                    title: 'O Oráculo está Exausto!',
+                    html: `
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Você zerou seus créditos de sabedoria este mês.</p>
+                        <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 mb-4">
+                            <div class="text-2xl font-black text-purple-700 dark:text-purple-300">${errorData.user_credits}/${errorData.monthly_max}</div>
+                            <div class="text-xs text-purple-600 dark:text-purple-400 mt-1">Renova em ${resetDate}</div>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Comprar Mais (conceitual)',
+                    cancelButtonText: 'Ok',
+                    confirmButtonColor: '#8b5cf6',
+                });
+                
+                // Show conceptual buy more info
+                if (exhaustedResult.isConfirmed) {
+                    await window.swalTailwind.fire({
+                        title: 'Recurso Conceitual',
+                        text: 'Em uma versão comercial, aqui você poderia adquirir mais créditos. Esta é uma demonstração para fins acadêmicos (TCC).',
+                        icon: 'info',
+                        confirmButtonText: 'Entendi',
+                    });
+                }
+                return;
+            }
+            
             if (!response.ok) throw new Error('Erro na API');
             
             const data = await response.json();
@@ -1292,9 +1377,24 @@
             // 6. Remove "Digitando..." e exibe resposta
             removeTyping(typingId);
             
+            // Update credits display via Global Event
+            if (data.user_credits !== undefined) {
+                window.dispatchEvent(new CustomEvent('ai-credits:update', { 
+                    detail: { 
+                        credits: data.user_credits, 
+                        max: {{ $user->getMonthlyMaxCredits() }} 
+                    } 
+                }));
+            }
+            
             setTimeout(() => {
-                // O backend retorna: { message: "...", risk: "HIGH|MEDIUM|LOW" }
-                appendMessage('ai', data.message, data.risk, '📅');
+                // Add cache indicator if cached
+                let message = data.message;
+                if (data.cached) {
+                    message += '<div class="mt-2 text-xs opacity-70 flex items-center gap-1"><svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg> Grátis (Cache)</div>';
+                }
+                
+                appendMessage('ai', message, data.risk, '📅');
                 scrollToBottom();
             }, 500);
 

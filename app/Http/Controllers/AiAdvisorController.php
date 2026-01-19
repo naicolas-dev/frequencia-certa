@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Disciplina;
 use App\Services\DisciplinaStatsService;
 use App\Helpers\AiCacheHelper;
+use App\Helpers\AiCredits;
 use Carbon\Carbon;
 
 
@@ -67,7 +68,22 @@ class AiAdvisorController extends Controller
         if (Cache::has($cacheKey)) {
             $cached = Cache::get($cacheKey);
             $cached['cached'] = true;
+            $cached['cost_applied'] = 0;
+            $cached['user_credits'] = $user->ai_credits;
             return response()->json($cached);
+        }
+
+        // 💰 2. CREDIT CHECK (Cache miss - will call LLM)
+        $user->ensureMonthlyCreditsFresh();
+        
+        if (!$user->hasEnoughCredits(AiCredits::COST_DAY_CHECK)) {
+            return response()->json([
+                'message' => 'Your wisdom credits are exhausted for this month.',
+                'error' => 'insufficient_credits',
+                'user_credits' => $user->ai_credits,
+                'monthly_max' => $user->getMonthlyMaxCredits(),
+                'reset_at' => $user->credits_reset_at?->toIso8601String(),
+            ], 402);
         }
 
         // 🐎 2. BUILD DAY CONTEXT (No N+1 Queries)
@@ -95,14 +111,16 @@ class AiAdvisorController extends Controller
             ->orderBy('nome')
             ->get();
 
-        // If no classes today, short-circuit
+        // If no classes today, short-circuit (No LLM call = No charge)
         if ($disciplinas->isEmpty()) {
             $response = [
                 'message' => 'Nenhuma aula agendada para este dia. Aproveite o descanso! 🎉',
                 'risk' => 'NONE',
                 'date' => $date,
                 'subjects' => [],
-                'cached' => false
+                'cached' => false,
+                'cost_applied' => 0,
+                'user_credits' => $user->ai_credits,
             ];
             
             // Cache this "no classes" response
@@ -182,31 +200,38 @@ class AiAdvisorController extends Controller
         try {
             $aiResponse = $this->callGeminiForDayAdvice($dayContext, $dateCarbon, $overallRisk);
             
+            // ✅ SUCCESS: Deduct credits and build response
+            $user->deductCredits(AiCredits::COST_DAY_CHECK);
+            
             $response = [
                 'message' => $aiResponse['message'] ?? 'Consulte seus dados e decida com sabedoria.',
                 'risk' => $aiResponse['risk'] ?? $overallRisk,
                 'date' => $date,
-                'subjects' => $dayContext, // Optional debug payload
-                'cached' => false
+                'subjects' => $dayContext,
+                'cached' => false,
+                'cost_applied' => AiCredits::COST_DAY_CHECK,
+                'user_credits' => $user->ai_credits, // After deduction
             ];
+            
+            // 📦 Cache the successful response
+            $ttl = $this->cacheTtlUntilEndOfDay($date);
+            Cache::put($cacheKey, $response, $ttl);
             
         } catch (\Exception $e) {
             Log::error('AI Day Check failed', ['error' => $e->getMessage()]);
             
-            // Fallback response
+            // ❌ FAILURE: Do NOT deduct credits, do NOT cache
             $response = [
                 'message' => 'O oráculo está temporariamente indisponível. Baseie-se nos dados: ' . 
                              ($criticalCount > 0 ? 'Você tem matérias CRÍTICAS hoje. Recomendo ir!' : 'Avalie os números com cuidado.'),
                 'risk' => $overallRisk,
                 'date' => $date,
                 'subjects' => $dayContext,
-                'cached' => false
+                'cached' => false,
+                'cost_applied' => 0,
+                'user_credits' => $user->ai_credits, // No deduction
             ];
         }
-
-        // 📦 6. CACHE THE RESPONSE
-        $ttl = $this->cacheTtlUntilEndOfDay($date);
-        Cache::put($cacheKey, $response, $ttl);
         
         $response['cached'] = false;
         return response()->json($response);
@@ -304,6 +329,33 @@ RETORNE APENAS JSON:
         if (Auth::id() !== $disciplina->user_id) {
             Log::warning("Tentativa de acesso não autorizado: User " . Auth::id() . " tentou acessar disciplina " . $disciplina->id);
             abort(403, 'Você não tem permissão para acessar esta disciplina.');
+        }
+
+        $user = Auth::user();
+        $date = now()->format('Y-m-d');
+
+        // 📦 CHECK CACHE FIRST
+        $cacheKey = AiCacheHelper::subjectAnalysisKey($user->id, $disciplina->id, $date);
+        
+        if (Cache::has($cacheKey)) {
+            $cached = Cache::get($cacheKey);
+            $cached['cached'] = true;
+            $cached['cost_applied'] = 0;
+            $cached['user_credits'] = $user->ai_credits;
+            return response()->json($cached);
+        }
+
+        // 💰 CREDIT CHECK (Cache miss - will call LLM)
+        $user->ensureMonthlyCreditsFresh();
+        
+        if (!$user->hasEnoughCredits(AiCredits::COST_SUBJECT_ANALYSIS)) {
+            return response()->json([
+                'message' => 'Your wisdom credits are exhausted for this month.',
+                'error' => 'insufficient_credits',
+                'user_credits' => $user->ai_credits,
+                'monthly_max' => $user->getMonthlyMaxCredits(),
+                'reset_at' => $user->credits_reset_at?->toIso8601String(),
+            ], 402);
         }
 
         // --- PREPARAÇÃO DOS DADOS ---
@@ -428,6 +480,18 @@ RETORNE APENAS JSON:
                 return $this->fallbackResponse('Erro na tradução da profecia.');
             }
 
+            // ✅ SUCCESS: Deduct credits and cache response
+            $user->deductCredits(AiCredits::COST_SUBJECT_ANALYSIS);
+            
+            // Add credit info to response
+            $dados['cost_applied'] = AiCredits::COST_SUBJECT_ANALYSIS;
+            $dados['user_credits'] = $user->ai_credits;
+            $dados['cached'] = false;
+
+            // Cache for end of day
+            $ttl = $this->cacheTtlUntilEndOfDay($date);
+            Cache::put($cacheKey, $dados, $ttl);
+
             return response()->json($dados);
 
         } catch (\Exception $e) {
@@ -437,14 +501,18 @@ RETORNE APENAS JSON:
     }
 
     /**
-     * Fallback para erros
+     * Fallback para erros (NO credit charge)
      */
     private function fallbackResponse($msg)
     {
+        $user = Auth::user();
         return response()->json([
             'analise' => $msg . ' Mas na dúvida: VÁ PARA A AULA!',
             'risco' => 'ALTO',
-            'emoji' => '🤖'
+            'emoji' => '🤖',
+            'cost_applied' => 0,
+            'user_credits' => $user->ai_credits,
+            'cached' => false,
         ]);
     }
 }

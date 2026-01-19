@@ -11,8 +11,57 @@
                 this.show = false;
             }
         }, { passive: true });
+    },
+    // AI Credits Logic
+    aiCredits: {
+        current: {{ Auth::user()->ai_credits }},
+        max: {{ Auth::user()->getMonthlyMaxCredits() }},
+        delta: 0,
+        showDelta: false,
+        deltaColor: 'text-red-500',
+        
+        init() {
+            window.addEventListener('ai-credits:update', (e) => {
+                this.update(e.detail.credits, e.detail.max);
+            });
+        },
+
+        update(newCredits, newMax) {
+            const diff = newCredits - this.current;
+            if (diff === 0) return;
+
+            this.delta = diff > 0 ? '+' + diff : diff;
+            this.deltaColor = diff > 0 ? 'text-green-500' : 'text-red-500';
+            this.showDelta = true;
+            this.max = newMax;
+
+            // Animate counting
+            const start = this.current;
+            const end = newCredits;
+            const duration = 1000;
+            const startTime = performance.now();
+
+            const animate = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out quart
+                const ease = 1 - Math.pow(1 - progress, 4);
+                
+                this.current = Math.round(start + (diff * ease));
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    this.current = end;
+                    setTimeout(() => { this.showDelta = false; }, 1000);
+                }
+            };
+
+            requestAnimationFrame(animate);
+        }
     }
-}">
+}" x-init="aiCredits.init()">
 
     {{-- 1. ÁREA DE GATILHO + DICA VISUAL (DESKTOP) --}}
     <div 
@@ -74,6 +123,38 @@
 
             {{-- Ações Direita --}}
             <div class="flex items-center gap-3">
+                
+                {{-- AI CREDITS PILL (DESKTOP) --}}
+                <div class="relative group flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-full border border-purple-200 dark:border-purple-800/50 shadow-sm hover:shadow-md transition-all cursor-help"
+                     title="Créditos de Inteligência Artificial">
+                    
+                    {{-- Floating Delta --}}
+                    <div x-show="aiCredits.showDelta" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-4"
+                         x-transition:enter-end="opacity-100 -translate-y-6"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 -translate-y-6"
+                         x-transition:leave-end="opacity-0 -translate-y-10"
+                         class="absolute -top-4 right-0 font-bold text-lg pointer-events-none z-50"
+                         :class="aiCredits.deltaColor"
+                         x-text="aiCredits.delta">
+                    </div>
+
+                    <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    
+                    <div class="flex flex-col leading-none">
+                        <span class="text-[8px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider hidden lg:block">Créditos</span>
+                        <div class="flex items-baseline gap-0.5">
+                            <span class="text-sm font-black text-purple-700 dark:text-purple-300 tabular-nums" x-text="aiCredits.current"></span>
+                            <span class="text-[10px] font-medium text-purple-500 dark:text-purple-400">/</span>
+                            <span class="text-[10px] font-medium text-purple-500 dark:text-purple-400 tabular-nums" x-text="aiCredits.max"></span>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Theme Toggle (Desktop) --}}
                 <button 
                     id="tour-theme-toggle"
@@ -146,6 +227,30 @@
          <a href="{{ route('dashboard') }}">
             <x-application-logo class="block h-8 w-auto fill-current text-blue-600 dark:text-blue-500" />
          </a>
+
+         {{-- AI CREDITS (MOBILE) --}}
+         <div class="absolute left-4 top-1/2 -translate-y-1/2">
+             <div class="relative flex items-center gap-1.5 px-2 py-1 bg-purple-50/80 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30">
+                 
+                 {{-- Floating Delta Mobile --}}
+                 <div x-show="aiCredits.showDelta" 
+                      x-transition:enter="transition ease-out duration-300"
+                      x-transition:enter-start="opacity-0 translate-y-2"
+                      x-transition:enter-end="opacity-100 -translate-y-4"
+                      x-transition:leave="transition ease-in duration-300"
+                      x-transition:leave-start="opacity-100 -translate-y-4"
+                      x-transition:leave-end="opacity-0 -translate-y-8"
+                      class="absolute -top-2 left-0 font-bold text-xs pointer-events-none z-50 whitespace-nowrap"
+                      :class="aiCredits.deltaColor"
+                      x-text="aiCredits.delta">
+                 </div>
+
+                 <svg class="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                 </svg>
+                 <span class="text-xs font-black text-purple-700 dark:text-purple-300 tabular-nums" x-text="aiCredits.current"></span>
+             </div>
+         </div>
 
          {{-- Toggle de Tema (Posicionado na direita) --}}
          <button 
