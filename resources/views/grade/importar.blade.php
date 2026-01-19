@@ -77,13 +77,21 @@
                             <button x-show="previewUrl" @click.stop="limparFoto()" class="absolute top-2 right-2 z-20 bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                         </div>
                     </div>
-                    <div class="mt-8">
+                    <div class="mt-8 space-y-3">
                         <button @click="processarIA()" :disabled="isLoading" class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold text-lg py-4 rounded-2xl shadow-lg shadow-yellow-500/20 transform transition active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-3">
                             <svg class="w-5 h-5 animate-pulse group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
                             </svg>
                             <span x-show="!isLoading">Confirmar</span><span x-show="isLoading">Analisando...</span>
                         </button>
+                        
+                        {{-- Aviso de Créditos --}}
+                        <div class="text-center">
+                            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
+                                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+                                Esta operação consome <span class="text-yellow-600 dark:text-yellow-400 font-bold">{{ \App\Helpers\AiCredits::COST_IMPORT_SCHEDULE }} créditos</span> de IA
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -258,11 +266,56 @@
 
                 handleFileUpload(event) { const file = event.target.files[0]; if (!file) return; this.file = file; const reader = new FileReader(); reader.onload = (e) => this.previewUrl = e.target.result; reader.readAsDataURL(file); },
                 limparFoto() { this.file = null; this.previewUrl = null; this.$refs.fileInput.value = ''; },
-                async processarIA() { 
+                async processarIA() {
+                    // 1. Validações iniciais (Mantém igual)
                     if (this.mode === 'texto' && !this.textoInput.trim()) return this.alert('Atenção', 'Digite ou cole sua grade.', 'warning');
                     if (this.mode === 'foto' && !this.file) return this.alert('Atenção', 'Selecione uma foto.', 'warning');
-                    this.isLoading = true; const formData = new FormData(); this.mode === 'texto' ? formData.append('texto_grade', this.textoInput) : formData.append('foto_grade', this.file);
-                    try { const response = await fetch("{{ route('grade.importar') }}", { method: 'POST', headers: { 'X-CSRF-TOKEN': "{{ csrf_token() }}" }, body: formData }); const result = await response.json(); if (!response.ok) throw new Error(result.error); this.dadosExtraidos = result.data; this.step = 2; window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (error) { this.alert('Erro', 'Não consegui ler a grade.', 'error'); } finally { this.isLoading = false; }
+
+                    // 2. AVISO TIPO SWAL (Confirmação de Créditos)
+                    const custo = {{ \App\Helpers\AiCredits::COST_IMPORT_SCHEDULE }};
+                    const swalInstance = window.swalTailwind || window.Swal;
+                    
+                    if (swalInstance) {
+                        const confirmacao = await swalInstance.fire({
+                            title: 'Confirmar importação?',
+                            html: `A IA vai processar sua grade e importar para o sistema automaticamente.<br> <br><span class="text-sm text-purple-600 dark:text-purple-400 font-bold">Custo: ${custo} créditos</span>`,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#eab308', // Yellow-500 (cor do tema)
+                            cancelButtonColor: '#6b7280',  // Gray-500
+                            confirmButtonText: 'Sim, importar!',
+                            cancelButtonText: 'Cancelar',
+                            reverseButtons: true
+                        });
+
+                        if (!confirmacao.isConfirmed) return; // Para tudo se cancelar
+                    }
+
+                    // 3. Processamento (Lógica original de envio)
+                    this.isLoading = true; 
+                    const formData = new FormData(); 
+                    this.mode === 'texto' ? formData.append('texto_grade', this.textoInput) : formData.append('foto_grade', this.file);
+                    
+                    try { 
+                        const response = await fetch("{{ route('grade.importar') }}", { 
+                            method: 'POST', 
+                            headers: { 'X-CSRF-TOKEN': "{{ csrf_token() }}" }, 
+                            body: formData 
+                        }); 
+                        
+                        const result = await response.json(); 
+                        
+                        if (!response.ok) throw new Error(result.error); 
+                        
+                        this.dadosExtraidos = result.data; 
+                        this.step = 2; 
+                        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+
+                    } catch (error) { 
+                        this.alert('Erro', 'Não consegui ler a grade. Verifique se a imagem está nítida ou se você tem créditos suficientes.', 'error'); 
+                    } finally { 
+                        this.isLoading = false; 
+                    }
                 },
                 async salvarTudo() {
                     if (!this.dadosExtraidos.length) return; this.isLoading = true;
