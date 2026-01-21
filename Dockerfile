@@ -113,7 +113,7 @@ CMD sh -c '\
     echo "📂 Executando Migrations..." && \
     php artisan migrate --force --no-interaction && \
     php artisan db:seed --class=Database\\Seeders\\BadgeSeeder --force --no-interaction && \
-    php artisan seo:generate-sitemap
+    php artisan seo:generate-sitemap; \
 
     \
     echo "⚡ Otimizando caches..."; \
