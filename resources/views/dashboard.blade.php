@@ -1052,8 +1052,16 @@
 
                     window.dispatchEvent(new CustomEvent('tour-starting'));
 
-                    // Pequeno delay para garantir que a animação da página terminou antes de focar
-                    setTimeout(() => driverObj.drive(), 1300);
+                    const startTourWhenReady = () => {
+                        const loader = document.getElementById('page-loader');
+
+                        if (loader && getComputedStyle(loader).display !== 'none') {
+                            setTimeout(startTourWhenReady, 200);
+                        } else {
+                            setTimeout(() => driverObj.drive(), 500);
+                        }
+                };
+                  startTourWhenReady();  
                 };
 
                 // 3. EXECUTA IMEDIATAMENTE (Sem esperar DOMContentLoaded, pois o HTML já está lá)
