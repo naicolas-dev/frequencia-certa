@@ -233,7 +233,11 @@ function hideLoader() {
 }
 
 // Initialization & Clean up
-window.addEventListener('load', hideLoader);
+if (document.readyState === 'complete') {
+    hideLoader();
+} else {
+    window.addEventListener('load', hideLoader);
+}
 
 setTimeout(() => {
     const loader = document.querySelector('#page-loader');
