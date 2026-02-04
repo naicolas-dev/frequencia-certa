@@ -12,7 +12,8 @@
     <link rel="icon" type="image/png" href="/favicon.ico">
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800|inter:400,500,600,700"
+        rel="stylesheet" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
@@ -38,7 +39,7 @@
 
     <x-loading />
 
-    <div class="min-h-screen flex flex-col">
+    <div class="min-h-screen flex flex-col pt-16 sm:pt-24">
         @include('layouts.navigation')
 
         @isset($header)

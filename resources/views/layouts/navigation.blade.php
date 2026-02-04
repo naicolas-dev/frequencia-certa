@@ -1,319 +1,365 @@
-<nav x-data="{ 
-    show: true,
-    scrolled: false,
-    init() {
-        // Monitora o scroll para o comportamento 'auto-hide' do Desktop
-        window.addEventListener('scroll', () => {
-            this.scrolled = window.scrollY > 20;
-            if (!this.scrolled) {
-                this.show = true;
-            } else {
-                this.show = false;
-            }
-        }, { passive: true });
-    },
-    // AI Credits Logic
-    aiCredits: {
-        current: {{ Auth::user()->ai_credits }},
-        max: {{ Auth::user()->getMonthlyMaxCredits() }},
-        delta: 0,
-        showDelta: false,
-        deltaColor: 'text-red-500',
-        
-        init() {
-            window.addEventListener('ai-credits:update', (e) => {
-                this.update(e.detail.credits, e.detail.max);
-            });
-        },
+<nav x-data="navbar()" x-init="init()" class="fixed top-0 inset-x-0 z-50 pointer-events-none font-['Inter']">
 
-        update(newCredits, newMax) {
-            const diff = newCredits - this.current;
-            if (diff === 0) return;
-
-            this.delta = diff > 0 ? '+' + diff : diff;
-            this.deltaColor = diff > 0 ? 'text-green-500' : 'text-red-500';
-            this.showDelta = true;
-            this.max = newMax;
-
-            // Animate counting
-            const start = this.current;
-            const end = newCredits;
-            const duration = 1000;
-            const startTime = performance.now();
-
-            const animate = (currentTime) => {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                // Ease out quart
-                const ease = 1 - Math.pow(1 - progress, 4);
-                
-                this.current = Math.round(start + (diff * ease));
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    this.current = end;
-                    setTimeout(() => { this.showDelta = false; }, 1000);
-                }
-            };
-
-            requestAnimationFrame(animate);
-        }
-    }
-}" x-init="aiCredits.init()">
-
-    {{-- 1. ÁREA DE GATILHO + DICA VISUAL (DESKTOP) --}}
-    <div 
-        class="fixed top-0 left-0 w-full h-8 z-50 flex justify-center items-start group hidden sm:flex cursor-pointer"
-        @mouseenter="if(scrolled) show = true"
-    >
-        <div 
-            x-show="!show && scrolled"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 -translate-y-full"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 translate-y-0"
-            x-transition:leave-end="opacity-0 -translate-y-full"
-            class="mt-1"
-        >
-            <div class="h-1.5 w-24 bg-gray-300/50 dark:bg-gray-600/50 backdrop-blur-md rounded-full shadow-sm ring-1 ring-black/5 transition-all duration-300 group-hover:bg-blue-500/80 group-hover:w-32 group-hover:h-2 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+    {{-- TRIGGER HANDLE (Visible cue when navbar is hidden) --}}
+    <div class="hidden sm:block fixed top-0 left-1/2 -translate-x-1/2 z-50 pointer-events-auto transition-all duration-500 ease-out"
+        :class="(scrolled && !forceShow) ? 'translate-y-0 opacity-100 delay-200' : '-translate-y-full opacity-0'"
+        @mouseenter="showNavbar()">
+        <div
+            class="w-32 h-1.5 mx-auto bg-gray-300/50 dark:bg-gray-600/50 backdrop-blur-md rounded-b-xl shadow-sm hover:bg-blue-500 dark:hover:bg-blue-400 transition-colors cursor-pointer group">
+            <div class="w-8 h-0.5 bg-white/50 rounded-full mx-auto mt-0.5 group-hover:bg-white/80 transition-colors">
+            </div>
         </div>
     </div>
 
-    {{-- 2. NAVBAR FLUTUANTE (DESKTOP) --}}
-    <div 
-        x-show="show"
-        @mouseleave="if(scrolled) show = false"
-        x-transition:enter="transition ease-out duration-500"
-        x-transition:enter-start="-translate-y-[150%] opacity-0"
-        x-transition:enter-end="translate-y-0 opacity-100"
-        x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="translate-y-0 opacity-100"
-        x-transition:leave-end="-translate-y-[150%] opacity-0"
-        class="fixed top-6 left-1/2 -translate-x-1/2 z-40 hidden sm:flex"
-    >
-        <div class="flex items-center gap-6 px-6 py-3 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border border-white/20 dark:border-gray-700/50 shadow-2xl shadow-black/5 dark:shadow-black/20 ring-1 ring-black/5">
-            
-            {{-- Logo --}}
-            <div class="shrink-0 flex items-center">
-                <a href="{{ route('dashboard') }}" class="hover:scale-105 transition-transform">
-                    <x-application-logo class="block h-8 w-auto fill-current text-blue-600 dark:text-blue-500" />
+    {{-- EDGE TRIGGER (Thin hidden strip for easy access) --}}
+    <div class="hidden sm:block fixed top-0 inset-x-0 h-1.5 z-50 pointer-events-auto" x-show="scrolled && !forceShow"
+        @mouseenter="showNavbar()"></div>
+
+    {{-- DESKTOP / TABLET FLOATING HUD --}}
+    <div class="pointer-events-auto w-full flex justify-center pt-6 px-4 transition-transform duration-500 hidden sm:flex"
+        :class="(scrolled && !forceShow) ? '-translate-y-[150%]' : 'translate-y-0'" @mouseenter="showNavbar()"
+        @mouseleave="hideNavbar()">
+
+        <div class="relative group">
+
+            {{-- PILL CONTAINER --}}
+            <div class="relative flex items-center gap-1 p-2 bg-white/90 dark:bg-[#0F172A]/90 backdrop-blur-2xl border border-white/20 dark:border-white/10 rounded-full shadow-2xl shadow-blue-900/10 transition-all duration-300"
+                :class="isCompact ? 'px-3' : 'px-4 pr-2'">
+
+                {{-- LOGO --}}
+                <a href="{{ route('dashboard') }}"
+                    class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:scale-110 hover:rotate-3 transition-transform duration-300">
+                    <x-application-logo class="w-6 h-6 fill-current" />
                 </a>
-            </div>
 
-            {{-- Links --}}
-            <div class="flex space-x-1">
-                <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 border-0 text-sm font-medium transition-colors">
-                    {{ __('Painel') }}
-                </x-nav-link>
+                {{-- NAV LINKS (DESKTOP) --}}
+                <div
+                    class="hidden md:flex items-center bg-gray-100/50 dark:bg-gray-800/50 rounded-full px-1 py-1 mx-2 gap-1 border border-gray-200/50 dark:border-white/5">
+                    <x-nav-link-modern href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')"
+                        icon="home">
+                        Painel
+                    </x-nav-link-modern>
+                    <x-nav-link-modern href="{{ route('grade.geral') }}" :active="request()->routeIs('grade.geral')"
+                        icon="calendar">
+                        Grade
+                    </x-nav-link-modern>
+                    <x-nav-link-modern href="{{ route('frequencia.historico') }}"
+                        :active="request()->routeIs('frequencia.historico')" icon="clock">
+                        Histórico
+                    </x-nav-link-modern>
+                </div>
 
-                <x-nav-link id="tour-grade-desktop" :href="route('grade.geral')" :active="request()->routeIs('grade.geral')" class="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 border-0 text-sm font-medium transition-colors">
-                    {{ __('Grade') }}
-                </x-nav-link>
+                {{-- DIVIDER --}}
+                <div class="hidden md:block w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1"></div>
 
-                <x-nav-link :href="route('frequencia.historico')" :active="request()->routeIs('frequencia.historico')" class="px-4 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 border-0 text-sm font-medium transition-colors">
-                    {{ __('Histórico') }}
-                </x-nav-link>
-            </div>
+                {{-- ACTIONS --}}
+                <div class="flex items-center gap-2">
 
-            {{-- Separador --}}
-            <div class="h-5 w-px bg-gray-200 dark:bg-gray-700"></div>
-
-            {{-- Ações Direita --}}
-            <div class="flex items-center gap-3">
-
-            
-                
-                {{-- AI CREDITS PILL (DESKTOP) --}}
-                <button type="button" 
-                        @click="$dispatch('open-modal', 'ai-credits-info')"
-                        class="cursor-help relative group flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-full border border-purple-200 dark:border-purple-800/50 shadow-sm hover:shadow-md hover:scale-105 transition-all cursor-pointer"
-                        title="Ver detalhes dos créditos">
-                    
-                    {{-- Floating Delta --}}
-                    <div x-show="aiCredits.showDelta" 
-                         {{-- (Mantenha o conteúdo interno do Delta igual) --}}
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-4"
-                         x-transition:enter-end="opacity-100 -translate-y-6"
-                         x-transition:leave="transition ease-in duration-300"
-                         x-transition:leave-start="opacity-100 -translate-y-6"
-                         x-transition:leave-end="opacity-0 -translate-y-10"
-                         class="absolute -top-4 right-0 font-bold text-lg pointer-events-none z-50"
-                         :class="aiCredits.deltaColor"
-                         x-text="aiCredits.delta">
-                    </div>
-
-                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
-                    </svg>
-                    
-                    <div class="flex flex-col leading-none items-start">
-                        <span class="text-[8px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider hidden lg:block">Créditos</span>
-                        <div class="flex items-baseline gap-0.5">
-                            <span class="text-sm font-black text-purple-700 dark:text-purple-300 tabular-nums" x-text="aiCredits.current"></span>
-                            <span class="text-[10px] font-medium text-purple-500 dark:text-purple-400">/</span>
-                            <span class="text-[10px] font-medium text-purple-500 dark:text-purple-400 tabular-nums" x-text="aiCredits.max"></span>
+                    {{-- CREDITS --}}
+                    <button @click="$dispatch('open-modal', 'ai-credits-info')"
+                        class="group/credits relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 border border-purple-100 dark:border-purple-500/20 hover:border-purple-300 dark:hover:border-purple-500/50 transition-all overflow-hidden"
+                        title="Créditos IA">
+                        <div
+                            class="absolute inset-0 bg-purple-500/10 translate-y-full group-hover/credits:translate-y-0 transition-transform duration-300">
                         </div>
-                    </div>
-                </button>
 
-                {{-- Theme Toggle (Desktop) --}}
-                <button 
-                    id="tour-theme-toggle"
-                    type="button" 
-                    x-data 
-                    @click="
-                        if (localStorage.theme === 'dark') {
-                            localStorage.theme = 'light';
-                            document.documentElement.classList.remove('dark');
-                        } else {
-                            localStorage.theme = 'dark';
-                            document.documentElement.classList.add('dark');
-                        }
-                    "
-                    class="p-2 text-gray-500 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                >
-                    <svg class="w-5 h-5 hidden dark:block text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                    <svg class="w-5 h-5 block dark:hidden text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"></path></svg>
-                </button>
+                        {{-- Icon --}}
+                        <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
 
-                {{-- User Dropdown --}}
-                <div class="relative" x-data="{ open: false }" @click.outside="open = false">
-                    <button @click="open = !open" class="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 transition-colors">
-                        <span class="text-xs font-medium text-gray-700 dark:text-gray-200 px-2 max-w-[100px] truncate">{{ Auth::user()->name }}</span>
-                        <div class="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                            <svg class="w-3 h-3 text-gray-500 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        {{-- Counter --}}
+                        <div class="flex flex-col items-start leading-none relative z-10">
+                            <span
+                                class="text-[9px] font-bold uppercase text-purple-400 dark:text-purple-500 tracking-widest"
+                                :class="isCompact ? 'hidden' : 'block'">Créditos</span>
+                            <div
+                                class="flex items-baseline gap-0.5 text-purple-700 dark:text-purple-200 font-mono font-bold text-xs">
+                                <span x-text="aiCredits.current">0</span>
+                                <span class="opacity-50 text-[10px]">/</span>
+                                <span class="opacity-50 text-[10px]" x-text="aiCredits.max">100</span>
+                            </div>
+                        </div>
+
+                        {{-- Delta Animation --}}
+                        <div x-show="aiCredits.showDelta" x-transition:enter="transition ease-out duration-300"
+                            x-transition:enter-start="translate-y-full opacity-0"
+                            x-transition:enter-end="translate-y-0 opacity-100"
+                            x-transition:leave="transition ease-in duration-200"
+                            x-transition:leave-start="translate-y-0 opacity-100"
+                            x-transition:leave-end="-translate-y-full opacity-0"
+                            class="absolute inset-0 flex items-center justify-center font-bold font-mono bg-purple-100 dark:bg-purple-900 z-20"
+                            :class="aiCredits.delta > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                            <span x-text="aiCredits.delta > 0 ? '+' + aiCredits.delta : aiCredits.delta"></span>
                         </div>
                     </button>
 
-                    <div x-show="open" 
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 scale-95"
-                         x-transition:enter-end="opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-75"
-                         x-transition:leave-start="opacity-100 scale-100"
-                         x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg ring-1 ring-black/5 py-1 z-50 origin-top-right" style="display: none;">
-                        <x-dropdown-link :href="route('profile.edit')">{{ __('Perfil') }}</x-dropdown-link>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')" 
-                                class="group text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                onclick="event.preventDefault(); this.closest('form').submit();">
-                                
-                                <div class="flex items-center gap-2">
-                                    {{-- Ícone de Logout --}}
-                                    <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                    </svg>
-                                    
-                                    <span>{{ __('Sair') }}</span>
-                                </div>
+                    {{-- THEME TOGGLE --}}
+                    <button @click="toggleTheme()"
+                        class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-gray-800 dark:text-gray-400 dark:hover:text-yellow-400 transition-colors">
+                        {{-- Sun --}}
+                        <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        {{-- Moon --}}
+                        <svg class="w-5 h-5 block dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z">
+                            </path>
+                        </svg>
+                    </button>
 
-                            </x-dropdown-link>
-                        </form>
+                    {{-- USER MENU --}}
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false"
+                        @mouseleave="open = false">
+                        <button @click="open = !open" @mouseenter="open = true"
+                            class="flex items-center gap-1 pl-1 pr-1 lg:gap-2 lg:pl-2 py-1 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 transition-colors">
+                            <div
+                                class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                                {{ substr(Auth::user()->name, 0, 2) }}
+                            </div>
+                            <span
+                                class="text-xs font-medium text-gray-700 dark:text-gray-200 lg:block truncate max-w-[60px] lg:max-w-[100px]"
+                                :class="isCompact ? 'hidden' : 'block'">
+                                {{ Auth::user()->name }}
+                            </span>
+                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+                                :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        {{-- DROPDOWN --}}
+                        <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                            x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-150"
+                            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                            x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                            class="absolute right-0 mt-3 w-56 transform origin-top-right bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl ring-1 ring-black/5 dark:ring-white/10 p-2 overflow-hidden z-50">
+
+                            <div class="px-3 py-2 border-b border-gray-100 dark:border-gray-700 mb-1">
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Logado como</span>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white truncate">
+                                    {{ Auth::user()->name }}
+                                </p>
+                            </div>
+
+                            <a href="{{ route('profile.edit') }}"
+                                class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Editar Perfil
+                            </a>
+
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit"
+                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                    Encerrar Sessão
+                                </button>
+                            </form>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- 3. SPACER INVISÍVEL --}}
-    <div class="hidden sm:block h-24 w-full" aria-hidden="true"></div>
+    {{-- 4. NAVBAR MOBILE (LEGACY - RESTORED) --}}
+    <div
+        class="sm:hidden flex items-center justify-center h-16 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100 dark:border-gray-800 relative">
 
-    {{-- 4. NAVBAR MOBILE (Com Toggle de Tema) --}}
-    {{-- 'relative' permite posicionar o botão absolute na direita --}}
-    <div class="sm:hidden flex items-center justify-center h-16 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100 dark:border-gray-800 relative">
-         
-         {{-- Logo Centralizado --}}
-         <a href="{{ route('dashboard') }}">
+        {{-- Logo Centralizado --}}
+        <a href="{{ route('dashboard') }}">
             <x-application-logo class="block h-8 w-auto fill-current text-blue-600 dark:text-blue-500" />
-         </a>
+        </a>
 
-         {{-- AI CREDITS (MOBILE) --}}
-         <div class="absolute left-4 top-1/2 -translate-y-1/2">
-             <button type="button" 
-                     @click="$dispatch('open-modal', 'ai-credits-info')"
-                     class="relative flex items-center gap-1.5 px-2 py-1 bg-purple-50/80 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30 active:scale-95 transition-transform">
-                 
-                 {{-- Floating Delta Mobile --}}
-                 <div x-show="aiCredits.showDelta" 
-                      {{-- (Mantenha o conteúdo interno do Delta igual) --}}
-                      x-transition:enter="transition ease-out duration-300"
-                      x-transition:enter-start="opacity-0 translate-y-2"
-                      x-transition:enter-end="opacity-100 -translate-y-4"
-                      x-transition:leave="transition ease-in duration-300"
-                      x-transition:leave-start="opacity-100 -translate-y-4"
-                      x-transition:leave-end="opacity-0 -translate-y-8"
-                      class="absolute -top-2 left-0 font-bold text-xs pointer-events-none z-50 whitespace-nowrap"
-                      :class="aiCredits.deltaColor"
-                      x-text="aiCredits.delta">
-                 </div>
+        {{-- AI CREDITS (MOBILE) --}}
+        <div class="absolute left-4 top-1/2 -translate-y-1/2">
+            <button type="button" @click="$dispatch('open-modal', 'ai-credits-info')"
+                class="relative flex items-center gap-1.5 px-2 py-1 bg-purple-50/80 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30 active:scale-95 transition-transform">
 
-                 <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                {{-- Floating Delta Mobile --}}
+                <div x-show="aiCredits.showDelta" x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-2"
+                    x-transition:enter-end="opacity-100 -translate-y-4"
+                    x-transition:leave="transition ease-in duration-300"
+                    x-transition:leave-start="opacity-100 -translate-y-4"
+                    x-transition:leave-end="opacity-0 -translate-y-8"
+                    class="absolute -top-2 left-0 font-bold text-xs pointer-events-none z-50 whitespace-nowrap"
+                    :class="aiCredits.delta > 0 ? 'text-green-500' : 'text-red-500'"
+                    x-text="aiCredits.delta > 0 ? '+' + aiCredits.delta : aiCredits.delta">
+                </div>
+
+                <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24"
+                    stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
                 </svg>
-                 <span class="text-xs font-black text-purple-700 dark:text-purple-300 tabular-nums" x-text="aiCredits.current"></span>
-             </button>
-         </div>
+                <span class="text-xs font-black text-purple-700 dark:text-purple-300 tabular-nums"
+                    x-text="aiCredits.current"></span>
+            </button>
+        </div>
 
-         {{-- Toggle de Tema (Posicionado na direita) --}}
-         <button 
-            type="button" 
-            x-data 
-            @click="
-                if (localStorage.theme === 'dark') {
-                    localStorage.theme = 'light';
-                    document.documentElement.classList.remove('dark');
-                } else {
-                    localStorage.theme = 'dark';
-                    document.documentElement.classList.add('dark');
-                }
-            "
-            class="absolute right-4 p-2 text-gray-500 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        >
+        {{-- Toggle de Tema (Posicionado na direita) --}}
+        <button type="button" @click="toggleTheme()"
+            class="absolute right-4 p-2 text-gray-500 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
             {{-- Ícone Lua (mostra no dark) --}}
             <svg class="w-5 h-5 hidden dark:block text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
             </svg>
             {{-- Ícone Sol (mostra no light) --}}
             <svg class="w-5 h-5 block dark:hidden text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"></path>
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z">
+                </path>
             </svg>
         </button>
     </div>
-</nav>
 
-{{-- MENU INFERIOR MOBILE --}}
-<div class="fixed bottom-0 left-0 z-50 w-full h-16 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg sm:hidden pb-safe">
-    <div class="grid h-full max-w-lg grid-cols-5 mx-auto font-medium">
-        <a href="{{ route('dashboard') }}" class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
-            <svg class="w-6 h-6 mb-1 {{ request()->routeIs('dashboard') ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400' }}" fill="{{ request()->routeIs('dashboard') ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-            <span class="text-[9px] {{ request()->routeIs('dashboard') ? 'text-blue-600 dark:text-blue-500 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Início</span>
-        </a>
-        <a id="tour-grade-mobile" href="{{ route('grade.geral') }}" class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
-            <svg class="w-6 h-6 mb-1 {{ request()->routeIs('grade.*') ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0" /></svg>
-            <span class="text-[9px] {{ request()->routeIs('grade.*') ? 'text-blue-600 dark:text-blue-500 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Grade</span>
-        </a>
-        <div class="flex items-center justify-center relative">
-            <a id="tour-add-mobile" href="{{ route('disciplinas.criar') }}" class="absolute -top-5 inline-flex items-center justify-center w-12 h-12 font-medium bg-blue-600 rounded-full hover:bg-blue-700 shadow-lg shadow-blue-500/40 transform active:scale-95 transition-all border-4 border-white dark:border-gray-900">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+    {{-- MENU INFERIOR MOBILE (LEGACY - RESTORED) --}}
+    <div
+        class="fixed bottom-0 left-0 z-50 w-full h-16 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg sm:hidden pb-safe">
+        <div class="grid h-full max-w-lg grid-cols-5 mx-auto font-medium">
+            <a href="{{ route('dashboard') }}"
+                class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
+                <svg class="w-6 h-6 mb-1 {{ request()->routeIs('dashboard') ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400' }}"
+                    fill="{{ request()->routeIs('dashboard') ? 'currentColor' : 'none' }}" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span
+                    class="text-[9px] {{ request()->routeIs('dashboard') ? 'text-blue-600 dark:text-blue-500 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Início</span>
+            </a>
+            <a id="tour-grade-mobile" href="{{ route('grade.geral') }}"
+                class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
+                <svg class="w-6 h-6 mb-1 {{ request()->routeIs('grade.*') ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400' }}"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0" />
+                </svg>
+                <span
+                    class="text-[9px] {{ request()->routeIs('grade.*') ? 'text-blue-600 dark:text-blue-500 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Grade</span>
+            </a>
+            <div class="flex items-center justify-center relative">
+                <a id="tour-add-mobile" href="{{ route('disciplinas.criar') }}"
+                    class="absolute -top-5 inline-flex items-center justify-center w-12 h-12 font-medium bg-blue-600 rounded-full hover:bg-blue-700 shadow-lg shadow-blue-500/40 transform active:scale-95 transition-all border-4 border-white dark:border-gray-900">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </a>
+            </div>
+            <a href="{{ route('frequencia.historico') }}"
+                class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
+                <svg class="w-6 h-6 mb-1 {{ request()->routeIs('frequencia.historico') ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400' }}"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                <span
+                    class="text-[9px] {{ request()->routeIs('frequencia.historico') ? 'text-blue-600 dark:text-blue-500 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Histórico</span>
+            </a>
+            <a id="tour-profile-mobile" href="{{ route('profile.edit') }}"
+                class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
+                <svg class="w-6 h-6 mb-1 {{ request()->routeIs('profile.*') ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400' }}"
+                    fill="{{ request()->routeIs('profile.*') ? 'currentColor' : 'none' }}" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span
+                    class="text-[9px] {{ request()->routeIs('profile.*') ? 'text-blue-600 dark:text-blue-500 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Perfil</span>
             </a>
         </div>
-        <a href="{{ route('frequencia.historico') }}" class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
-            <svg class="w-6 h-6 mb-1 {{ request()->routeIs('frequencia.historico') ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
-            <span class="text-[9px] {{ request()->routeIs('frequencia.historico') ? 'text-blue-600 dark:text-blue-500 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Histórico</span>
-        </a>
-        <a id="tour-profile-mobile" href="{{ route('profile.edit') }}" class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
-            <svg class="w-6 h-6 mb-1 {{ request()->routeIs('profile.*') ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400' }}" fill="{{ request()->routeIs('profile.*') ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-            <span class="text-[9px] {{ request()->routeIs('profile.*') ? 'text-blue-600 dark:text-blue-500 font-bold' : 'text-gray-500 dark:text-gray-400' }}">Perfil</span>
-        </a>
     </div>
-</div>
 
+</nav>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('navbar', () => ({
+            scrolled: false,
+            isDark: localStorage.theme === 'dark',
+            isCompact: false,
+            forceShow: false,
+            hoverTimer: null,
+
+            showNavbar() {
+                clearTimeout(this.hoverTimer);
+                this.forceShow = true;
+            },
+
+            hideNavbar() {
+                this.hoverTimer = setTimeout(() => {
+                    this.forceShow = false;
+                }, 200);
+            },
+
+            aiCredits: {
+                current: {{ Auth::user()->ai_credits }},
+                max: {{ Auth::user()->getMonthlyMaxCredits() }},
+                delta: 0,
+                showDelta: false,
+                init() {
+                    window.addEventListener('ai-credits:update', (e) => this.handleUpdate(e.detail));
+                    // Check responsive state
+                    const resizeObserver = new ResizeObserver(entries => {
+                        this.isCompact = window.innerWidth < 1100; // Trigger compact mode earlier for zoom safety
+                    });
+                    resizeObserver.observe(document.body);
+                },
+                handleUpdate(detail) {
+                    const diff = detail.credits - this.current;
+                    if (diff === 0) return;
+                    this.delta = diff;
+                    this.current = detail.credits;
+                    this.max = detail.max || this.max;
+                    this.showDelta = true;
+                    setTimeout(() => this.showDelta = false, 2000);
+                }
+            },
+
+            init() {
+                this.aiCredits.init();
+                window.addEventListener('scroll', () => {
+                    this.scrolled = window.scrollY > 20;
+                }, { passive: true });
+
+                // Set initial dark state properly
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                    this.isDark = true;
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    this.isDark = false;
+                }
+            },
+
+            toggleTheme() {
+                this.isDark = !this.isDark;
+                if (this.isDark) {
+                    localStorage.theme = 'dark';
+                    document.documentElement.classList.add('dark');
+                } else {
+                    localStorage.theme = 'light';
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+        }));
+    });
+</script>
 {{-- MODAL DE INFORMAÇÕES DOS CRÉDITOS (GLOBAL) --}}
 <x-modal name="ai-credits-info" focusable>
     <div class="p-6 bg-white dark:bg-gray-800">
@@ -361,7 +407,8 @@
             </table>
         </div>
 
-        <div class="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/30">
+        <div
+            class="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/30">
             <span class="text-sm font-medium text-purple-800 dark:text-purple-200">
                 {{ __('Limite Mensal') }}
             </span>
