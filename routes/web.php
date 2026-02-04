@@ -26,9 +26,9 @@ use Spatie\Sitemap\Tags\Url;
 // 🌍 ROTAS PÚBLICAS
 // ======================================================
 
-Route::get('/', fn () => view('welcome'));
+Route::get('/', fn() => view('welcome'));
 
-Route::get('/offline', fn () => view('offline'));
+Route::get('/offline', fn() => view('offline'));
 
 // Social Login (Firebase)
 Route::post('/auth/social/login', [SocialAuthController::class, 'login'])
@@ -46,8 +46,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // -------------------------
     Route::post('/push/subscribe', function (Request $request) {
         $request->validate([
-            'endpoint'    => 'required',
-            'keys.auth'   => 'required',
+            'endpoint' => 'required',
+            'keys.auth' => 'required',
             'keys.p256dh' => 'required',
         ]);
 
@@ -81,6 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // 📚 DISCIPLINAS
     // -------------------------
     Route::get('/disciplinas', [DisciplinaController::class, 'index'])->name('disciplinas');
+    Route::get('/api/disciplinas/list', [DisciplinaController::class, 'jsonList'])->name('disciplinas.list');
     Route::get('/disciplinas/criar', [DisciplinaController::class, 'criar'])->name('disciplinas.criar');
     Route::post('/disciplinas', [DisciplinaController::class, 'store'])->name('disciplinas.store');
     Route::get('/disciplinas/{id}/editar', [DisciplinaController::class, 'edit'])->name('disciplinas.edit');
@@ -91,13 +92,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // 🗓️ GRADE HORÁRIA (REFATORADO PARA AJAX)
     // -------------------------
     Route::get('/grade', [GradeHorariaController::class, 'geral'])->name('grade.geral');
-    
+
     // Lista os horários de uma disciplina específica (Tela Principal com o Modal)
     Route::get('/disciplinas/{id}/horarios', [GradeHorariaController::class, 'index'])->name('grade.index');
-    
+
     // Salvar novo horário (Agora rota genérica, pois o ID da disciplina vem no JSON)
     Route::post('/grade', [GradeHorariaController::class, 'store'])->name('grade.store');
-    
+
     // Atualizar e Deletar (AJAX)
     Route::put('/grade/{id}', [GradeHorariaController::class, 'update'])->name('grade.update');
     Route::delete('/grade/{id}', [GradeHorariaController::class, 'destroy'])->name('grade.destroy');
@@ -142,6 +143,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('throttle:5,1')
         ->get('/api/ai/analisar/{disciplina}', [AiAdvisorController::class, 'analisarRisco'])
         ->name('ai.analisar');
+
+    Route::get('/api/ai-advisor/history', [AiAdvisorController::class, 'history'])
+        ->name('ai.history');
 
     Route::middleware('throttle:10,1')
         ->get('/ai-advisor/day-check', [AiAdvisorController::class, 'dayCheck'])

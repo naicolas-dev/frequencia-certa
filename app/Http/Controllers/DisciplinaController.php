@@ -14,27 +14,27 @@ class DisciplinaController extends Controller
         $disciplinas = Auth::user()->disciplinas()
             ->with(['horarios', 'frequencias'])
             ->get();
-            
+
         // 2. Prepara as variáveis que a Dashboard exige
         $todasDisciplinas = $disciplinas;
-        $disciplinasFiltradas = $disciplinas; 
-        
+        $disciplinasFiltradas = $disciplinas;
+
         // 3. Cálculos básicos
         $materiasEmRisco = $disciplinas->filter(function ($d) {
             // Só conta como risco se tiver aulas registradas e frequência baixa
-            return $d->frequencias->count() > 0 && $d->taxa_presenca < 75; 
+            return $d->frequencias->count() > 0 && $d->taxa_presenca < 75;
         })->count();
 
         // Cálculo da média global
         $somaPresencas = 0;
         $totalAulas = 0;
-        foreach($disciplinas as $d) {
+        foreach ($disciplinas as $d) {
             $totalAulas += $d->frequencias->count();
             $somaPresencas += $d->frequencias->where('presente', true)->count();
         }
         $porcentagemGlobal = $totalAulas > 0 ? round(($somaPresencas / $totalAulas) * 100) : 0; // Inicia em 0 se vazio
-        
-        $corGlobal = match(true) {
+
+        $corGlobal = match (true) {
             $porcentagemGlobal < 75 => 'text-red-500',
             $porcentagemGlobal < 85 => 'text-yellow-500',
             default => 'text-emerald-500',
@@ -46,14 +46,27 @@ class DisciplinaController extends Controller
 
         // 4. Retorna a view com TUDO que ela precisa
         return view('dashboard', compact(
-            'disciplinas', 
-            'todasDisciplinas', 
-            'disciplinasFiltradas', 
-            'materiasEmRisco', 
-            'porcentagemGlobal', 
+            'disciplinas',
+            'todasDisciplinas',
+            'disciplinasFiltradas',
+            'materiasEmRisco',
+            'porcentagemGlobal',
             'corGlobal',
             'estadoVazio'
         ));
+    }
+
+    /**
+     * Retorna lista simples de disciplinas para a API (Selects/AI)
+     */
+    public function jsonList()
+    {
+        $disciplinas = Auth::user()->disciplinas()
+            ->orderBy('nome')
+            ->select('id', 'nome')
+            ->get();
+
+        return response()->json($disciplinas);
     }
 
     public function criar()
@@ -77,7 +90,7 @@ class DisciplinaController extends Controller
         }
 
         $inicio = $request->data_inicio ?? Auth::user()->ano_letivo_inicio;
-        $fim    = $request->data_fim    ?? Auth::user()->ano_letivo_fim;
+        $fim = $request->data_fim ?? Auth::user()->ano_letivo_fim;
 
         // 1. CAPTURAMOS A DISCIPLINA EM UMA VARIÁVEL ($disciplina)
         $disciplina = Auth::user()->disciplinas()->create([
@@ -85,7 +98,7 @@ class DisciplinaController extends Controller
             'cor' => $cor, // Usa a cor tratada (que pode ser a gerada aleatoriamente)
             'data_inicio' => $inicio,
             'data_fim' => $fim,
-            'carga_horaria_total' => 0, 
+            'carga_horaria_total' => 0,
             'porcentagem_minima' => 75,
         ]);
 
@@ -94,7 +107,7 @@ class DisciplinaController extends Controller
         }
 
         // 2. ALTERADO: Redireciona para a rota de editar grade passando o ID
-        return redirect()->route('grade.index', $disciplina->id)->with('toast',[
+        return redirect()->route('grade.index', $disciplina->id)->with('toast', [
             'type' => 'success',
             'message' => 'Disciplina criada! Agora adicione os horários.'
         ]);
@@ -135,7 +148,7 @@ class DisciplinaController extends Controller
             return response()->json(['message' => 'Disciplina atualizada com sucesso!'], 200);
         }
 
-        return redirect()->route('dashboard')->with('toast',[
+        return redirect()->route('dashboard')->with('toast', [
             'type' => 'success',
             'message' => 'Disciplina atualizada com sucesso!'
         ]);
@@ -158,7 +171,7 @@ class DisciplinaController extends Controller
             return response()->json(['message' => 'Disciplina removida com sucesso!'], 200);
         }
 
-        return redirect()->route('dashboard')->with('toast',[
+        return redirect()->route('dashboard')->with('toast', [
             'type' => 'success',
             'message' => 'Disciplina removida com sucesso!'
         ]);

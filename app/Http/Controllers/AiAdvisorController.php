@@ -11,6 +11,7 @@ use App\Models\Disciplina;
 use App\Services\DisciplinaStatsService;
 use App\Helpers\AiCacheHelper;
 use App\Helpers\AiCredits;
+use App\Models\AiChatMessage;
 use Carbon\Carbon;
 
 
@@ -27,15 +28,15 @@ class AiAdvisorController extends Controller
         $targetDate = Carbon::parse($date, config('app.timezone'));
         $endOfDay = $targetDate->copy()->endOfDay();
         $now = Carbon::now(config('app.timezone'));
-        
+
         // If the date is in the past, cache for 24 hours (already immutable)
         if ($targetDate->isPast() && !$targetDate->isToday()) {
             return 86400; // 24 hours
         }
-        
+
         // For today or future, cache until end of that day
         $diff = $now->diffInSeconds($endOfDay, false);
-        
+
         // Ensure minimum 60 seconds TTL
         return max(60, $diff);
     }
@@ -54,7 +55,7 @@ class AiAdvisorController extends Controller
     public function dayCheck(Request $request)
     {
         $request->validate([
-            'date' => 'nullable|date|after_or_equal:'. now()->startOfYear()->format('Y-m-d')
+            'date' => 'nullable|date|after_or_equal:' . now()->startOfYear()->format('Y-m-d')
         ]);
 
         $user = Auth::user();
@@ -64,7 +65,7 @@ class AiAdvisorController extends Controller
 
         // 📦 1. CHECK CACHE FIRST
         $cacheKey = AiCacheHelper::dayCheckKey($user->id, $date);
-        
+
         if (Cache::has($cacheKey)) {
             $cached = Cache::get($cacheKey);
             $cached['cached'] = true;
@@ -75,7 +76,7 @@ class AiAdvisorController extends Controller
 
         // 💰 2. CREDIT CHECK (Cache miss - will call LLM)
         $user->ensureMonthlyCreditsFresh();
-        
+
         if (!$user->hasEnoughCredits(AiCredits::COST_DAY_CHECK)) {
             return response()->json([
                 'message' => 'Your wisdom credits are exhausted for this month.',
@@ -89,22 +90,22 @@ class AiAdvisorController extends Controller
         // 🐎 2. BUILD DAY CONTEXT (No N+1 Queries)
         // Fetch all disciplines that have classes on this day of week
         $disciplinas = Disciplina::where('user_id', $user->id)
-            ->whereHas('horarios', function($q) use ($dayOfWeekIso) {
+            ->whereHas('horarios', function ($q) use ($dayOfWeekIso) {
                 $q->where('dia_semana', $dayOfWeekIso);
             })
-            ->where(function($q) use ($date) {
+            ->where(function ($q) use ($date) {
                 // Only include if within semester dates
                 $q->whereNull('data_inicio')
                     ->orWhere('data_inicio', '<=', $date);
             })
-            ->where(function($q) use ($date) {
+            ->where(function ($q) use ($date) {
                 $q->whereNull('data_fim')
                     ->orWhere('data_fim', '>=', $date);
             })
             ->with(['horarios']) // ✅ FIX: Load ALL horarios (not filtered by day) for StatsService
             ->withCount([
                 'frequencias as total_aulas_realizadas',
-                'frequencias as total_faltas' => function($q) {
+                'frequencias as total_faltas' => function ($q) {
                     $q->where('presente', false);
                 }
             ])
@@ -122,11 +123,11 @@ class AiAdvisorController extends Controller
                 'cost_applied' => 0,
                 'user_credits' => $user->ai_credits,
             ];
-            
+
             // Cache this "no classes" response
             $ttl = $this->cacheTtlUntilEndOfDay($date);
             Cache::put($cacheKey, $response, $ttl);
-            
+
             $response['cached'] = false;
             return response()->json($response);
         }
@@ -145,13 +146,13 @@ class AiAdvisorController extends Controller
             $total_aulas_realizadas = $disciplina->total_aulas_realizadas ?? 0;
             $total_faltas = $disciplina->total_faltas ?? 0;
             $total_previsto = $disciplina->getAttribute('total_aulas_previstas_cache') ?? 0;
-            
+
             // ✅ P0-2 FIX: Skip disciplines with no projected classes (avoid false CRITICAL)
             if ($total_previsto === 0) {
                 \Log::info("Discipline {$disciplina->nome} skipped - no projected classes");
                 continue; // Skip disciplines without date range or schedule
             }
-            
+
             $limite_faltas = floor($total_previsto * 0.25);
             $restantes = max(0, $limite_faltas - $total_faltas);
 
@@ -199,10 +200,10 @@ class AiAdvisorController extends Controller
         // 🤖 5. CALL LLM (Gemini)
         try {
             $aiResponse = $this->callGeminiForDayAdvice($dayContext, $dateCarbon, $overallRisk);
-            
+
             // ✅ SUCCESS: Deduct credits and build response
             $user->deductCredits(AiCredits::COST_DAY_CHECK);
-            
+
             $response = [
                 'message' => $aiResponse['message'] ?? 'Consulte seus dados e decida com sabedoria.',
                 'risk' => $aiResponse['risk'] ?? $overallRisk,
@@ -212,18 +213,39 @@ class AiAdvisorController extends Controller
                 'cost_applied' => AiCredits::COST_DAY_CHECK,
                 'user_credits' => $user->ai_credits, // After deduction
             ];
-            
+
             // 📦 Cache the successful response
             $ttl = $this->cacheTtlUntilEndOfDay($date);
             Cache::put($cacheKey, $response, $ttl);
-            
+
+            // 💾 SAVE HISTORY
+            // User Message
+            AiChatMessage::create([
+                'user_id' => $user->id,
+                'role' => 'user',
+                'content' => "Analise o meu dia {$dateCarbon->format('d/m')}. Posso faltar?",
+                'meta' => ['type' => 'day_check', 'date' => $date]
+            ]);
+
+            // AI Message
+            AiChatMessage::create([
+                'user_id' => $user->id,
+                'role' => 'ai',
+                'content' => $response['message'],
+                'meta' => [
+                    'risk' => $response['risk'],
+                    'subjects' => $dayContext,
+                    'cost' => AiCredits::COST_DAY_CHECK
+                ]
+            ]);
+
         } catch (\Exception $e) {
             Log::error('AI Day Check failed', ['error' => $e->getMessage()]);
-            
+
             // ❌ FAILURE: Do NOT deduct credits, do NOT cache
             $response = [
-                'message' => 'O oráculo está temporariamente indisponível. Baseie-se nos dados: ' . 
-                             ($criticalCount > 0 ? 'Você tem matérias CRÍTICAS hoje. Recomendo ir!' : 'Avalie os números com cuidado.'),
+                'message' => 'O oráculo está temporariamente indisponível. Baseie-se nos dados: ' .
+                    ($criticalCount > 0 ? 'Você tem matérias CRÍTICAS hoje. Recomendo ir!' : 'Avalie os números com cuidado.'),
                 'risk' => $overallRisk,
                 'date' => $date,
                 'subjects' => $dayContext,
@@ -232,7 +254,7 @@ class AiAdvisorController extends Controller
                 'user_credits' => $user->ai_credits, // No deduction
             ];
         }
-        
+
         $response['cached'] = false;
         return response()->json($response);
     }
@@ -296,12 +318,12 @@ RETORNE APENAS JSON:
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])->timeout(20)->post($url, [
-            'contents' => [['parts' => [['text' => $prompt]]]],
-            'generationConfig' => [
-                'response_mime_type' => 'application/json',
-                'temperature' => 0.8
-            ]
-        ]);
+                    'contents' => [['parts' => [['text' => $prompt]]]],
+                    'generationConfig' => [
+                        'response_mime_type' => 'application/json',
+                        'temperature' => 0.8
+                    ]
+                ]);
 
         if ($response->failed()) {
             throw new \Exception('Gemini API request failed: ' . $response->body());
@@ -336,7 +358,7 @@ RETORNE APENAS JSON:
 
         // 📦 CHECK CACHE FIRST
         $cacheKey = AiCacheHelper::subjectAnalysisKey($user->id, $disciplina->id, $date);
-        
+
         if (Cache::has($cacheKey)) {
             $cached = Cache::get($cacheKey);
             $cached['cached'] = true;
@@ -347,7 +369,7 @@ RETORNE APENAS JSON:
 
         // 💰 CREDIT CHECK (Cache miss - will call LLM)
         $user->ensureMonthlyCreditsFresh();
-        
+
         if (!$user->hasEnoughCredits(AiCredits::COST_SUBJECT_ANALYSIS)) {
             return response()->json([
                 'message' => 'Your wisdom credits are exhausted for this month.',
@@ -388,7 +410,7 @@ RETORNE APENAS JSON:
         $mes = now()->month;
 
         // Define a fase do ano para a IA entender a gravidade
-        $contextoTemporal = match(true) {
+        $contextoTemporal = match (true) {
             $mes <= 3 => "INÍCIO do ano letivo. (Faltar agora é perigoso pois queima margem cedo)",
             $mes <= 6 => "MEIO do 1º semestre.",
             $mes == 7 => "FÉRIAS de meio de ano chegando.",
@@ -450,12 +472,12 @@ RETORNE APENAS JSON:
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
             ])->timeout(20)->post($url, [
-                'contents' => [['parts' => [['text' => $prompt]]]],
-                'generationConfig' => [
-                    'response_mime_type' => 'application/json',
-                    'temperature' => 1.0
-                ]
-            ]);
+                        'contents' => [['parts' => [['text' => $prompt]]]],
+                        'generationConfig' => [
+                            'response_mime_type' => 'application/json',
+                            'temperature' => 1.0
+                        ]
+                    ]);
 
             if ($response->failed()) {
                 Log::error('Erro API Google: ' . $response->body());
@@ -482,7 +504,7 @@ RETORNE APENAS JSON:
 
             // ✅ SUCCESS: Deduct credits and cache response
             $user->deductCredits(AiCredits::COST_SUBJECT_ANALYSIS);
-            
+
             // Add credit info to response
             $dados['cost_applied'] = AiCredits::COST_SUBJECT_ANALYSIS;
             $dados['user_credits'] = $user->ai_credits;
@@ -491,6 +513,27 @@ RETORNE APENAS JSON:
             // Cache for end of day
             $ttl = $this->cacheTtlUntilEndOfDay($date);
             Cache::put($cacheKey, $dados, $ttl);
+
+            // 💾 SAVE HISTORY
+            // User Message
+            AiChatMessage::create([
+                'user_id' => $user->id,
+                'role' => 'user',
+                'content' => "Analise minha situação em {$disciplina->nome}. Posso faltar?",
+                'meta' => ['type' => 'subject_analysis', 'subject_id' => $disciplina->id]
+            ]);
+
+            // AI Message
+            AiChatMessage::create([
+                'user_id' => $user->id,
+                'role' => 'ai',
+                'content' => $dados['analise'],
+                'meta' => [
+                    'risk' => $dados['risco'],
+                    'emoji' => $dados['emoji'],
+                    'cost' => AiCredits::COST_SUBJECT_ANALYSIS
+                ]
+            ]);
 
             return response()->json($dados);
 
@@ -514,5 +557,19 @@ RETORNE APENAS JSON:
             'user_credits' => $user->ai_credits,
             'cached' => false,
         ]);
+    }
+
+    /**
+     * GET /api/ai-advisor/history
+     * Returns the chat history for the authenticated user.
+     */
+    public function history(Request $request)
+    {
+        $messages = AiChatMessage::where('user_id', Auth::id())
+            ->orderBy('created_at', 'asc') // Oldest first for chat UI
+            ->limit(50) // Limit to last 50 interactions
+            ->get();
+
+        return response()->json($messages);
     }
 }

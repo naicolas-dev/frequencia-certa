@@ -13,7 +13,7 @@
     <link rel="manifest" href="{{ asset('manifest.json') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800" rel="stylesheet" />
-    
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
 
@@ -32,7 +32,9 @@
 </head>
 
 {{-- Aplicando as cores exatas da Landing Page e a fonte Instrument Sans --}}
-<body class="font-['Instrument_Sans'] antialiased bg-[#F8FAFC] dark:bg-[#0F172A] text-gray-900 dark:text-gray-100 selection:bg-[#06B6D4] selection:text-white transition-colors duration-300">
+
+<body
+    class="font-['Instrument_Sans'] antialiased bg-[#F8FAFC] dark:bg-[#0F172A] text-gray-900 dark:text-gray-100 selection:bg-[#06B6D4] selection:text-white transition-colors duration-300">
 
     <x-loading />
 
@@ -40,11 +42,12 @@
         @include('layouts.navigation')
 
         @isset($header)
-        <header class="bg-white/80 dark:bg-[#0F172A]/90 backdrop-blur-md shadow-sm border-b border-gray-200/50 dark:border-white/5 sticky top-0 z-20">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                {{ $header }}
-            </div>
-        </header>
+            <header
+                class="bg-white/80 dark:bg-[#0F172A]/90 backdrop-blur-md shadow-sm border-b border-gray-200/50 dark:border-white/5 sticky top-0 z-20">
+                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    {{ $header }}
+                </div>
+            </header>
         @endisset
 
         <main class="flex-1 w-full">
@@ -54,41 +57,41 @@
 
     {{-- GLOBAL TOAST --}}
     @if(session('toast'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const toast = @json(session('toast'));
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const toast = @json(session('toast'));
 
-            switch (toast.type) {
-                case 'success':
-                    toastSuccess(toast.message);
-                    break;
-                case 'error':
-                    toastError(toast.message);
-                    break;
-                case 'warning':
-                    toastWarning(toast.message);
-                    break;
-                default:
-                    toastInfo(toast.message);
-            }
-        });
-    </script>
+                switch (toast.type) {
+                    case 'success':
+                        toastSuccess(toast.message);
+                        break;
+                    case 'error':
+                        toastError(toast.message);
+                        break;
+                    case 'warning':
+                        toastWarning(toast.message);
+                        break;
+                    default:
+                        toastInfo(toast.message);
+                }
+            });
+        </script>
     @endif
 
     {{-- SWEETALERT --}}
     @if(session('swal'))
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const swal = @json(session('swal'));
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const swal = @json(session('swal'));
 
-            swalTailwind.fire({
-                icon: swal.icon ?? 'info',
-                title: swal.title ?? '',
-                text: swal.text ?? '',
-                confirmButtonText: 'Entendi'
+                swalTailwind.fire({
+                    icon: swal.icon ?? 'info',
+                    title: swal.title ?? '',
+                    text: swal.text ?? '',
+                    confirmButtonText: 'Entendi'
+                });
             });
-        });
-    </script>
+        </script>
     @endif
 
     {{-- PWA --}}
@@ -105,6 +108,7 @@
             });
         }
     </script>
+    <x-ai-sidebar />
     <x-cookie-banner />
 </body>
 
