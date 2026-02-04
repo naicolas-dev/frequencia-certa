@@ -23,21 +23,21 @@
                 {{-- 1. POP-UP DA OFENSIVA (FOGO) --}}
                 @if($streak == 1 && $marcouHoje)
                     <div x-data="{ 
-                                                                        show: false,
-                                                                        init() {
-                                                                            const key = 'fire_shown_{{ $dateString }}';
-                                                                            if (!localStorage.getItem(key)) {
-                                                                                // Pequeno delay inicial para não brigar com outros elementos
-                                                                                setTimeout(() => {
-                                                                                    this.show = true;
-                                                                                    setTimeout(() => {
-                                                                                        this.show = false;
-                                                                                        localStorage.setItem(key, 'true');
-                                                                                    }, 1500);
-                                                                                }, 500);
-                                                                            }
-                                                                        }
-                                                                     }" x-show="show"
+                                                                                    show: false,
+                                                                                    init() {
+                                                                                        const key = 'fire_shown_{{ $dateString }}';
+                                                                                        if (!localStorage.getItem(key)) {
+                                                                                            // Pequeno delay inicial para não brigar com outros elementos
+                                                                                            setTimeout(() => {
+                                                                                                this.show = true;
+                                                                                                setTimeout(() => {
+                                                                                                    this.show = false;
+                                                                                                    localStorage.setItem(key, 'true');
+                                                                                                }, 1500);
+                                                                                            }, 500);
+                                                                                        }
+                                                                                    }
+                                                                                 }" x-show="show"
                         x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-50"
                         x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-500"
                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-110"
@@ -68,27 +68,27 @@
                 {{-- 2. POP-UP DE MEDALHAS (LOOP COM DELAY) --}}
                 @foreach($medalhasHoje as $index => $badge)
                     <div x-data="{ 
-                                                                    show: false,
-                                                                    init() {
-                                                                        const key = 'badge_shown_{{ $badge->id }}_{{ $dateString }}';
+                                                                                show: false,
+                                                                                init() {
+                                                                                    const key = 'badge_shown_{{ $badge->id }}_{{ $dateString }}';
 
-                                                                        // Se ainda não mostrou hoje
-                                                                        if (!localStorage.getItem(key)) {
-                                                                            // Calcula o delay baseado na ordem (index).
-                                                                            // Se tiver a animação do FOGO (streak == 1), soma +2000ms para não encavalar.
-                                                                            let baseDelay = {{ ($streak == 1 && $marcouHoje) ? 2500 : 500 }};
-                                                                            let myDelay = baseDelay + ({{ $index }} * 2000); 
+                                                                                    // Se ainda não mostrou hoje
+                                                                                    if (!localStorage.getItem(key)) {
+                                                                                        // Calcula o delay baseado na ordem (index).
+                                                                                        // Se tiver a animação do FOGO (streak == 1), soma +2000ms para não encavalar.
+                                                                                        let baseDelay = {{ ($streak == 1 && $marcouHoje) ? 2500 : 500 }};
+                                                                                        let myDelay = baseDelay + ({{ $index }} * 2000); 
 
-                                                                            setTimeout(() => {
-                                                                                this.show = true;
-                                                                                setTimeout(() => {
-                                                                                    this.show = false;
-                                                                                    localStorage.setItem(key, 'true');
-                                                                                }, 1500); // Duração de 1.5s
-                                                                            }, myDelay);
-                                                                        }
-                                                                    }
-                                                                 }" x-show="show"
+                                                                                        setTimeout(() => {
+                                                                                            this.show = true;
+                                                                                            setTimeout(() => {
+                                                                                                this.show = false;
+                                                                                                localStorage.setItem(key, 'true');
+                                                                                            }, 1500); // Duração de 1.5s
+                                                                                        }, myDelay);
+                                                                                    }
+                                                                                }
+                                                                             }" x-show="show"
                         x-transition:enter="transition ease-out duration-500"
                         x-transition:enter-start="opacity-0 scale-50 rotate-180"
                         x-transition:enter-end="opacity-100 scale-100 rotate-0"
@@ -160,7 +160,7 @@
                         @endphp
 
                         <div
-                            class="relative overflow-hidden rounded-3xl p-4 group flex items-center justify-between h-24 sm:h-28 transition-all duration-300 hover:scale-[1.01] {{ $cardClasses }}">
+                            class="relative overflow-hidden rounded-3xl p-4 group flex items-center justify-between min-h-[6rem] sm:min-h-[7rem] transition-all duration-300 hover:scale-[1.01] {{ $cardClasses }}">
                             <div
                                 class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/20 blur-2xl transition-opacity duration-500 {{ $fireOpacity }}">
                             </div>
@@ -202,7 +202,7 @@
 
                         {{-- Card Medalhas --}}
                         <div x-data @click="$dispatch('open-modal', 'badges-gallery')"
-                            class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 p-4 shadow-sm flex flex-col justify-center h-24 sm:h-28 transition-transform hover:scale-[1.01] cursor-pointer group hover:bg-white/80 dark:hover:bg-gray-800/80 overflow-hidden relative">
+                            class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 p-4 shadow-sm flex flex-col justify-center min-h-[6rem] sm:min-h-[7rem] transition-transform hover:scale-[1.01] cursor-pointer group hover:bg-white/80 dark:hover:bg-gray-800/80 overflow-hidden relative">
 
                             <div class="flex items-center justify-between mb-2">
                                 <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Conquistas</p>
@@ -669,45 +669,45 @@
                             @else
                                 {{-- ESTADO ATIVO (Com Animação Inteligente e Bidirecional) --}}
                                 <div class="flex items-baseline gap-1" x-data="{ 
-                                                                                    current: window.lastPercentage ?? 0, 
-                                                                                    target: {{ $porcentagemGlobal }} 
-                                                                                 }" x-init="
-                                                                                     // Delay para garantir que o DOM renderizou
-                                                                                     setTimeout(() => {
-                                                                                         const duration = 1500; 
-                                                                                         const startValue = current;
-                                                                                         const endValue = target;
-                                                                                         const change = endValue - startValue; // Calcula a diferença (pode ser negativa)
-                                                                                         let start = null;
+                                                                                                current: window.lastPercentage ?? 0, 
+                                                                                                target: {{ $porcentagemGlobal }} 
+                                                                                             }" x-init="
+                                                                                                 // Delay para garantir que o DOM renderizou
+                                                                                                 setTimeout(() => {
+                                                                                                     const duration = 1500; 
+                                                                                                     const startValue = current;
+                                                                                                     const endValue = target;
+                                                                                                     const change = endValue - startValue; // Calcula a diferença (pode ser negativa)
+                                                                                                     let start = null;
 
-                                                                                         // Função de Easing (Suave)
-                                                                                         const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4);
+                                                                                                     // Função de Easing (Suave)
+                                                                                                     const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4);
 
-                                                                                         const step = (timestamp) => {
-                                                                                             if (!start) start = timestamp;
-                                                                                             const progress = Math.min((timestamp - start) / duration, 1);
+                                                                                                     const step = (timestamp) => {
+                                                                                                         if (!start) start = timestamp;
+                                                                                                         const progress = Math.min((timestamp - start) / duration, 1);
 
-                                                                                             // A mágica: soma a diferença (positiva ou negativa) ao valor inicial
-                                                                                             current = Math.floor(startValue + (change * easeOutQuart(progress)));
+                                                                                                         // A mágica: soma a diferença (positiva ou negativa) ao valor inicial
+                                                                                                         current = Math.floor(startValue + (change * easeOutQuart(progress)));
 
-                                                                                             if (progress < 1) {
-                                                                                                 window.requestAnimationFrame(step);
-                                                                                             } else {
-                                                                                                 // Garante que termina no número exato
-                                                                                                 current = endValue;
-                                                                                                 // SALVA NA MEMÓRIA GLOBAL para a próxima vez
-                                                                                                 window.lastPercentage = endValue;
-                                                                                             }
-                                                                                         };
+                                                                                                         if (progress < 1) {
+                                                                                                             window.requestAnimationFrame(step);
+                                                                                                         } else {
+                                                                                                             // Garante que termina no número exato
+                                                                                                             current = endValue;
+                                                                                                             // SALVA NA MEMÓRIA GLOBAL para a próxima vez
+                                                                                                             window.lastPercentage = endValue;
+                                                                                                         }
+                                                                                                     };
 
-                                                                                         // Só anima se houver mudança
-                                                                                         if (startValue !== endValue) {
-                                                                                             window.requestAnimationFrame(step);
-                                                                                         } else {
-                                                                                             window.lastPercentage = endValue;
-                                                                                         }
-                                                                                     }, 200);
-                                                                                 ">
+                                                                                                     // Só anima se houver mudança
+                                                                                                     if (startValue !== endValue) {
+                                                                                                         window.requestAnimationFrame(step);
+                                                                                                     } else {
+                                                                                                         window.lastPercentage = endValue;
+                                                                                                     }
+                                                                                                 }, 200);
+                                                                                             ">
                                     <h3 class="text-4xl font-extrabold {{ $corGlobal }}" x-text="current">
                                         {{-- Fallback visual enquanto o Alpine carrega --}}
                                         {{ $porcentagemGlobal }}
@@ -937,17 +937,17 @@
                                             {{-- Barra de Progresso Inteligente --}}
                                             <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden"
                                                 x-data="{ 
-                                                                                            id: {{ $disciplina->id }},
-                                                                                            width: window.memoriaBarras[{{ $disciplina->id }}] ?? '{{ $larguraBarra }}%' 
-                                                                                        }" x-init="
-                                                                                            // Espera um tick para o navegador renderizar o valor inicial
-                                                                                            $nextTick(() => { 
-                                                                                                // Define a nova largura alvo
-                                                                                                width = '{{ $larguraBarra }}%'; 
-                                                                                                // Salva na memória global para o próximo reload
-                                                                                                window.memoriaBarras[id] = width;
-                                                                                            })
-                                                                                        ">
+                                                                                                        id: {{ $disciplina->id }},
+                                                                                                        width: window.memoriaBarras[{{ $disciplina->id }}] ?? '{{ $larguraBarra }}%' 
+                                                                                                    }" x-init="
+                                                                                                        // Espera um tick para o navegador renderizar o valor inicial
+                                                                                                        $nextTick(() => { 
+                                                                                                            // Define a nova largura alvo
+                                                                                                            width = '{{ $larguraBarra }}%'; 
+                                                                                                            // Salva na memória global para o próximo reload
+                                                                                                            window.memoriaBarras[id] = width;
+                                                                                                        })
+                                                                                                    ">
 
                                                 <div class="h-2.5 rounded-full transition-all duration-1000 ease-in-out {{ $corBarra }}"
                                                     :style="'width: ' + width">
@@ -1372,15 +1372,14 @@
                         <x-notification-banner />
 
                         {{-- BUTTON FAB ORACLE (DESKTOP ONLY) --}}
-                        <button
-                            onclick="window.dispatchEvent(new CustomEvent('open-ai-sidebar'))"
-                            class="hidden md:flex fixed bottom-8 right-8 z-[40]
+                        <button onclick="window.dispatchEvent(new CustomEvent('open-ai-sidebar'))" class="hidden md:flex fixed bottom-8 right-8 z-[40]
                                     bg-white dark:bg-[#0B1220] hover:bg-gray-50 dark:hover:bg-gray-800
                                     text-purple-600 dark:text-purple-400 p-2
                                     rounded-full shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1
                                     transition-all duration-300 border border-gray-100 dark:border-gray-700
                                     group items-center gap-1 group-hover:gap-4 group-hover:pr-6">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shrink-0">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-md shrink-0">
                                 ✨
                             </div>
 
