@@ -12,11 +12,21 @@ class RelatorioController extends Controller
     {
         $user = Auth::user();
 
-        // Busca todas as disciplinas com frequências
+        // Busca todas as disciplinas com estatísticas completas
         $disciplinas = $user->disciplinas()
-                            ->with('frequencias')
-                            ->orderBy('nome', 'asc')
-                            ->get();
+            ->with(['horarios', 'frequencias'])
+            ->withCount([
+                'frequencias as total_aulas_realizadas',
+                'frequencias as total_faltas' => function ($q) {
+                    $q->where('presente', false);
+                }
+            ])
+            ->orderBy('nome', 'asc')
+            ->get();
+
+        // Enriquece com estatísticas (calcula total_aulas_previstas)
+        $statsService = app(\App\Services\DisciplinaStatsService::class);
+        $statsService->enrichWithStats($disciplinas, $user);
 
         // Gera o PDF usando uma View
         $pdf = Pdf::loadView('relatorios.baixar', compact('user', 'disciplinas'));
