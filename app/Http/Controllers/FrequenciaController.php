@@ -141,7 +141,7 @@ class FrequenciaController extends Controller
     public function historico(Request $request)
     {
         // Inicia a query focada no utilizador logado
-        $query = \App\Models\Frequencia::where('user_id', Auth::id())
+        $query = Frequencia::where('user_id', Auth::id())
             ->with('disciplina') // Traz a disciplina para não pesar o banco
             ->orderBy('data', 'desc')
             ->orderBy('created_at', 'desc');
