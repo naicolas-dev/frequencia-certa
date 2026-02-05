@@ -15,9 +15,6 @@
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800|inter:400,500,600,700"
         rel="stylesheet" />
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css" />
-    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
-
     <script>
         window.VAPID_PUBLIC_KEY = "{{ config('webpush.vapid.public_key') }}";
     </script>
