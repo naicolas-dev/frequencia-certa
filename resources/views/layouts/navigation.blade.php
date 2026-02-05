@@ -186,7 +186,7 @@
 
     {{-- 4. NAVBAR MOBILE (LEGACY - RESTORED) --}}
     <div
-        class="sm:hidden flex items-center justify-center h-16 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100 dark:border-gray-800 relative">
+        class="sm:hidden pointer-events-auto flex items-center justify-center h-16 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md sticky top-0 z-30 border-b border-gray-100 dark:border-gray-800 relative">
 
         {{-- Logo Centralizado --}}
         <a href="{{ route('dashboard') }}">
@@ -238,7 +238,7 @@
 
     {{-- MENU INFERIOR MOBILE (LEGACY - RESTORED) --}}
     <div
-        class="fixed bottom-0 left-0 z-50 w-full h-16 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg sm:hidden pb-safe">
+        class="fixed bottom-0 left-0 z-50 pointer-events-auto w-full h-16 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 shadow-lg sm:hidden pb-safe">
         <div class="grid h-full max-w-lg grid-cols-5 mx-auto font-medium">
             <a href="{{ route('dashboard') }}"
                 class="inline-flex flex-col items-center justify-center px-2 hover:bg-gray-50 dark:hover:bg-gray-800 group transition-colors">
