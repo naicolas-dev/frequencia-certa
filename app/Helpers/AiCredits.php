@@ -22,12 +22,12 @@ class AiCredits
     /**
      * Cost for Day Check endpoint (Oracle advice for entire day)
      */
-    const COST_DAY_CHECK = 5;
+    const COST_DAY_CHECK = 10;
 
     /**
      * Cost for Subject Analysis endpoint (Oracle advice for single subject)
      */
-    const COST_SUBJECT_ANALYSIS = 10;
+    const COST_SUBJECT_ANALYSIS = 5;
 
     /**
      * Cost for Import Schedule endpoint (OCR or text-based schedule import)
