@@ -34,8 +34,6 @@
 <body
     class="font-['Instrument_Sans'] antialiased bg-[#F8FAFC] dark:bg-[#0F172A] text-gray-900 dark:text-gray-100 selection:bg-[#06B6D4] selection:text-white transition-colors duration-300">
 
-    <x-loading />
-
     <div class="min-h-screen flex flex-col pt-16 sm:pt-24">
         @include('layouts.navigation')
 
