@@ -3,7 +3,7 @@
     </div>
 
     <div class="py-6 sm:py-10 pb-24 md:pb-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
 
             {{-- CABEÇALHO --}}
             <div class="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
@@ -23,23 +23,24 @@
                 {{-- 1. POP-UP DA OFENSIVA (FOGO) --}}
                 @if($streak == 1 && $marcouHoje)
                     <div x-data="{ 
-                                                                                    show: false,
-                                                                                    init() {
-                                                                                        const key = 'fire_shown_{{ $dateString }}';
-                                                                                        if (!localStorage.getItem(key)) {
-                                                                                            // Pequeno delay inicial para não brigar com outros elementos
-                                                                                            setTimeout(() => {
-                                                                                                this.show = true;
-                                                                                                setTimeout(() => {
-                                                                                                    this.show = false;
-                                                                                                    localStorage.setItem(key, 'true');
-                                                                                                }, 1500);
-                                                                                            }, 500);
-                                                                                        }
-                                                                                    }
-                                                                                 }" x-show="show"
-                        x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-50"
-                        x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-500"
+                                                                                                                                                                                                        show: false,
+                                                                                                                                                                                                        init() {
+                                                                                                                                                                                                            const key = 'fire_shown_{{ $dateString }}';
+                                                                                                                                                                                                            if (!localStorage.getItem(key)) {
+                                                                                                                                                                                                                // Pequeno delay inicial para não brigar com outros elementos
+                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                    this.show = true;
+                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                        this.show = false;
+                                                                                                                                                                                                                        localStorage.setItem(key, 'true');
+                                                                                                                                                                                                                    }, 1500);
+                                                                                                                                                                                                                }, 500);
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                        }
+                                                                                                                                                                                                     }"
+                        x-show="show" x-transition:enter="transition ease-out duration-500"
+                        x-transition:enter-start="opacity-0 scale-50" x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-500"
                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-110"
                         class="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none"
                         style="display: none;">
@@ -68,28 +69,28 @@
                 {{-- 2. POP-UP DE MEDALHAS (LOOP COM DELAY) --}}
                 @foreach($medalhasHoje as $index => $badge)
                     <div x-data="{ 
-                                                                                show: false,
-                                                                                init() {
-                                                                                    const key = 'badge_shown_{{ $badge->id }}_{{ $dateString }}';
+                                                                                                                                                                                                    show: false,
+                                                                                                                                                                                                    init() {
+                                                                                                                                                                                                        const key = 'badge_shown_{{ $badge->id }}_{{ $dateString }}';
 
-                                                                                    // Se ainda não mostrou hoje
-                                                                                    if (!localStorage.getItem(key)) {
-                                                                                        // Calcula o delay baseado na ordem (index).
-                                                                                        // Se tiver a animação do FOGO (streak == 1), soma +2000ms para não encavalar.
-                                                                                        let baseDelay = {{ ($streak == 1 && $marcouHoje) ? 2500 : 500 }};
-                                                                                        let myDelay = baseDelay + ({{ $index }} * 2000); 
+                                                                                                                                                                                                        // Se ainda não mostrou hoje
+                                                                                                                                                                                                        if (!localStorage.getItem(key)) {
+                                                                                                                                                                                                            // Calcula o delay baseado na ordem (index).
+                                                                                                                                                                                                            // Se tiver a animação do FOGO (streak == 1), soma +2000ms para não encavalar.
+                                                                                                                                                                                                            let baseDelay = {{ ($streak == 1 && $marcouHoje) ? 2500 : 500 }};
+                                                                                                                                                                                                            let myDelay = baseDelay + ({{ $index }} * 2000); 
 
-                                                                                        setTimeout(() => {
-                                                                                            this.show = true;
-                                                                                            setTimeout(() => {
-                                                                                                this.show = false;
-                                                                                                localStorage.setItem(key, 'true');
-                                                                                            }, 1500); // Duração de 1.5s
-                                                                                        }, myDelay);
-                                                                                    }
-                                                                                }
-                                                                             }" x-show="show"
-                        x-transition:enter="transition ease-out duration-500"
+                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                this.show = true;
+                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                    this.show = false;
+                                                                                                                                                                                                                    localStorage.setItem(key, 'true');
+                                                                                                                                                                                                                }, 1500); // Duração de 1.5s
+                                                                                                                                                                                                            }, myDelay);
+                                                                                                                                                                                                        }
+                                                                                                                                                                                                    }
+                                                                                                                                                                                                 }"
+                        x-show="show" x-transition:enter="transition ease-out duration-500"
                         x-transition:enter-start="opacity-0 scale-50 rotate-180"
                         x-transition:enter-end="opacity-100 scale-100 rotate-0"
                         x-transition:leave="transition ease-in duration-500"
@@ -129,160 +130,50 @@
                     </div>
                 @endforeach
 
-                {{-- 3. CARDS DO PAINEL (Lógica Padrão) --}}
-                @if($streak > 0 || $badgesCount > 0)
-                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                        {{-- Card Ofensiva --}}
-                        @php
-                            if ($streak == 0) {
-                                $cardClasses = "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm opacity-75";
-                                $textClasses = "text-gray-500 dark:text-gray-400";
-                                $numClasses = "text-gray-400 dark:text-gray-500";
-                                $iconColor = "text-gray-300 dark:text-gray-600";
-                                $msg = "Reinicie a chama!";
-                                $fireOpacity = "opacity-0";
-                            } elseif (!$marcouHoje) {
-                                $cardClasses = "bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-transparent shadow-inner";
-                                $textClasses = "text-gray-600 dark:text-gray-200";
-                                $numClasses = "text-gray-800 dark:text-white opacity-90";
-                                $iconColor = "text-gray-400 dark:text-gray-300";
-                                $msg = "Salve a ofensiva!";
-                                $fireOpacity = "opacity-0";
-                            } else {
-                                $cardClasses = "bg-gradient-to-br from-orange-500 to-red-600 shadow-lg shadow-orange-500/20";
-                                $textClasses = "text-orange-100";
-                                $numClasses = "text-white drop-shadow-md";
-                                $iconColor = "text-white";
-                                $msg = "Em chamas!";
-                                $fireOpacity = "opacity-100";
-                            }
-                        @endphp
-
+                {{-- Modal Galeria (Definido globalmente para ser usado pelo card na lateral) --}}
+                <x-modal name="badges-gallery" focusable>
+                    <div class="bg-white dark:bg-gray-900 flex flex-col max-h-[85vh]">
                         <div
-                            class="relative overflow-hidden rounded-3xl p-4 group flex items-center justify-between min-h-[6rem] sm:min-h-[7rem] transition-all duration-300 hover:scale-[1.01] {{ $cardClasses }}">
-                            <div
-                                class="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/20 blur-2xl transition-opacity duration-500 {{ $fireOpacity }}">
+                            class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-10 flex justify-between items-center">
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                    🏆 Sala de Troféus</h2>
+                                <p class="text-xs text-gray-500">{{ $badgesCount }} desbloqueadas</p>
                             </div>
-
-                            <div class="relative z-10 flex flex-col justify-center">
-                                <p class="text-[10px] font-bold uppercase tracking-wider opacity-80 {{ $textClasses }}">
-                                    Ofensiva</p>
-                                <div class="flex items-baseline gap-1">
-                                    <span class="text-4xl font-black {{ $numClasses }}">{{ $streak }}</span>
-                                    <span class="text-sm font-bold opacity-80 {{ $textClasses }}">dias</span>
-                                </div>
-                                <p class="text-[10px] font-medium mt-0.5 opacity-90 truncate {{ $textClasses }}">{{ $msg }}
-                                </p>
-                            </div>
-
-                            <div
-                                class="relative z-10 mr-2 drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 {{ $iconColor }}">
-                                @if($streak > 0 && !$marcouHoje)
-                                    <div class="animate-pulse">
-                                        <svg class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                            stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                        </svg>
+                            <button x-on:click.stop="$dispatch('close-modal', 'badges-gallery')"
+                                class="p-2 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900/50">
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                @foreach(Auth::user()->badges->sortByDesc('pivot.earned_at') as $badge)
+                                    <div
+                                        class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm text-center">
+                                        <div class="text-4xl mb-2 drop-shadow-md">{{ $badge->icon }}</div>
+                                        <h3 class="font-bold text-gray-800 dark:text-white text-xs leading-tight mb-1">
+                                            {{ $badge->name }}
+                                        </h3>
+                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-2 h-7 mb-2">
+                                            {{ $badge->description }}
+                                        </p>
+                                        <span
+                                            class="text-[9px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">{{ \Carbon\Carbon::parse($badge->pivot->earned_at)->format('d/m/y') }}</span>
                                     </div>
-                                @elseif($streak == 0)
-                                    <svg class="w-12 h-12 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                        stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                    </svg>
-                                @else
-                                    <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" />
-                                    </svg>
-                                @endif
+                                @endforeach
                             </div>
                         </div>
-
-                        {{-- Card Medalhas --}}
-                        <div x-data @click="$dispatch('open-modal', 'badges-gallery')"
-                            class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md rounded-3xl border border-white/20 dark:border-gray-800 p-4 shadow-sm flex flex-col justify-center min-h-[6rem] sm:min-h-[7rem] transition-transform hover:scale-[1.01] cursor-pointer group hover:bg-white/80 dark:hover:bg-gray-800/80 overflow-hidden relative">
-
-                            <div class="flex items-center justify-between mb-2">
-                                <p class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Conquistas</p>
-                                <span
-                                    class="bg-gray-100 dark:bg-gray-800 text-[10px] font-bold px-1.5 py-0.5 rounded text-gray-500 group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">
-                                    {{ $badgesCount }}
-                                </span>
-                            </div>
-
-                            <div class="flex gap-2 items-center">
-                                @forelse(Auth::user()->badges->sortByDesc('pivot.earned_at')->take(3) as $badge)
-                                    <div
-                                        class="shrink-0 w-10 h-10 bg-gradient-to-b from-yellow-100 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/10 rounded-xl border border-yellow-200 dark:border-yellow-800/50 flex items-center justify-center text-xl shadow-sm relative group-hover:-translate-y-0.5 transition-transform duration-300">
-                                        {{ $badge->icon }}
-                                    </div>
-                                @empty
-                                    <div class="flex items-center gap-2 text-gray-400 opacity-60">
-                                        <div
-                                            class="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center grayscale">
-                                            🏆</div>
-                                        <span class="text-[10px] font-medium leading-tight">Sem medalhas<br>ainda...</span>
-                                    </div>
-                                @endforelse
-
-                                @if($badgesCount > 3)
-                                    <div
-                                        class="shrink-0 w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-                                        +{{ $badgesCount - 3 }}
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        {{-- Modal Galeria --}}
-                        <x-modal name="badges-gallery" focusable>
-                            <div class="bg-white dark:bg-gray-900 flex flex-col max-h-[85vh]">
-                                <div
-                                    class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-10 flex justify-between items-center">
-                                    <div>
-                                        <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                            🏆 Sala de Troféus</h2>
-                                        <p class="text-xs text-gray-500">{{ $badgesCount }} desbloqueadas</p>
-                                    </div>
-                                    <button x-on:click.stop="$dispatch('close-modal', 'badges-gallery')"
-                                        class="p-2 bg-gray-100 dark:bg-gray-800 rounded-full text-gray-500">
-                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="p-4 overflow-y-auto bg-gray-50 dark:bg-gray-900/50">
-                                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                        @foreach(Auth::user()->badges->sortByDesc('pivot.earned_at') as $badge)
-                                            <div
-                                                class="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm text-center">
-                                                <div class="text-4xl mb-2 drop-shadow-md">{{ $badge->icon }}</div>
-                                                <h3 class="font-bold text-gray-800 dark:text-white text-xs leading-tight mb-1">
-                                                    {{ $badge->name }}
-                                                </h3>
-                                                <p class="text-[10px] text-gray-500 dark:text-gray-400 line-clamp-2 h-7 mb-2">
-                                                    {{ $badge->description }}
-                                                </p>
-                                                <span
-                                                    class="text-[9px] font-bold text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">{{ \Carbon\Carbon::parse($badge->pivot->earned_at)->format('d/m/y') }}</span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        </x-modal>
-
                     </div>
-                @endif
+                </x-modal>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
 
                 {{-- CARD DO DIÁRIO DE CLASSE --}}
                 <div id="tour-chamada"
-                    class="lg:col-span-2 relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-700 shadow-2xl shadow-blue-900/20 text-white p-6 sm:p-8"
+                    class="lg:col-span-2 relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-700 shadow-2xl shadow-blue-900/20 text-white p-6 sm:p-8 h-full flex flex-col"
                     x-data="{
                         modalOpen: false, 
                         modalEvento: false,
@@ -392,7 +283,7 @@
                         class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-purple-500/20 rounded-full blur-2xl">
                     </div>
 
-                    <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="relative z-10 flex flex-col gap-6">
                         {{-- Header do Card --}}
                         <div class="flex justify-between items-start mb-6">
                             <div>
@@ -650,7 +541,83 @@
                 </div>
 
                 {{-- WRAPPER PARA ATUALIZAR STATUS VIA AJAX --}}
-                <div id="tour-status" class="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
+                <div id="tour-status" class="grid grid-cols-1 gap-4 lg:gap-6">
+
+                    {{-- SEÇÃO COMPACTA: OFENSIVA + CONQUISTAS (Lado a Lado) --}}
+                    <div class="grid grid-cols-2 gap-4">
+                        {{-- CARD: OFENSIVA --}}
+                        @if($streak > 0)
+                            @php
+                                if (!$marcouHoje) {
+                                    $cardClasses = "bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-transparent opacity-90";
+                                    $textClasses = "text-gray-600 dark:text-gray-200";
+                                    $numClasses = "text-gray-800 dark:text-white";
+                                    $iconColor = "text-gray-400 dark:text-gray-300";
+                                    $msg = "Salve!";
+                                    $fireOpacity = "opacity-0";
+                                } else {
+                                    $cardClasses = "bg-gradient-to-br from-orange-500 to-red-600 shadow-lg shadow-orange-500/20";
+                                    $textClasses = "text-orange-100";
+                                    $numClasses = "text-white drop-shadow-md";
+                                    $iconColor = "text-white";
+                                    $msg = "On fire!";
+                                    $fireOpacity = "opacity-100";
+                                }
+                            @endphp
+                            <div
+                                class="relative overflow-hidden rounded-3xl p-4 flex items-center justify-between min-h-[5rem] transition-all duration-300 hover:scale-[1.02] {{ $cardClasses }}">
+                                <div
+                                    class="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-white/20 blur-xl transition-opacity duration-500 {{ $fireOpacity }}">
+                                </div>
+                                <div class="relative z-10">
+                                    <p class="text-[9px] font-bold uppercase tracking-widest opacity-80 {{ $textClasses }}">
+                                        Ofensiva</p>
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-3xl font-black {{ $numClasses }}">{{ $streak }}</span>
+                                        <span class="text-xs font-bold opacity-80 {{ $textClasses }}">dias</span>
+                                    </div>
+                                    <p class="text-[9px] font-medium opacity-90 {{ $textClasses }}">{{ $msg }}</p>
+                                </div>
+                                <div
+                                    class="relative z-10 drop-shadow-lg transform group-hover:scale-110 transition-transform duration-300 {{ $iconColor }}">
+                                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12.75 2.255C10.636 3.69 9.098 5.617 8.356 7.822c-.655 1.946.068 4.253 1.058 5.92.358.604.76 1.18 1.157 1.761.278.406.495.962.247 1.41-.33.593-1.127.674-1.685.295-.506-.343-.888-.868-1.157-1.424-.486-1.008-.66-2.148-.5-3.245.093-.634-.73-1.03-1.163-.585C4.244 14.12 4.2 18.23 6.55 20.85c2.19 2.443 6.037 3.018 8.87.973 2.508-1.81 3.554-5.286 2.053-7.974-.833-1.492-2.103-2.73-3.138-4.148-.485-.665-.705-1.52-.395-2.296.342-.857 1.084-1.516 1.458-2.355.197-.442-.315-.903-.748-.795z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        @endif
+
+                        {{-- CARD: CONQUISTAS --}}
+                        <div x-data @click="$dispatch('open-modal', 'badges-gallery')"
+                            class="bg-white/60 dark:bg-[#1E293B]/60 backdrop-blur-md rounded-3xl p-4 shadow-sm border border-white/10 dark:border-gray-800 flex flex-col justify-center min-h-[5rem] transition-all hover:scale-[1.02] cursor-pointer group hover:bg-white/80 dark:hover:bg-gray-800/80 overflow-hidden relative">
+                            <div class="flex items-center justify-between mb-2">
+                                <p
+                                    class="text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400">
+                                    Conquistas</p>
+                                <span
+                                    class="bg-gray-100 dark:bg-gray-800 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full text-gray-500 group-hover:bg-yellow-100 group-hover:text-yellow-700 transition-colors">
+                                    {{ $badgesCount }}
+                                </span>
+                            </div>
+                            <div class="flex gap-1.5 items-center">
+                                @forelse(Auth::user()->badges->sortByDesc('pivot.earned_at')->take(4) as $badge)
+                                    <div
+                                        class="shrink-0 w-8 h-8 bg-gradient-to-tr from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-center text-base shadow-sm transition-transform group-hover:-translate-y-1">
+                                        {{ $badge->icon }}
+                                    </div>
+                                @empty
+                                    <div class="flex items-center gap-2 text-gray-400 opacity-60">
+                                        <div
+                                            class="w-6 h-6 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center grayscale text-xs">
+                                            🏆</div>
+                                        <span class="text-[8px] font-bold uppercase tracking-tighter">Comece agora!</span>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="dashboard-stats" class="contents">
 
                         {{-- CARD 1: PRESENÇA TOTAL --}}
@@ -668,46 +635,48 @@
                                 </div>
                             @else
                                 {{-- ESTADO ATIVO (Com Animação Inteligente e Bidirecional) --}}
-                                <div class="flex items-baseline gap-1" x-data="{ 
-                                                                                                current: window.lastPercentage ?? 0, 
-                                                                                                target: {{ $porcentagemGlobal }} 
-                                                                                             }" x-init="
-                                                                                                 // Delay para garantir que o DOM renderizou
-                                                                                                 setTimeout(() => {
-                                                                                                     const duration = 1500; 
-                                                                                                     const startValue = current;
-                                                                                                     const endValue = target;
-                                                                                                     const change = endValue - startValue; // Calcula a diferença (pode ser negativa)
-                                                                                                     let start = null;
+                                <div class="flex items-baseline gap-1"
+                                    x-data="{ 
+                                                                                                                                                                                                                    current: window.lastPercentage ?? 0, 
+                                                                                                                                                                                                                    target: {{ $porcentagemGlobal }} 
+                                                                                                                                                                                                                 }"
+                                    x-init="
+                                                                                                                                                                                                                     // Delay para garantir que o DOM renderizou
+                                                                                                                                                                                                                     setTimeout(() => {
+                                                                                                                                                                                                                         const duration = 1500; 
+                                                                                                                                                                                                                         const startValue = current;
+                                                                                                                                                                                                                         const endValue = target;
+                                                                                                                                                                                                                         const change = endValue - startValue; // Calcula a diferença (pode ser negativa)
+                                                                                                                                                                                                                         let start = null;
 
-                                                                                                     // Função de Easing (Suave)
-                                                                                                     const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4);
+                                                                                                                                                                                                                         // Função de Easing (Suave)
+                                                                                                                                                                                                                         const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4);
 
-                                                                                                     const step = (timestamp) => {
-                                                                                                         if (!start) start = timestamp;
-                                                                                                         const progress = Math.min((timestamp - start) / duration, 1);
+                                                                                                                                                                                                                         const step = (timestamp) => {
+                                                                                                                                                                                                                             if (!start) start = timestamp;
+                                                                                                                                                                                                                             const progress = Math.min((timestamp - start) / duration, 1);
 
-                                                                                                         // A mágica: soma a diferença (positiva ou negativa) ao valor inicial
-                                                                                                         current = Math.floor(startValue + (change * easeOutQuart(progress)));
+                                                                                                                                                                                                                             // A mágica: soma a diferença (positiva ou negativa) ao valor inicial
+                                                                                                                                                                                                                             current = Math.floor(startValue + (change * easeOutQuart(progress)));
 
-                                                                                                         if (progress < 1) {
-                                                                                                             window.requestAnimationFrame(step);
-                                                                                                         } else {
-                                                                                                             // Garante que termina no número exato
-                                                                                                             current = endValue;
-                                                                                                             // SALVA NA MEMÓRIA GLOBAL para a próxima vez
-                                                                                                             window.lastPercentage = endValue;
-                                                                                                         }
-                                                                                                     };
+                                                                                                                                                                                                                             if (progress < 1) {
+                                                                                                                                                                                                                                 window.requestAnimationFrame(step);
+                                                                                                                                                                                                                             } else {
+                                                                                                                                                                                                                                 // Garante que termina no número exato
+                                                                                                                                                                                                                                 current = endValue;
+                                                                                                                                                                                                                                 // SALVA NA MEMÓRIA GLOBAL para a próxima vez
+                                                                                                                                                                                                                                 window.lastPercentage = endValue;
+                                                                                                                                                                                                                             }
+                                                                                                                                                                                                                         };
 
-                                                                                                     // Só anima se houver mudança
-                                                                                                     if (startValue !== endValue) {
-                                                                                                         window.requestAnimationFrame(step);
-                                                                                                     } else {
-                                                                                                         window.lastPercentage = endValue;
-                                                                                                     }
-                                                                                                 }, 200);
-                                                                                             ">
+                                                                                                                                                                                                                         // Só anima se houver mudança
+                                                                                                                                                                                                                         if (startValue !== endValue) {
+                                                                                                                                                                                                                             window.requestAnimationFrame(step);
+                                                                                                                                                                                                                         } else {
+                                                                                                                                                                                                                             window.lastPercentage = endValue;
+                                                                                                                                                                                                                         }
+                                                                                                                                                                                                                     }, 200);
+                                                                                                                                                                                                                 ">
                                     <h3 class="text-4xl font-extrabold {{ $corGlobal }}" x-text="current">
                                         {{-- Fallback visual enquanto o Alpine carrega --}}
                                         {{ $porcentagemGlobal }}
@@ -937,17 +906,18 @@
                                             {{-- Barra de Progresso Inteligente --}}
                                             <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden"
                                                 x-data="{ 
-                                                                                                        id: {{ $disciplina->id }},
-                                                                                                        width: window.memoriaBarras[{{ $disciplina->id }}] ?? '{{ $larguraBarra }}%' 
-                                                                                                    }" x-init="
-                                                                                                        // Espera um tick para o navegador renderizar o valor inicial
-                                                                                                        $nextTick(() => { 
-                                                                                                            // Define a nova largura alvo
-                                                                                                            width = '{{ $larguraBarra }}%'; 
-                                                                                                            // Salva na memória global para o próximo reload
-                                                                                                            window.memoriaBarras[id] = width;
-                                                                                                        })
-                                                                                                    ">
+                                                                                                                                                                                                                            id: {{ $disciplina->id }},
+                                                                                                                                                                                                                            width: window.memoriaBarras[{{ $disciplina->id }}] ?? '{{ $larguraBarra }}%' 
+                                                                                                                                                                                                                        }"
+                                                x-init="
+                                                                                                                                                                                                                            // Espera um tick para o navegador renderizar o valor inicial
+                                                                                                                                                                                                                            $nextTick(() => { 
+                                                                                                                                                                                                                                // Define a nova largura alvo
+                                                                                                                                                                                                                                width = '{{ $larguraBarra }}%'; 
+                                                                                                                                                                                                                                // Salva na memória global para o próximo reload
+                                                                                                                                                                                                                                window.memoriaBarras[id] = width;
+                                                                                                                                                                                                                            })
+                                                                                                                                                                                                                        ">
 
                                                 <div class="h-2.5 rounded-full transition-all duration-1000 ease-in-out {{ $corBarra }}"
                                                     :style="'width: ' + width">
@@ -1131,104 +1101,114 @@
 
                         @if(Auth::user()->has_seen_intro && !Auth::user()->has_completed_tour)
                             <script>
-                                { // <--- 1. ABRE ESCOPO: Isso impede o erro de "variável já declarada" ao voltar na página
-
-                                    // 2. Função encapsulada para iniciar o tour
-                                    const initDashboardTour = () => {
-
-                                        // Verifica se a biblioteca driver.js carregou
-                                        if (!window.driver || !window.driver.js || !window.driver.js.driver) {
-                                            console.warn('Driver.js não encontrado');
-                                            return;
-                                        }
-
-                                        const driver = window.driver.js.driver;
-                                        const isMobile = window.innerWidth < 1024;
-
-                                        let tourSteps = [
-                                            {
-                                                element: '#tour-chamada',
-                                                popover: {
-                                                    title: 'Diário de Classe',
-                                                    description: 'Registre sua presença do dia com um clique. Ou, marque um dia livre.'
-                                                }
-                                            },
-                                            {
-                                                element: '#tour-status',
-                                                popover: {
-                                                    title: 'Seu Painel',
-                                                    description: 'Acompanhe sua frequência global e veja alertas de matérias em risco.'
-                                                }
-                                            },
-                                            {
-                                                element: '#tour-theme-toggle',
-                                                popover: {
-                                                    title: 'Modo Noturno',
-                                                    description: 'Prefere estudar à noite? Troque o tema aqui.'
-                                                }
-                                            }
-                                        ];
-
-                                        if (isMobile) {
-                                            tourSteps.push(
-                                                {
-                                                    element: '#tour-grade-mobile',
-                                                    popover: { title: 'Sua Grade', description: 'Acesse a visão completa da sua semana.' }
-                                                },
-                                                {
-                                                    element: '#tour-profile-mobile',
-                                                    popover: { title: 'Seu Perfil', description: 'Gerencie sua conta e outras configurações aqui.' }
-                                                },
-                                                {
-                                                    element: '#tour-add-mobile',
-                                                    popover: { title: 'Adicione uma Matéria', description: 'Toque no botão central para adicionar suas matérias.' }
-                                                }
-                                            );
-                                        } else {
-                                            tourSteps.push(
-                                                {
-                                                    element: '#tour-grade-desktop',
-                                                    popover: { title: 'Grade Horária', description: 'Acesse a visão completa da sua semana.' }
-                                                },
-                                                {
-                                                    element: '#tour-nova-materia',
-                                                    popover: { title: 'Adicione uma Matéria', description: 'Comece clicando aqui para cadastrar suas matérias.' }
-                                                }
-                                            );
-                                        }
-
-                                        const driverObj = driver({
-                                            showProgress: true,
-                                            allowClose: true,
-                                            animate: true,
-                                            nextBtnText: 'Próximo',
-                                            prevBtnText: 'Voltar',
-                                            doneBtnText: 'Concluir',
-                                            steps: tourSteps,
-                                            onDestroyStarted: () => {
-                                                fetch('{{ route("tour.finish") }}', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                                        'Content-Type': 'application/json'
-                                                    }
-                                                }).catch(err => console.error(err));
-
-                                                window.dispatchEvent(new CustomEvent('tour-finished'));
-                                                driverObj.destroy();
-                                            }
-                                        });
-
-                                        window.dispatchEvent(new CustomEvent('tour-starting'));
-
-                                        // Pequeno delay para garantir que a animação da página terminou antes de focar
-                                        setTimeout(() => driverObj.drive(), 1300);
+                                {
+                                    // Passos do Tour - Descrições mais detalhadas
+                                    const TOUR_STEPS = {
+                                        mobile: [
+                                            { element: '#tour-credits-mobile', intro: '<strong>💎 Créditos de IA</strong><p>Você tem <b>créditos mensais</b> para usar o Oráculo. Renovam automaticamente!</p>', position: 'bottom' },
+                                            { element: '#tour-theme-toggle', intro: '<strong>🌙 Alternar Tema</strong><p>Clique para trocar entre <b>modo claro e escuro</b>.</p>', position: 'bottom' },
+                                            { element: '#tour-chamada', intro: '<strong>📋 Registrar Presença</strong><p><b>Botão principal!</b> Registre se compareceu ou faltou às aulas de hoje.</p>', position: 'bottom' },
+                                            { element: '#tour-status', intro: '<strong>📊 Status de Frequência</strong><p>Veja sua <b>frequência geral</b>. Verde = OK, Vermelho = atenção!</p>', position: 'top' },
+                                            { element: '#tour-grade-mobile', intro: '<strong>📅 Grade Horária</strong><p>Acesse sua <b>grade semanal completa</b> organizada por dia.</p>', position: 'top' },
+                                            { element: '#tour-profile-mobile', intro: '<strong>👤 Seu Perfil</strong><p>Gerencie <b>conta, metas</b> e configurações.</p>', position: 'top' },
+                                            { element: '#tour-add-mobile', intro: '<strong>➕ Adicionar Matéria</strong><p>Clique aqui para <b>cadastrar sua primeira disciplina</b>!</p>', position: 'top' }
+                                        ],
+                                        desktop: [
+                                            { element: '#tour-chamada', intro: '<strong>📋 Registrar Presença</strong><p><b>Coração do app!</b> Marque presença ou falta. O Oráculo calcula quantas faltas você ainda pode ter.</p>', position: 'bottom' },
+                                            { element: '#tour-status', intro: '<strong>📊 Painel de Frequência</strong><p>Frequência <b>em tempo real</b>. Menos de 75%? Alerta vermelho!</p>', position: 'left' },
+                                            { element: '#tour-grade-desktop', intro: '<strong>📅 Sua Semana</strong><p>Visualize sua <b>grade horária</b> organizada por dia.</p>', position: 'bottom' },
+                                            { element: '#tour-credits', intro: '<strong>💎 Energia do Oráculo</strong><p><b>Créditos de IA</b> para consultar o Oráculo. Renovam todo mês!</p>', position: 'bottom' },
+                                            { element: '#tour-oracle', intro: '<strong>🔮 Consultar o Oráculo</strong><p>Dúvida se pode faltar? A IA <b>analisa seus dados</b> e te aconselha!</p>', position: 'left' },
+                                            { element: '#tour-theme-toggle', intro: '<strong>🌙 Modo Escuro</strong><p>Alterne entre <b>tema claro e escuro</b>.</p>', position: 'bottom' },
+                                            { element: '#tour-nova-materia', intro: '<strong>➕ Nova Matéria</strong><p><b>Clique aqui</b> para cadastrar sua primeira disciplina!</p>', position: 'top' }
+                                        ]
                                     };
 
-                                    // 3. EXECUTA IMEDIATAMENTE (Sem esperar DOMContentLoaded, pois o HTML já está lá)
-                                    initDashboardTour();
+                                    const finishTour = () => {
+                                        fetch('{{ route("tour.finish") }}', {
+                                            method: 'POST',
+                                            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
+                                        }).catch(console.error);
+                                        window.dispatchEvent(new CustomEvent('tour-finished'));
+                                    };
 
-                                } // <--- FECHA ESCOPO
+                                    const launchTour = () => {
+                                        const isMobile = window.innerWidth < 1024;
+                                        const steps = isMobile ? TOUR_STEPS.mobile : TOUR_STEPS.desktop;
+
+                                        const tour = window.introJs.tour();
+                                        tour.setOptions({
+                                            steps,
+                                            showProgress: true,
+                                            showBullets: false,
+                                            exitOnOverlayClick: false,
+                                            disableInteraction: false,
+                                            nextLabel: 'Próximo →',
+                                            prevLabel: '← Voltar',
+                                            doneLabel: 'Finalizar ✓',
+                                            skipLabel: 'Pular',
+                                            scrollToElement: true,
+                                            scrollPadding: 100,
+                                            overlayOpacity: 0.75,
+                                            highlightClass: 'tour-highlight-pulse'
+                                        });
+
+                                        tour.oncomplete(finishTour);
+                                        tour.onexit(finishTour);
+
+                                        // Dispara evento para forçar navbar visível
+                                        window.scrollTo({ top: 0, behavior: 'instant' });
+                                        window.dispatchEvent(new CustomEvent('tour-starting'));
+                                        setTimeout(() => tour.start(), 300);
+                                    };
+
+                                    const askToStartTour = () => {
+                                        const isDark = document.documentElement.classList.contains('dark');
+                                        window.Swal.fire({
+                                            title: 'Boas-vindas!',
+                                            html: `
+                                                                                                        <p style="margin-bottom:0.5rem; color: ${isDark ? '#f3f4f6' : '#1f2937'};">Deseja fazer um <b>tour guiado</b> pelo app?</p>
+                                                                                                        <p style="font-size:0.875rem; color: ${isDark ? '#9ca3af' : '#4b5563'};">É rápido e ajuda você a começar.</p>
+                                                                                                        <p style="font-size:0.75rem; color: ${isDark ? '#6b7280' : '#9ca3af'}; margin-top: 1rem; border-top: 1px solid ${isDark ? '#1f2937' : '#f3f4f6'}; padding-top: 0.5rem;">Você pode repetir esse tour sempre que quiser no seu <b>Perfil</b>.</p>
+                                                                                                    `,
+                                            icon: 'info',
+                                            iconColor: '#2563eb',
+                                            background: isDark ? '#111827' : '#ffffff',
+                                            showCancelButton: true,
+                                            confirmButtonText: 'Ver Tour',
+                                            cancelButtonText: 'Agora não',
+                                            confirmButtonColor: '#1D4ED8',
+                                            cancelButtonColor: isDark ? '#374151' : '#9ca3af',
+                                            allowOutsideClick: false,
+                                            customClass: {
+                                                popup: 'rounded-xl border border-gray-200 dark:border-gray-800 shadow-2xl',
+                                                title: 'font-semibold tracking-tight',
+                                                confirmButton: 'rounded-lg px-6 py-2.5 font-bold transition-all hover:scale-105 active:scale-95',
+                                                cancelButton: 'rounded-lg px-6 py-2.5 font-semibold transition-all'
+                                            }
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                setTimeout(launchTour, 300);
+                                            } else {
+                                                finishTour();
+                                            }
+                                        });
+                                    };
+
+                                    // Aguarda libs carregarem
+                                    const waitForLibs = (maxMs = 5000) => {
+                                        const start = Date.now();
+                                        const poll = () => {
+                                            const ready = typeof window.introJs?.tour === 'function' && typeof window.Swal?.fire === 'function';
+                                            if (ready) return setTimeout(askToStartTour, 600);
+                                            if (Date.now() - start < maxMs) requestAnimationFrame(poll);
+                                            else console.warn('Tour libs timeout');
+                                        };
+                                        poll();
+                                    };
+
+                                    waitForLibs();
+                                }
                             </script>
                         @endif
 
@@ -1372,7 +1352,8 @@
                         <x-notification-banner />
 
                         {{-- BUTTON FAB ORACLE (DESKTOP ONLY) --}}
-                        <button onclick="window.dispatchEvent(new CustomEvent('open-ai-sidebar'))" class="hidden md:flex fixed bottom-8 right-8 z-[40]
+                        <button id="tour-oracle" onclick="window.dispatchEvent(new CustomEvent('open-ai-sidebar'))"
+                            class="hidden md:flex fixed bottom-8 right-8 z-[40]
                                     bg-white dark:bg-[#0B1220] hover:bg-gray-50 dark:hover:bg-gray-800
                                     text-purple-600 dark:text-purple-400 p-2
                                     rounded-full shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1
