@@ -3,7 +3,7 @@
     {{-- TRIGGER HANDLE (Visible cue when navbar is hidden) --}}
     <div class="hidden sm:block fixed top-0 left-1/2 -translate-x-1/2 z-50 pointer-events-auto transition-all duration-500 ease-out"
         :class="(scrolled && !forceShow) ? 'translate-y-0 opacity-100 delay-200' : '-translate-y-full opacity-0'"
-        @mouseenter="showNavbar()">
+        @mouseenter="showNavbar()" x-cloak>
         <div
             class="w-32 h-1.5 mx-auto bg-gray-300/50 dark:bg-gray-600/50 backdrop-blur-md rounded-b-xl shadow-sm hover:bg-blue-500 dark:hover:bg-blue-400 transition-colors cursor-pointer group">
             <div class="w-8 h-0.5 bg-white/50 rounded-full mx-auto mt-0.5 group-hover:bg-white/80 transition-colors">
@@ -129,7 +129,7 @@
                             </div>
                             <span
                                 class="text-xs font-medium text-gray-700 dark:text-gray-200 lg:block truncate max-w-[60px] lg:max-w-[100px]"
-                                :class="isCompact ? 'hidden' : 'block'">
+                                :class="isCompact ? 'hidden' : 'block'" x-cloak>
                                 {{ Auth::user()->name }}
                             </span>
                             <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
@@ -140,7 +140,7 @@
                         </button>
 
                         {{-- DROPDOWN --}}
-                        <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                        <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                             x-transition:leave="transition ease-in duration-150"

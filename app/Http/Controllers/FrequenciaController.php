@@ -18,12 +18,12 @@ class FrequenciaController extends Controller
     {
 
         $request->validate([
-        'data' => [
-            'required', 
-            'date',
-            'after_or_equal:' . now()->startOfYear()->format('Y-m-d'), // >= 01/01/202X
-            'before_or_equal:' . now()->endOfYear()->format('Y-m-d'),   // <= 31/12/202X]
-        ],
+            'data' => [
+                'required',
+                'date',
+                'after_or_equal:' . now()->startOfYear()->format('Y-m-d'), // >= 01/01/202X
+                'before_or_equal:' . now()->endOfYear()->format('Y-m-d'),   // <= 31/12/202X]
+            ],
         ]);
 
         // Pega a data da URL (?data=2025-12-18) ou usa Hoje se não vier nada
@@ -39,21 +39,21 @@ class FrequenciaController extends Controller
                 'motivo' => $diaLivre['titulo'],
             ]);
         }
-        
+
         // Descobre o dia da semana dessa data (1=Segunda ... 7=Domingo)
         $diaSemana = Carbon::parse($dataAlvo)->dayOfWeekIso;
 
         // 1. Busca a Grade Horária daquele dia da semana
         $grade = GradeHoraria::where('dia_semana', $diaSemana)
             ->where('user_id', Auth::id())
-            ->whereHas('disciplina', function($query) use ($dataAlvo) {
-                $query->where(function($q) use ($dataAlvo) {
+            ->whereHas('disciplina', function ($query) use ($dataAlvo) {
+                $query->where(function ($q) use ($dataAlvo) {
                     $q->whereNull('data_inicio')
                         ->orWhere('data_inicio', '<=', $dataAlvo);
-            })->where(function($q) use ($dataAlvo) {
-                $q->whereNull('data_fim')
-                    ->orWhere('data_fim', '>=', $dataAlvo);
-            });
+                })->where(function ($q) use ($dataAlvo) {
+                    $q->whereNull('data_fim')
+                        ->orWhere('data_fim', '>=', $dataAlvo);
+                });
             })
             ->with('disciplina')
             ->orderBy('horario_inicio', 'asc')
@@ -65,9 +65,9 @@ class FrequenciaController extends Controller
             ->get();
 
         // 3. Mescla os dois: Grade + O que foi marcado
-        $resultado = $grade->map(function($aula) use ($historico) {
-            $registro = $historico->first(function($h) use ($aula) {
-                return $h->disciplina_id == $aula->disciplina->id 
+        $resultado = $grade->map(function ($aula) use ($historico) {
+            $registro = $historico->first(function ($h) use ($aula) {
+                return $h->disciplina_id == $aula->disciplina->id
                     && substr($h->horario, 0, 5) == substr($aula->horario_inicio, 0, 5);
             });
 
@@ -78,7 +78,7 @@ class FrequenciaController extends Controller
                 'horario' => $aula->horario_inicio,
                 'horario_fim' => $aula->horario_fim,
                 // Se existir registro, usa ele. Se não, padrão é true (Presente)
-                'presente' => $registro ? (bool)$registro->presente : true,
+                'presente' => $registro ? (bool) $registro->presente : true,
                 'ja_registrado' => $registro ? true : false // Para saber se é edição ou novo
             ];
         })->values();
@@ -166,6 +166,18 @@ class FrequenciaController extends Controller
             $query->where('presente', $request->status);
         }
 
+        // Calcular Totais (Baseado na query filtrada, mas sem paginação)
+        // Clonamos a query para não afetar a paginação
+        $statsQuery = $query->clone();
+
+        $totalRegistros = $statsQuery->count();
+        $totalPresencas = $statsQuery->clone()->where('presente', true)->count();
+        $totalFaltas = $statsQuery->clone()->where('presente', false)->count();
+
+        $porcentagemPresenca = $totalRegistros > 0
+            ? round(($totalPresencas / $totalRegistros) * 100, 1)
+            : 0;
+
         // Paginação (15 itens por página)
         // O ->withQueryString() mantém os filtros ao clicar na página 2
         $historico = $query->paginate(15)->withQueryString();
@@ -173,6 +185,13 @@ class FrequenciaController extends Controller
         // Carrega todas as disciplinas para preencher o <select> de filtro
         $disciplinas = Auth::user()->disciplinas()->orderBy('nome')->get();
 
-        return view('frequencia.historico', compact('historico', 'disciplinas'));
+        return view('frequencia.historico', compact(
+            'historico',
+            'disciplinas',
+            'totalRegistros',
+            'totalPresencas',
+            'totalFaltas',
+            'porcentagemPresenca'
+        ));
     }
 }

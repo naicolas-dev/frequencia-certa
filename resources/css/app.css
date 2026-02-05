@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+[x-cloak] {
+    display: none !important;
+}
+
 /* === ESTILOS GERAIS DA LANDING PAGE === */
 .landing-page {
     font-family: 'Instrument Sans', sans-serif;
