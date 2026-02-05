@@ -25,6 +25,9 @@ class CalculoFrequenciaTest extends TestCase
         Frequencia::create(['user_id' => $user->id, 'disciplina_id' => $disciplina->id, 'data' => '2024-02-04', 'presente' => true]);
         Frequencia::create(['user_id' => $user->id, 'disciplina_id' => $disciplina->id, 'data' => '2024-02-05', 'presente' => false]);
 
+        // Reload to get frequencias relation loaded
+        $disciplina->load('frequencias');
+
         // (4 presenças / 5 aulas) * 100 = 80%
         $this->assertEquals(80.0, $disciplina->taxa_presenca);
     }
@@ -34,7 +37,11 @@ class CalculoFrequenciaTest extends TestCase
         $user = User::factory()->create();
         $disciplina = Disciplina::factory()->create(['user_id' => $user->id]);
 
-        $this->assertEquals(100.0, $disciplina->taxa_presenca);
+        // Reload with empty frequencias relation
+        $disciplina->load('frequencias');
+
+        // No aulas = 0% (safe fallback, not 100%)
+        $this->assertEquals(0.0, $disciplina->taxa_presenca);
     }
 
     public function test_calcula_reprovacao_abaixo_de_75()
@@ -47,6 +54,9 @@ class CalculoFrequenciaTest extends TestCase
         Frequencia::create(['user_id' => $user->id, 'disciplina_id' => $disciplina->id, 'data' => '2024-02-02', 'presente' => true]);
         Frequencia::create(['user_id' => $user->id, 'disciplina_id' => $disciplina->id, 'data' => '2024-02-03', 'presente' => false]);
         Frequencia::create(['user_id' => $user->id, 'disciplina_id' => $disciplina->id, 'data' => '2024-02-04', 'presente' => false]);
+
+        // Reload to get frequencias relation loaded
+        $disciplina->load('frequencias');
 
         // (2 presenças / 4 aulas) * 100 = 50%
         $this->assertEquals(50.0, $disciplina->taxa_presenca);

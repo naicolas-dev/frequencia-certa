@@ -12,7 +12,7 @@ class DisciplinaTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * Testa se a lista de disciplinas é renderizada.
+     * Testa se a lista de disciplinas redireciona para o dashboard.
      */
     public function test_lista_de_disciplinas_pode_ser_renderizada(): void
     {
@@ -20,9 +20,9 @@ class DisciplinaTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get('/disciplinas'); // Verifique se sua rota é '/disciplinas' ou '/dashboard'
+            ->get('/disciplinas');
 
-        $response->assertStatus(200);
+        $response->assertRedirect(route('dashboard'));
     }
 
     /**
@@ -44,8 +44,8 @@ class DisciplinaTest extends TestCase
             ->post('/disciplinas', $dadosDisciplina); // Rota de store
 
         // Verifica se redirecionou (geralmente para o index ou dashboard)
-        $response->assertRedirect(); 
-        
+        $response->assertRedirect();
+
         // Verifica se salvou no banco
         $this->assertDatabaseHas('disciplinas', [
             'nome' => 'Matemática Avançada',
@@ -81,10 +81,10 @@ class DisciplinaTest extends TestCase
         // Cria Usuário B
         $userB = User::factory()->create();
 
-        // Loga como B e tenta ver a lista
+        // Loga como B e vai para o dashboard (onde as disciplinas são exibidas)
         $response = $this
             ->actingAs($userB)
-            ->get('/disciplinas');
+            ->get('/dashboard');
 
         // Garante que o texto "Segredo do A" NÃO aparece na tela do B
         $response->assertDontSee('Segredo do A');

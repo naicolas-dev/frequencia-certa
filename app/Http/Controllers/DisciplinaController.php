@@ -10,50 +10,8 @@ class DisciplinaController extends Controller
 {
     public function index()
     {
-        // 1. Carrega as disciplinas com os relacionamentos necessários
-        $disciplinas = Auth::user()->disciplinas()
-            ->with(['horarios', 'frequencias'])
-            ->get();
-
-        // 2. Prepara as variáveis que a Dashboard exige
-        $todasDisciplinas = $disciplinas;
-        $disciplinasFiltradas = $disciplinas;
-
-        // 3. Cálculos básicos
-        $materiasEmRisco = $disciplinas->filter(function ($d) {
-            // Só conta como risco se tiver aulas registradas e frequência baixa
-            return $d->frequencias->count() > 0 && $d->taxa_presenca < 75;
-        })->count();
-
-        // Cálculo da média global
-        $somaPresencas = 0;
-        $totalAulas = 0;
-        foreach ($disciplinas as $d) {
-            $totalAulas += $d->frequencias->count();
-            $somaPresencas += $d->frequencias->where('presente', true)->count();
-        }
-        $porcentagemGlobal = $totalAulas > 0 ? round(($somaPresencas / $totalAulas) * 100) : 0; // Inicia em 0 se vazio
-
-        $corGlobal = match (true) {
-            $porcentagemGlobal < 75 => 'text-red-500',
-            $porcentagemGlobal < 85 => 'text-yellow-500',
-            default => 'text-emerald-500',
-        };
-
-        // --- CORREÇÃO DO ERRO ---
-        // Definimos a variável que estava faltando na View
-        $estadoVazio = $disciplinas->isEmpty() || $totalAulas === 0;
-
-        // 4. Retorna a view com TUDO que ela precisa
-        return view('dashboard', compact(
-            'disciplinas',
-            'todasDisciplinas',
-            'disciplinasFiltradas',
-            'materiasEmRisco',
-            'porcentagemGlobal',
-            'corGlobal',
-            'estadoVazio'
-        ));
+        // Redirect to dashboard since the subjects are displayed there
+        return redirect()->route('dashboard');
     }
 
     /**

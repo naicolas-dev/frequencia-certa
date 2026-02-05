@@ -36,17 +36,18 @@ class GradeHorariaTest extends TestCase
         $disciplina = Disciplina::factory()->create(['user_id' => $user->id]);
 
         $dados = [
+            'disciplina_id' => $disciplina->id,
             'dia_semana' => 1, // Segunda-feira
             'horario_inicio' => '08:00',
             'horario_fim' => '10:00',
         ];
 
         $response = $this->actingAs($user)
-            ->post(route('grade.store', $disciplina->id), $dados);
+            ->post(route('grade.store'), $dados);
 
         // Deve redirecionar de volta (back)
         $response->assertRedirect();
-        
+
         // Verifica se salvou no banco
         $this->assertDatabaseHas('grade_horarias', [
             'user_id' => $user->id,
@@ -76,6 +77,7 @@ class GradeHorariaTest extends TestCase
         // 2. Tenta criar outro horário que SOBREPÕE: Segunda, 09:00 às 11:00
         // (Começa antes do outro terminar)
         $dadosConflitantes = [
+            'disciplina_id' => $disciplina->id,
             'dia_semana' => 1,
             'horario_inicio' => '09:00',
             'horario_fim' => '11:00',
@@ -83,15 +85,15 @@ class GradeHorariaTest extends TestCase
 
         $response = $this->actingAs($user)
             ->from(route('grade.index', $disciplina->id)) // Simula estar na página anterior
-            ->post(route('grade.store', $disciplina->id), $dadosConflitantes);
+            ->post(route('grade.store'), $dadosConflitantes);
 
         // 3. Verifica:
         // - Redirecionou de volta
         $response->assertRedirect(route('grade.index', $disciplina->id));
-        
+
         // - A sessão tem uma mensagem toast de erro (baseado no seu controller)
-        $response->assertSessionHas('toast'); 
-        
+        $response->assertSessionHas('toast');
+
         // - NÃO salvou o segundo registro no banco (deve ter apenas 1)
         $this->assertDatabaseCount('grade_horarias', 1);
     }
@@ -105,13 +107,14 @@ class GradeHorariaTest extends TestCase
         $disciplina = Disciplina::factory()->create(['user_id' => $user->id]);
 
         $dadosErrados = [
+            'disciplina_id' => $disciplina->id,
             'dia_semana' => 1,
             'horario_inicio' => '10:00',
             'horario_fim' => '08:00', // Errado!
         ];
 
         $response = $this->actingAs($user)
-            ->post(route('grade.store', $disciplina->id), $dadosErrados);
+            ->post(route('grade.store'), $dadosErrados);
 
         $response->assertSessionHasErrors('horario_fim');
     }
@@ -123,7 +126,7 @@ class GradeHorariaTest extends TestCase
     {
         $user = User::factory()->create();
         $disciplina = Disciplina::factory()->create(['user_id' => $user->id]);
-        
+
         $horario = GradeHoraria::create([
             'user_id' => $user->id,
             'disciplina_id' => $disciplina->id,
