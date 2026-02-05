@@ -3,10 +3,13 @@ import gsap from 'gsap';
 import Alpine from 'alpinejs';
 import Swal from 'sweetalert2';
 import { socialLogin, consumeRedirectResult } from './firebase-auth';
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
 
 // --- Global Config ---
 window.Alpine = Alpine;
 window.Swal = Swal;
+window.introJs = introJs;
 
 // --- Firebase Auth ---
 window.firebaseAuth = window.firebaseAuth || {};
@@ -100,7 +103,7 @@ window.pedirPermissaoNotificacao = async () => {
     if (permission === 'granted') {
         try {
             const registration = await navigator.serviceWorker.ready;
-            const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY; 
+            const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
             if (!vapidPublicKey) return false;
 
             const subscription = await registration.pushManager.subscribe({
@@ -131,15 +134,15 @@ window.pedirPermissaoNotificacao = async () => {
 // --- SPA Logic ---
 document.addEventListener('click', (e) => {
     const link = e.target.closest('a');
-    if (!link || 
-        link.target === '_blank' || 
-        link.href.includes('#') || 
+    if (!link ||
+        link.target === '_blank' ||
+        link.href.includes('#') ||
         link.href.startsWith('mailto:') ||
         link.href.startsWith('tel:') ||
         !link.href.startsWith(window.location.origin) ||
         link.getAttribute('download') !== null ||
-        e.ctrlKey || e.metaKey || 
-        link.hasAttribute('data-no-spa') || 
+        e.ctrlKey || e.metaKey ||
+        link.hasAttribute('data-no-spa') ||
         link.getAttribute('onclick')?.includes('submit()')
     ) return;
 
@@ -160,9 +163,9 @@ async function spaNavigate(url, pushState = true) {
 
     try {
         const [_, response] = await Promise.all([curtainPromise, dataPromise]);
-        
+
         if (!response.ok) throw new Error('Erro na navegação');
-        
+
         const html = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
@@ -187,7 +190,7 @@ async function spaNavigate(url, pushState = true) {
                 window.Alpine.initTree(document.body);
             });
         }
-        
+
         window.scrollTo(0, 0);
         hideLoader();
 
@@ -201,14 +204,14 @@ async function spaNavigate(url, pushState = true) {
 function animateCurtainIn() {
     return new Promise(resolve => {
         const loader = document.querySelector('#page-loader');
-        if (!loader) { resolve(); return; } 
+        if (!loader) { resolve(); return; }
 
         loader.style.display = 'flex';
-        
+
         // 1s minimum delay logic
         const minTimePromise = new Promise(r => setTimeout(r, 1000));
-        const animationPromise = gsap.fromTo('#page-loader', 
-            { yPercent: -100, opacity: 1 }, 
+        const animationPromise = gsap.fromTo('#page-loader',
+            { yPercent: -100, opacity: 1 },
             { yPercent: 0, duration: 0.6, ease: 'power4.out' }
         );
 
@@ -228,8 +231,8 @@ function hideLoader() {
         yPercent: -100,
         duration: 0.8,
         ease: 'power4.inOut',
-        delay: 0.5 
-    }); 
+        delay: 0.5
+    });
 }
 
 // Initialization & Clean up
@@ -241,7 +244,7 @@ setTimeout(() => {
 }, 3000);
 
 window.addEventListener('pageshow', (event) => {
-    if (event.persisted) { 
+    if (event.persisted) {
         const loader = document.querySelector('#page-loader');
         if (loader) {
             gsap.killTweensOf(loader);
