@@ -4,7 +4,6 @@
 ![Laravel](https://img.shields.io/badge/Laravel-12+-FF2D20?style=flat&logo=laravel&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-Ready-5A0FC8?style=flat&logo=pwa&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=flat&logo=php&logoColor=white)
-![SPA](https://img.shields.io/badge/SPA-Turbo-blue?style=flat&logo=fastapi&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 > **Sistema Inteligente de Gestão e Controle de Frequência Escolar.**
@@ -15,11 +14,11 @@
 
 O **Frequência Certa** é uma solução híbrida (Web e PWA) desenvolvida para empoderar estudantes do ensino médio e técnico no gerenciamento de sua assiduidade escolar.
 
-Além de mitigar a evasão e auxiliar no cumprimento de requisitos para benefícios como o **Pé-de-Meia**, o sistema evoluiu para oferecer uma experiência de usuário moderna e engajadora. Agora operando como uma **Single Page Application (SPA)** simulada, o sistema oferece navegação instantânea, gamificação para incentivar a constância e um assistente de IA para análise de riscos.
+Além de mitigar a evasão e auxiliar no cumprimento de requisitos para benefícios como o **Pé-de-Meia**, o sistema evoluiu para oferecer uma experiência de usuário moderna e engajadora. Operando como uma **Progressive Web App (PWA)**, o sistema oferece navegação fluida, gamificação para incentivar a constância e um assistente de IA para análise de riscos.
 
 ### 🚀 Novas Funcionalidades (v2.0)
 
-- **⚡ Navegação SPA Fluida:** Transições de página instantâneas sem recarregamento (Reload), com animações de carregamento (Loading) elegantes e minimalistas via GSAP.
+- **⚡ Interface Moderna:** Design responsivo e interativo, otimizado para experiência mobile-first com animações sutis via GSAP.
 - **🔮 Oráculo Acadêmico (IA):** Um assistente virtual integrado (Google Gemini) que analisa o histórico do aluno via chat e oferece conselhos personalizados sobre faltar ou não.
 - **🏆 Gamificação & Conquistas:** Sistema de medalhas e "ofensivas" (streaks) para recompensar alunos que mantêm a frequência e o registro em dia.
 - **🔔 Notificações Push:** Lembretes automáticos enviados diretamente ao dispositivo para registrar a chamada ou alertar sobre limites de faltas.
