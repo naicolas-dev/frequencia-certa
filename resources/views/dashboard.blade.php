@@ -23,21 +23,21 @@
                 {{-- 1. POP-UP DA OFENSIVA (FOGO) --}}
                 @if($streak == 1 && $marcouHoje)
                     <div x-data="{ 
-                                                                                                                                                                                                        show: false,
-                                                                                                                                                                                                        init() {
-                                                                                                                                                                                                            const key = 'fire_shown_{{ $dateString }}';
-                                                                                                                                                                                                            if (!localStorage.getItem(key)) {
-                                                                                                                                                                                                                // Pequeno delay inicial para não brigar com outros elementos
-                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                    this.show = true;
-                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                        this.show = false;
-                                                                                                                                                                                                                        localStorage.setItem(key, 'true');
-                                                                                                                                                                                                                    }, 1500);
-                                                                                                                                                                                                                }, 500);
-                                                                                                                                                                                                            }
-                                                                                                                                                                                                        }
-                                                                                                                                                                                                     }"
+                                                                                                                                                                                                                show: false,
+                                                                                                                                                                                                                init() {
+                                                                                                                                                                                                                    const key = 'fire_shown_{{ $dateString }}';
+                                                                                                                                                                                                                    if (!localStorage.getItem(key)) {
+                                                                                                                                                                                                                        // Pequeno delay inicial para não brigar com outros elementos
+                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                            this.show = true;
+                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                this.show = false;
+                                                                                                                                                                                                                                localStorage.setItem(key, 'true');
+                                                                                                                                                                                                                            }, 1500);
+                                                                                                                                                                                                                        }, 500);
+                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                }
+                                                                                                                                                                                                             }"
                         x-show="show" x-transition:enter="transition ease-out duration-500"
                         x-transition:enter-start="opacity-0 scale-50" x-transition:enter-end="opacity-100 scale-100"
                         x-transition:leave="transition ease-in duration-500"
@@ -69,27 +69,27 @@
                 {{-- 2. POP-UP DE MEDALHAS (LOOP COM DELAY) --}}
                 @foreach($medalhasHoje as $index => $badge)
                     <div x-data="{ 
-                                                                                                                                                                                                    show: false,
-                                                                                                                                                                                                    init() {
-                                                                                                                                                                                                        const key = 'badge_shown_{{ $badge->id }}_{{ $dateString }}';
+                                                                                                                                                                                                            show: false,
+                                                                                                                                                                                                            init() {
+                                                                                                                                                                                                                const key = 'badge_shown_{{ $badge->id }}_{{ $dateString }}';
 
-                                                                                                                                                                                                        // Se ainda não mostrou hoje
-                                                                                                                                                                                                        if (!localStorage.getItem(key)) {
-                                                                                                                                                                                                            // Calcula o delay baseado na ordem (index).
-                                                                                                                                                                                                            // Se tiver a animação do FOGO (streak == 1), soma +2000ms para não encavalar.
-                                                                                                                                                                                                            let baseDelay = {{ ($streak == 1 && $marcouHoje) ? 2500 : 500 }};
-                                                                                                                                                                                                            let myDelay = baseDelay + ({{ $index }} * 2000); 
+                                                                                                                                                                                                                // Se ainda não mostrou hoje
+                                                                                                                                                                                                                if (!localStorage.getItem(key)) {
+                                                                                                                                                                                                                    // Calcula o delay baseado na ordem (index).
+                                                                                                                                                                                                                    // Se tiver a animação do FOGO (streak == 1), soma +2000ms para não encavalar.
+                                                                                                                                                                                                                    let baseDelay = {{ ($streak == 1 && $marcouHoje) ? 2500 : 500 }};
+                                                                                                                                                                                                                    let myDelay = baseDelay + ({{ $index }} * 2000); 
 
-                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                this.show = true;
-                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                    this.show = false;
-                                                                                                                                                                                                                    localStorage.setItem(key, 'true');
-                                                                                                                                                                                                                }, 1500); // Duração de 1.5s
-                                                                                                                                                                                                            }, myDelay);
-                                                                                                                                                                                                        }
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                 }"
+                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                        this.show = true;
+                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                            this.show = false;
+                                                                                                                                                                                                                            localStorage.setItem(key, 'true');
+                                                                                                                                                                                                                        }, 1500); // Duração de 1.5s
+                                                                                                                                                                                                                    }, myDelay);
+                                                                                                                                                                                                                }
+                                                                                                                                                                                                            }
+                                                                                                                                                                                                         }"
                         x-show="show" x-transition:enter="transition ease-out duration-500"
                         x-transition:enter-start="opacity-0 scale-50 rotate-180"
                         x-transition:enter-end="opacity-100 scale-100 rotate-0"
@@ -386,7 +386,10 @@
                     </div>
 
                     {{-- MODAL DE CHAMADA --}}
-                    <div x-show="modalOpen" style="display: none;"
+                    <div x-show="modalOpen" style="display: none;" @keydown.escape.window="modalOpen = false"
+                        x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" role="dialog"
                         aria-modal="true">
                         <div class="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
@@ -496,7 +499,10 @@
                     </div>
 
                     {{-- MODAL DE EVENTO --}}
-                    <div x-show="modalEvento" style="display: none"
+                    <div x-show="modalEvento" style="display: none" @keydown.escape.window="modalEvento = false"
+                        x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0"
+                        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                         class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6" role="dialog"
                         aria-modal="true">
                         <div class="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
@@ -637,46 +643,46 @@
                                 {{-- ESTADO ATIVO (Com Animação Inteligente e Bidirecional) --}}
                                 <div class="flex items-baseline gap-1"
                                     x-data="{ 
-                                                                                                                                                                                                                    current: window.lastPercentage ?? 0, 
-                                                                                                                                                                                                                    target: {{ $porcentagemGlobal }} 
-                                                                                                                                                                                                                 }"
+                                                                                                                                                                                                                            current: window.lastPercentage ?? 0, 
+                                                                                                                                                                                                                            target: {{ $porcentagemGlobal }} 
+                                                                                                                                                                                                                         }"
                                     x-init="
-                                                                                                                                                                                                                     // Delay para garantir que o DOM renderizou
-                                                                                                                                                                                                                     setTimeout(() => {
-                                                                                                                                                                                                                         const duration = 1500; 
-                                                                                                                                                                                                                         const startValue = current;
-                                                                                                                                                                                                                         const endValue = target;
-                                                                                                                                                                                                                         const change = endValue - startValue; // Calcula a diferença (pode ser negativa)
-                                                                                                                                                                                                                         let start = null;
+                                                                                                                                                                                                                             // Delay para garantir que o DOM renderizou
+                                                                                                                                                                                                                             setTimeout(() => {
+                                                                                                                                                                                                                                 const duration = 1500; 
+                                                                                                                                                                                                                                 const startValue = current;
+                                                                                                                                                                                                                                 const endValue = target;
+                                                                                                                                                                                                                                 const change = endValue - startValue; // Calcula a diferença (pode ser negativa)
+                                                                                                                                                                                                                                 let start = null;
 
-                                                                                                                                                                                                                         // Função de Easing (Suave)
-                                                                                                                                                                                                                         const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4);
+                                                                                                                                                                                                                                 // Função de Easing (Suave)
+                                                                                                                                                                                                                                 const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4);
 
-                                                                                                                                                                                                                         const step = (timestamp) => {
-                                                                                                                                                                                                                             if (!start) start = timestamp;
-                                                                                                                                                                                                                             const progress = Math.min((timestamp - start) / duration, 1);
+                                                                                                                                                                                                                                 const step = (timestamp) => {
+                                                                                                                                                                                                                                     if (!start) start = timestamp;
+                                                                                                                                                                                                                                     const progress = Math.min((timestamp - start) / duration, 1);
 
-                                                                                                                                                                                                                             // A mágica: soma a diferença (positiva ou negativa) ao valor inicial
-                                                                                                                                                                                                                             current = Math.floor(startValue + (change * easeOutQuart(progress)));
+                                                                                                                                                                                                                                     // A mágica: soma a diferença (positiva ou negativa) ao valor inicial
+                                                                                                                                                                                                                                     current = Math.floor(startValue + (change * easeOutQuart(progress)));
 
-                                                                                                                                                                                                                             if (progress < 1) {
-                                                                                                                                                                                                                                 window.requestAnimationFrame(step);
-                                                                                                                                                                                                                             } else {
-                                                                                                                                                                                                                                 // Garante que termina no número exato
-                                                                                                                                                                                                                                 current = endValue;
-                                                                                                                                                                                                                                 // SALVA NA MEMÓRIA GLOBAL para a próxima vez
-                                                                                                                                                                                                                                 window.lastPercentage = endValue;
-                                                                                                                                                                                                                             }
-                                                                                                                                                                                                                         };
+                                                                                                                                                                                                                                     if (progress < 1) {
+                                                                                                                                                                                                                                         window.requestAnimationFrame(step);
+                                                                                                                                                                                                                                     } else {
+                                                                                                                                                                                                                                         // Garante que termina no número exato
+                                                                                                                                                                                                                                         current = endValue;
+                                                                                                                                                                                                                                         // SALVA NA MEMÓRIA GLOBAL para a próxima vez
+                                                                                                                                                                                                                                         window.lastPercentage = endValue;
+                                                                                                                                                                                                                                     }
+                                                                                                                                                                                                                                 };
 
-                                                                                                                                                                                                                         // Só anima se houver mudança
-                                                                                                                                                                                                                         if (startValue !== endValue) {
-                                                                                                                                                                                                                             window.requestAnimationFrame(step);
-                                                                                                                                                                                                                         } else {
-                                                                                                                                                                                                                             window.lastPercentage = endValue;
-                                                                                                                                                                                                                         }
-                                                                                                                                                                                                                     }, 200);
-                                                                                                                                                                                                                 ">
+                                                                                                                                                                                                                                 // Só anima se houver mudança
+                                                                                                                                                                                                                                 if (startValue !== endValue) {
+                                                                                                                                                                                                                                     window.requestAnimationFrame(step);
+                                                                                                                                                                                                                                 } else {
+                                                                                                                                                                                                                                     window.lastPercentage = endValue;
+                                                                                                                                                                                                                                 }
+                                                                                                                                                                                                                             }, 200);
+                                                                                                                                                                                                                         ">
                                     <h3 class="text-4xl font-extrabold {{ $corGlobal }}" x-text="current">
                                         {{-- Fallback visual enquanto o Alpine carrega --}}
                                         {{ $porcentagemGlobal }}
@@ -906,18 +912,18 @@
                                             {{-- Barra de Progresso Inteligente --}}
                                             <div class="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5 overflow-hidden"
                                                 x-data="{ 
-                                                                                                                                                                                                                            id: {{ $disciplina->id }},
-                                                                                                                                                                                                                            width: window.memoriaBarras[{{ $disciplina->id }}] ?? '{{ $larguraBarra }}%' 
-                                                                                                                                                                                                                        }"
+                                                                                                                                                                                                                                    id: {{ $disciplina->id }},
+                                                                                                                                                                                                                                    width: window.memoriaBarras[{{ $disciplina->id }}] ?? '{{ $larguraBarra }}%' 
+                                                                                                                                                                                                                                }"
                                                 x-init="
-                                                                                                                                                                                                                            // Espera um tick para o navegador renderizar o valor inicial
-                                                                                                                                                                                                                            $nextTick(() => { 
-                                                                                                                                                                                                                                // Define a nova largura alvo
-                                                                                                                                                                                                                                width = '{{ $larguraBarra }}%'; 
-                                                                                                                                                                                                                                // Salva na memória global para o próximo reload
-                                                                                                                                                                                                                                window.memoriaBarras[id] = width;
-                                                                                                                                                                                                                            })
-                                                                                                                                                                                                                        ">
+                                                                                                                                                                                                                                    // Espera um tick para o navegador renderizar o valor inicial
+                                                                                                                                                                                                                                    $nextTick(() => { 
+                                                                                                                                                                                                                                        // Define a nova largura alvo
+                                                                                                                                                                                                                                        width = '{{ $larguraBarra }}%'; 
+                                                                                                                                                                                                                                        // Salva na memória global para o próximo reload
+                                                                                                                                                                                                                                        window.memoriaBarras[id] = width;
+                                                                                                                                                                                                                                    })
+                                                                                                                                                                                                                                ">
 
                                                 <div class="h-2.5 rounded-full transition-all duration-1000 ease-in-out {{ $corBarra }}"
                                                     :style="'width: ' + width">
@@ -1167,10 +1173,10 @@
                                         window.Swal.fire({
                                             title: 'Boas-vindas!',
                                             html: `
-                                                                                                        <p style="margin-bottom:0.5rem; color: ${isDark ? '#f3f4f6' : '#1f2937'};">Deseja fazer um <b>tour guiado</b> pelo app?</p>
-                                                                                                        <p style="font-size:0.875rem; color: ${isDark ? '#9ca3af' : '#4b5563'};">É rápido e ajuda você a começar.</p>
-                                                                                                        <p style="font-size:0.75rem; color: ${isDark ? '#6b7280' : '#9ca3af'}; margin-top: 1rem; border-top: 1px solid ${isDark ? '#1f2937' : '#f3f4f6'}; padding-top: 0.5rem;">Você pode repetir esse tour sempre que quiser no seu <b>Perfil</b>.</p>
-                                                                                                    `,
+                                                                                                                <p style="margin-bottom:0.5rem; color: ${isDark ? '#f3f4f6' : '#1f2937'};">Deseja fazer um <b>tour guiado</b> pelo app?</p>
+                                                                                                                <p style="font-size:0.875rem; color: ${isDark ? '#9ca3af' : '#4b5563'};">É rápido e ajuda você a começar.</p>
+                                                                                                                <p style="font-size:0.75rem; color: ${isDark ? '#6b7280' : '#9ca3af'}; margin-top: 1rem; border-top: 1px solid ${isDark ? '#1f2937' : '#f3f4f6'}; padding-top: 0.5rem;">Você pode repetir esse tour sempre que quiser no seu <b>Perfil</b>.</p>
+                                                                                                            `,
                                             icon: 'info',
                                             iconColor: '#2563eb',
                                             background: isDark ? '#111827' : '#ffffff',
