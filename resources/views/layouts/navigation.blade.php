@@ -39,8 +39,8 @@
                         icon="home">
                         Painel
                     </x-nav-link-modern>
-                    <x-nav-link-modern href="{{ route('grade.geral') }}" :active="request()->routeIs('grade.geral')"
-                        icon="calendar">
+                    <x-nav-link-modern id="tour-grade-desktop" href="{{ route('grade.geral') }}"
+                        :active="request()->routeIs('grade.geral')" icon="calendar">
                         Grade
                     </x-nav-link-modern>
                     <x-nav-link-modern href="{{ route('frequencia.historico') }}"
@@ -56,7 +56,7 @@
                 <div class="flex items-center gap-2">
 
                     {{-- CREDITS --}}
-                    <button @click="$dispatch('open-modal', 'ai-credits-info')"
+                    <button id="tour-credits" @click="$dispatch('open-modal', 'ai-credits-info')"
                         class="group/credits relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 border border-purple-100 dark:border-purple-500/20 hover:border-purple-300 dark:hover:border-purple-500/50 transition-all overflow-hidden"
                         title="Créditos IA">
                         <div
@@ -96,7 +96,7 @@
                     </button>
 
                     {{-- THEME TOGGLE --}}
-                    <button @click="toggleTheme()"
+                    <button id="tour-theme-toggle" @click="toggleTheme()"
                         class="w-9 h-9 flex items-center justify-center rounded-full text-gray-500 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-gray-800 dark:text-gray-400 dark:hover:text-yellow-400 transition-colors">
                         {{-- Sun --}}
                         <svg class="w-5 h-5 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
@@ -111,9 +111,17 @@
                     </button>
 
                     {{-- USER MENU --}}
-                    <div class="relative" x-data="{ open: false }" @click.outside="open = false"
-                        @mouseleave="open = false">
-                        <button @click="open = !open" @mouseenter="open = true"
+                    <div class="relative" x-data="{ 
+                        open: false, 
+                        timer: null,
+                        closeWithDelay() {
+                            this.timer = setTimeout(() => { this.open = false }, 400);
+                        },
+                        cancelClose() {
+                            clearTimeout(this.timer);
+                        }
+                    }" @click.outside="open = false" @mouseleave="closeWithDelay()" @mouseenter="cancelClose()">
+                        <button @click="open = !open"
                             class="flex items-center gap-1 pl-1 pr-1 lg:gap-2 lg:pl-2 py-1 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-700 transition-colors">
                             <div
                                 class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
@@ -187,7 +195,7 @@
 
         {{-- AI CREDITS (MOBILE) --}}
         <div class="absolute left-4 top-1/2 -translate-y-1/2">
-            <button type="button" @click="$dispatch('open-modal', 'ai-credits-info')"
+            <button id="tour-credits-mobile" type="button" @click="$dispatch('open-modal', 'ai-credits-info')"
                 class="relative flex items-center gap-1.5 px-2 py-1 bg-purple-50/80 dark:bg-purple-900/10 rounded-lg border border-purple-100 dark:border-purple-800/30 active:scale-95 transition-transform">
 
                 {{-- Floating Delta Mobile --}}
@@ -302,9 +310,10 @@
             },
 
             hideNavbar() {
+                clearTimeout(this.hoverTimer);
                 this.hoverTimer = setTimeout(() => {
                     this.forceShow = false;
-                }, 200);
+                }, 800);
             },
 
             aiCredits: {
@@ -336,6 +345,15 @@
                 window.addEventListener('scroll', () => {
                     this.scrolled = window.scrollY > 20;
                 }, { passive: true });
+
+                // Força a navbar visível durante o tour
+                window.addEventListener('tour-starting', () => {
+                    this.forceShow = true;
+                    this.scrolled = false; // Reset scroll state
+                });
+                window.addEventListener('tour-finished', () => {
+                    this.forceShow = false;
+                });
 
                 // Set initial dark state properly
                 if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
