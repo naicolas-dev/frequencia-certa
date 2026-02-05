@@ -77,6 +77,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return response()->json(['success' => true]);
     })->name('tour.finish');
 
+    Route::post('/tour/reset', function (Request $request) {
+        $request->user()->update(['has_completed_tour' => false]);
+        return redirect()->route('dashboard')->with('status', 'tour-reset');
+    })->name('tour.reset');
+
     // -------------------------
     // 📚 DISCIPLINAS
     // -------------------------
