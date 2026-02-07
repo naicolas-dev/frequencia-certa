@@ -379,66 +379,117 @@
     });
 </script>
 {{-- MODAL DE INFORMAÇÕES DOS CRÉDITOS (GLOBAL) --}}
-<x-modal name="ai-credits-info" focusable>
-    <div class="p-6 bg-white dark:bg-gray-800">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                ✨
-            </div>
-            <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">
-                {{ __('Sobre os Créditos IA') }}
-            </h2>
-        </div>
+{{-- MODAL DE INFORMAÇÕES DOS CRÉDITOS (CUSTOM STYLED) --}}
+<div x-data="{ show: false }" x-show="show" style="display: none"
+    @open-modal.window="$event.detail == 'ai-credits-info' ? show = true : null"
+    @close-modal.window="$event.detail == 'ai-credits-info' ? show = false : null" @keydown.escape.window="show = false"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+    x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
 
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
-            {{ __('Os créditos são utilizados para realizar ações inteligentes no sistema. Eles são renovados mensalmente. Veja abaixo quanto custa cada ação:') }}
-        </p>
+    {{-- Overlay --}}
+    <div class="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm" @click="show = false"></div>
 
-        <div class="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
-            <table class="w-full text-sm text-left">
-                <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300">
-                    <tr>
-                        <th class="px-4 py-3 font-medium">{{ __('Ação') }}</th>
-                        <th class="px-4 py-3 font-medium text-right">{{ __('Custo') }}</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <tr class="bg-white dark:bg-gray-800">
-                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Posso faltar hoje?</td>
-                        <td class="px-4 py-3 text-right font-bold text-purple-600 dark:text-purple-400">
-                            {{ \App\Helpers\AiCredits::COST_DAY_CHECK }} créditos
-                        </td>
-                    </tr>
-                    <tr class="bg-white dark:bg-gray-800">
-                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Análise de Disciplina</td>
-                        <td class="px-4 py-3 text-right font-bold text-purple-600 dark:text-purple-400">
-                            {{ \App\Helpers\AiCredits::COST_SUBJECT_ANALYSIS }} créditos
-                        </td>
-                    </tr>
-                    <tr class="bg-white dark:bg-gray-800">
-                        <td class="px-4 py-3 text-gray-600 dark:text-gray-400">Importação de Grade</td>
-                        <td class="px-4 py-3 text-right font-bold text-purple-600 dark:text-purple-400">
-                            {{ \App\Helpers\AiCredits::COST_IMPORT_SCHEDULE }} créditos
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+    {{-- Modal Content --}}
+    <div x-show="show" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+        x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        class="relative w-full max-w-lg rounded-3xl bg-white dark:bg-[#0B1220] shadow-2xl shadow-black/20 dark:shadow-black/60 border border-gray-100 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
 
+        {{-- Header --}}
         <div
-            class="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800/30">
-            <span class="text-sm font-medium text-purple-800 dark:text-purple-200">
-                {{ __('Limite Mensal') }}
-            </span>
-            <span class="text-lg font-black text-purple-700 dark:text-purple-300">
-                {{ \App\Helpers\AiCredits::MONTHLY_MAX }}
-            </span>
+            class="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl z-10">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+                    ✨
+                </div>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+                    {{ __('Sobre os Créditos IA') }}
+                </h3>
+            </div>
+            <button @click="show = false"
+                class="p-2 -mr-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
         </div>
 
-        <div class="mt-6 flex justify-end">
-            <x-secondary-button x-on:click="$dispatch('close')">
+        {{-- Body --}}
+        <div class="p-6 overflow-y-auto">
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                {{ __('Os créditos são utilizados para realizar ações inteligentes no sistema. Eles são renovados mensalmente. Veja abaixo quanto custa cada ação:') }}
+            </p>
+
+            <div class="relative overflow-hidden rounded-2xl border border-gray-100 dark:border-white/10 mb-6">
+                <table class="w-full text-sm text-left">
+                    <thead
+                        class="bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-800">
+                        <tr>
+                            <th class="px-4 py-3.5 font-bold uppercase text-xs tracking-wider">{{ __('Ação') }}</th>
+                            <th class="px-4 py-3.5 font-bold uppercase text-xs tracking-wider text-right">
+                                {{ __('Custo') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                        <tr class="bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                            <td class="px-4 py-4 text-gray-700 dark:text-gray-300 font-medium">Posso faltar hoje?</td>
+                            <td class="px-4 py-4 text-right font-bold text-purple-600 dark:text-purple-400">
+                                {{ \App\Helpers\AiCredits::COST_DAY_CHECK }} créditos
+                            </td>
+                        </tr>
+                        <tr class="bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                            <td class="px-4 py-4 text-gray-700 dark:text-gray-300 font-medium">Análise de Disciplina
+                            </td>
+                            <td class="px-4 py-4 text-right font-bold text-purple-600 dark:text-purple-400">
+                                {{ \App\Helpers\AiCredits::COST_SUBJECT_ANALYSIS }} créditos
+                            </td>
+                        </tr>
+                        <tr class="bg-white dark:bg-[#0F172A] hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                            <td class="px-4 py-4 text-gray-700 dark:text-gray-300 font-medium">Importação de Grade</td>
+                            <td class="px-4 py-4 text-right font-bold text-purple-600 dark:text-purple-400">
+                                {{ \App\Helpers\AiCredits::COST_IMPORT_SCHEDULE }} créditos
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div
+                class="flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/10 rounded-2xl border border-purple-100 dark:border-purple-500/20">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white dark:bg-purple-900/30 rounded-xl shadow-sm">
+                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <span
+                            class="block text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-0.5">
+                            {{ __('Limite Mensal') }}
+                        </span>
+                        <span class="text-xs text-purple-600/70 dark:text-purple-400/70">Renova todo dia 1º</span>
+                    </div>
+                </div>
+                <span class="text-2xl font-black text-purple-700 dark:text-purple-300">
+                    {{ \App\Helpers\AiCredits::MONTHLY_MAX }}
+                </span>
+            </div>
+        </div>
+
+        {{-- Footer --}}
+        <div class="p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-black/20">
+            <button @click="show = false"
+                class="w-full bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 font-bold py-4 rounded-xl shadow-lg transition transform active:scale-[0.98]">
                 {{ __('Entendi') }}
-            </x-secondary-button>
+            </button>
         </div>
     </div>
-</x-modal>
+</div>
