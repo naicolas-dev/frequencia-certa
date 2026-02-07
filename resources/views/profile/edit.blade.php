@@ -75,7 +75,7 @@
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Nome
                                 Completo</label>
                             <input type="text" name="name" value="{{ old('name', $user->name) }}" required
-                                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/20 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
+                                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
                             <x-input-error class="mt-2" :messages="$errors->get('name')" />
                         </div>
 
@@ -84,7 +84,7 @@
                             <label
                                 class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">Email</label>
                             <input type="email" name="email" value="{{ old('email', $user->email) }}" required
-                                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/20 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
+                                class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
                             <x-input-error class="mt-2" :messages="$errors->get('email')" />
                         </div>
 
@@ -95,7 +95,7 @@
                                 (UF)</label>
                             <div class="relative">
                                 <select name="estado"
-                                    class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/20 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all appearance-none">
+                                    class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all appearance-none">
                                     @foreach($estados as $sigla => $nome)
                                         <option value="{{ $sigla }}" {{ old('estado', $user->estado) === $sigla ? 'selected' : '' }}>
                                             {{ $nome }} - {{ $sigla }}
@@ -122,7 +122,7 @@
                                 <input type="date" name="ano_letivo_inicio"
                                     value="{{ old('ano_letivo_inicio', optional($user->ano_letivo_inicio)->format('Y-m-d')) }}"
                                     required
-                                    class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/20 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
+                                    class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
                                 <x-input-error class="mt-2" :messages="$errors->get('ano_letivo_inicio')" />
                             </div>
 
@@ -133,7 +133,7 @@
                                 <input type="date" name="ano_letivo_fim"
                                     value="{{ old('ano_letivo_fim', optional($user->ano_letivo_fim)->format('Y-m-d')) }}"
                                     required
-                                    class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/20 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
+                                    class="w-full rounded-2xl border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900 dark:text-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 py-4 px-5 transition-all">
                                 <x-input-error class="mt-2" :messages="$errors->get('ano_letivo_fim')" />
                             </div>
                         </div>

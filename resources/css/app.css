@@ -6,6 +6,10 @@
     display: none !important;
 }
 
+.dark {
+    color-scheme: dark;
+}
+
 /* === ESTILOS GERAIS DA LANDING PAGE === */
 .landing-page {
     font-family: 'Instrument Sans', sans-serif;
@@ -281,7 +285,7 @@
 }
 
 .dark ::-webkit-calendar-picker-indicator {
-    filter: invert(1);
+    /* filter: invert(1); REMOVIDO: O color-scheme: dark já deixa o ícone branco */
     opacity: 0.6;
     transition: opacity 0.2s;
     cursor: pointer;
