@@ -76,7 +76,7 @@
                                                pl-4 pr-10 py-4 font-semibold text-gray-800 dark:text-white
                                                focus:ring-2 focus:ring-blue-500 transition-shadow appearance-none cursor-pointer">
                                     <option value="sem_aula" @selected($evento->tipo === 'sem_aula')>Sem Aula (Folga)</option>
-                                    <option value="feriado" @selected($evento->tipo === 'feriado')>Feriado Nacional</option>
+                                    <option value="feriado" @selected($evento->tipo === 'feriado')>Feriado Municipal</option>
                                 </select>
                                 <div class="absolute right-4 top-4 pointer-events-none text-gray-500">
                                 </div>
